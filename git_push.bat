@@ -1,18 +1,17 @@
 @echo off
-chcp 65001 >nul
 cd /d "%~dp0"
 
-echo.
+echo(
 echo ========================================
-echo   FarmaFacil Assistente — Git Push
+echo   FarmaFacil Assistente - Git Push
 echo ========================================
-echo.
+echo(
 
 git add -A
 
 echo Arquivos staged:
 git status --short
-echo.
+echo(
 
 set /p MSG="Mensagem do commit (Enter para usar data/hora): "
 if "%MSG%"=="" (
@@ -24,6 +23,6 @@ if "%MSG%"=="" (
 git commit -m "%MSG%"
 git push origin main
 
-echo.
+echo(
 echo Push concluido!
 pause
