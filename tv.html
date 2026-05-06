@@ -220,9 +220,6 @@
     }
     .di-num-big{font-family:monospace;font-weight:700;font-size:34px;line-height:1}
     .di-num-meta{font-size:13px;color:#4b5a72;font-family:monospace;font-weight:600}
-    .di-ritmo-col{width:76px;text-align:right;flex-shrink:0;padding-left:10px}
-    .di-ritmo-val{font-family:monospace;font-size:16px;font-weight:700;line-height:1}
-    .di-ritmo-lbl{font-size:9px;color:#6b7a94;text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
   </style>
 </head>
 <body>
@@ -293,12 +290,20 @@ var dataDiario= null;
 var curTab    = 'metas';
 var paused    = false;
 var rotTmr    = null;
-var ROT       = 12;
+var ROT       = 30;
 var TABS      = ['metas', 'diario', 'desempenho'];
 
 var TC = {
   Fiscal:   { a:'#F59E0B', bg:'rgba(245,158,11,.10)',  bd:'rgba(245,158,11,.28)' },
   Producao: { a:'#10B981', bg:'rgba(16,185,129,.10)',  bd:'rgba(16,185,129,.28)' },
+  G1:       { a:'#8B5CF6', bg:'rgba(139,92,246,.10)',  bd:'rgba(139,92,246,.28)' },
+  GW:       { a:'#EC4899', bg:'rgba(236,72,153,.10)',  bd:'rgba(236,72,153,.28)' }
+};
+
+/* Cores exclusivas da aba Ritmo Diário */
+var TC_DI = {
+  Fiscal:   { a:'#FBBF24', bg:'rgba(251,191,36,.10)',  bd:'rgba(251,191,36,.28)' },
+  Producao: { a:'#3B82F6', bg:'rgba(59,130,246,.10)',  bd:'rgba(59,130,246,.28)' },
   G1:       { a:'#8B5CF6', bg:'rgba(139,92,246,.10)',  bd:'rgba(139,92,246,.28)' },
   GW:       { a:'#EC4899', bg:'rgba(236,72,153,.10)',  bd:'rgba(236,72,153,.28)' }
 };
@@ -449,16 +454,6 @@ function renderDiario(){
   sEl.textContent = (saldoDia >= 0 ? '+' : '') + saldoDia;
   sEl.style.color = saldoDia > 0 ? '#10b981' : saldoDia < 0 ? '#ef4444' : '#e2e8f6';
 
-  /* ritmo semanal: fechados_semana / dias decorridos */
-  var semMap = {};
-  if(data && data.analistas){
-    for(var i=0; i<data.analistas.length; i++){
-      semMap[data.analistas[i].display] = data.analistas[i];
-    }
-  }
-  var wd = new Date().getDay(); /* 0=dom, 1=seg ... 5=sex, 6=sab */
-  var daysEl = (wd === 0 || wd === 6) ? 5 : wd;
-
   /* escala global das barras: meta máxima * 2 ou fechado máximo + margem */
   var maxMeta = 0, maxFech = 0;
   for(var i=0; i<al.length; i++){
@@ -472,16 +467,9 @@ function renderDiario(){
 
   for(var i=0; i<al.length; i++){
     var a    = al[i];
-    var c    = TC[a.equipe] || TC.G1;
+    var c    = TC_DI[a.equipe] || TC_DI.G1;
     var meta = a.meta_dia      || 0;
     var fech = a.fechados_hoje || 0;
-
-    /* ritmo da semana */
-    var semA    = semMap[a.display];
-    var fechSem = semA ? (semA.fechados || 0) : 0;
-    var ritmo   = daysEl > 0 ? rnd1(fechSem / daysEl) : fechSem;
-    var ritmoOk = meta > 0 && parseFloat(ritmo) >= meta;
-    var ritmoColor = meta > 0 ? (ritmoOk ? '#10b981' : '#f59e0b') : '#6b7a94';
 
     /* barra */
     var fillPct    = barMax > 0 ? Math.min(fech / barMax * 100, 100) : 0;
@@ -508,7 +496,6 @@ function renderDiario(){
       '<div class="di-rk">#'+(i+1)+'</div>'+
       '<div class="di-name-col">'+
         '<div class="di-name">'+a.display+'</div>'+
-        '<span class="di-tag" style="background:'+c.bg+';color:'+c.a+';border:1px solid '+c.bd+'">'+a.equipe+'</span>'+
       '</div>'+
       '<div class="di-bar-col">'+
         '<div class="di-track">'+
@@ -521,10 +508,6 @@ function renderDiario(){
       '<div class="di-num-col">'+
         '<span class="di-num-big" style="color:'+numColor+'">'+fech+'</span>'+
         '<span class="di-num-meta">'+metaFmt+'</span>'+
-      '</div>'+
-      '<div class="di-ritmo-col">'+
-        '<div class="di-ritmo-val" style="color:'+ritmoColor+'">'+ritmo+'</div>'+
-        '<div class="di-ritmo-lbl">ritmo/dia</div>'+
       '</div>';
 
     list.appendChild(row);
