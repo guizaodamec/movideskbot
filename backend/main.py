@@ -2706,6 +2706,9 @@ _painel_cache = {"data": None, "ts": 0.0}
 _painel_lock  = threading.Lock()
 _PAINEL_TTL   = 120  # 2 minutos
 
+_diario_cache = {"data": None, "ts": 0.0}
+_diario_lock  = threading.Lock()
+
 
 def _painel_match(owner_name, lookup):
     """Match case-insensitive do nome do analista no Movidesk. Exact first, partial fallback."""
@@ -2836,6 +2839,84 @@ def painel_semanal():
         return _jsonify({"error": str(e)}, 500)
 
 
+@app.route('/api/painel/diario')
+def painel_diario():
+    sess, err = _require_auth(request)
+    if err:
+        return err
+    role = sess.get('role', '')
+    if role not in ('lideres', 'administrador') and not sess.get('is_admin'):
+        return _jsonify({'error': 'Acesso negado'}, 403)
+
+    import time as _t
+    now = _t.time()
+    with _diario_lock:
+        if _diario_cache["data"] and now - _diario_cache["ts"] < _PAINEL_TTL:
+            return _jsonify(_diario_cache["data"])
+
+    try:
+        from utils.movidesk_client import fetch_resolved_page
+
+        today_str = datetime.datetime.now().strftime("%Y-%m-%d")
+
+        lookup = {}
+        for a in _PAINEL_ANALISTAS:
+            lookup[a["nome"].lower()] = {
+                "nome":          a["nome"],
+                "display":       a["display"],
+                "equipe":        a["equipe"],
+                "fechados_hoje": 0,
+                "meta_dia":      0.0,
+            }
+
+        skip, top = 0, 100
+        while True:
+            page = fetch_resolved_page(skip=skip, top=top,
+                                       since_date=today_str, until_date=today_str)
+            if not page:
+                break
+            for t in page:
+                owner = ((t.get("owner") or {}).get("businessName") or "").strip()
+                key = _painel_match(owner, lookup)
+                if key:
+                    lookup[key]["fechados_hoje"] += 1
+            if len(page) < top:
+                break
+            skip += top
+
+        try:
+            from utils.movidesk_sync import get_metas_por_equipe
+            metas_list = get_metas_por_equipe()
+            meta_eq = {m["grupo"]: m.get("meta_por_analista_dia", 0) for m in metas_list}
+        except Exception:
+            meta_eq = {}
+
+        for a in lookup.values():
+            a["meta_dia"] = meta_eq.get(a["equipe"], 0.0)
+
+        analistas = sorted(lookup.values(),
+                           key=lambda x: x["fechados_hoje"], reverse=True)
+
+        result = {
+            "data":      today_str,
+            "analistas": analistas,
+            "totais": {
+                "fechados_hoje": sum(a["fechados_hoje"] for a in analistas),
+                "meta_total":    round(sum(a["meta_dia"] for a in analistas), 1),
+            },
+            "updated_at": datetime.datetime.now().strftime("%H:%M"),
+        }
+
+        with _diario_lock:
+            _diario_cache["data"] = result
+            _diario_cache["ts"]   = now
+
+        return _jsonify(result)
+
+    except Exception as e:
+        return _jsonify({"error": str(e)}, 500)
+
+
 @app.route('/api/painel/reset-cache', methods=['POST'])
 def painel_reset_cache():
     sess, err = _require_auth(request)
@@ -2846,6 +2927,8 @@ def painel_reset_cache():
         return _jsonify({'error': 'Acesso negado'}, 403)
     with _painel_lock:
         _painel_cache["ts"] = 0.0
+    with _diario_lock:
+        _diario_cache["ts"] = 0.0
     return _jsonify({"ok": True})
 
 

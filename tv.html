@@ -65,8 +65,6 @@
     /* ═══════════════════════════════════════
        METAS INDIVIDUAIS
     ═══════════════════════════════════════ */
-
-    /* Totals strip */
     .totals{display:flex;gap:10px;flex-shrink:0}
     .tot-card{
       flex:1;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
@@ -75,7 +73,6 @@
     .tot-lbl{color:#6b7a94;font-size:13px;font-weight:600}
     .tot-val{font-family:monospace;font-size:34px;font-weight:700;line-height:1}
 
-    /* Countdown */
     #cd{
       display:flex;flex-shrink:0;align-items:center;gap:10px;
       padding:6px 16px;border-radius:10px;
@@ -86,7 +83,6 @@
     #cd-val{font-family:monospace;font-weight:700;font-size:13px;color:#6b7a94;transition:color .5s}
     #cd-warn{font-size:11px;font-weight:700;color:#f59e0b;display:none;margin-left:4px}
 
-    /* ── Ranking rows ── */
     #ranking{flex:1;display:flex;flex-direction:column;gap:8px;overflow:hidden;min-height:0}
 
     .a-row{
@@ -102,7 +98,6 @@
     .a-row-body{display:flex;align-items:center;gap:28px}
     .rk-circle,.rk-plain{margin-right:16px}
 
-    /* rank badge */
     .rk-circle{
       width:52px;height:52px;border-radius:50%;flex-shrink:0;
       display:flex;align-items:center;justify-content:center;
@@ -113,7 +108,6 @@
       font-family:monospace;font-size:20px;color:#4b5a72;font-weight:700;
     }
 
-    /* name + tag */
     .a-name-col{flex:1;min-width:0}
     .aname{
       font-size:32px;font-weight:700;color:white;line-height:1.1;
@@ -124,22 +118,11 @@
       font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;letter-spacing:.04em;
     }
 
-    /* stats — 3 columns with vertical separators */
     .a-stats{display:flex;align-items:stretch;flex-shrink:0;border-left:1px solid rgba(255,255,255,0.07)}
-    .st{
-      text-align:center;padding:0 28px;
-      border-right:1px solid rgba(255,255,255,0.07);
-    }
-    .st .sl{
-      font-size:11px;color:#6b7a94;font-weight:700;
-      text-transform:uppercase;letter-spacing:.1em;line-height:1;
-    }
-    .st .sv{
-      font-family:monospace;font-weight:700;font-size:46px;
-      line-height:1.15;margin-top:4px;color:white;
-    }
+    .st{text-align:center;padding:0 28px;border-right:1px solid rgba(255,255,255,0.07)}
+    .st .sl{font-size:11px;color:#6b7a94;font-weight:700;text-transform:uppercase;letter-spacing:.1em;line-height:1}
+    .st .sv{font-family:monospace;font-weight:700;font-size:46px;line-height:1.15;margin-top:4px;color:white}
 
-    /* discrete progress bar */
     .bar-wrap{height:2px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden;opacity:.5}
     .bar-inner{height:100%;border-radius:3px;position:relative;overflow:hidden}
     .bar-shim{
@@ -152,21 +135,14 @@
     /* ═══════════════════════════════════════
        DESEMPENHO POR EQUIPE
     ═══════════════════════════════════════ */
-    #eq-grid{
-      display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;
-      gap:14px;height:100%;
-    }
+    #eq-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:14px;height:100%}
     .eq-card{
-      border-radius:16px;
-      background:rgba(255,255,255,0.025);
-      border:1px solid rgba(255,255,255,0.06);
-      border-left-width:4px;
-      padding:20px 28px 16px;
-      display:flex;flex-direction:column;gap:0;overflow:hidden;position:relative;
+      border-radius:16px;background:rgba(255,255,255,0.025);
+      border:1px solid rgba(255,255,255,0.06);border-left-width:4px;
+      padding:20px 28px 16px;display:flex;flex-direction:column;gap:0;overflow:hidden;position:relative;
     }
     .eq-card.is-leader{background:rgba(255,255,255,0.04)}
     .eq-top-line{position:absolute;top:0;left:0;right:0;height:1px;opacity:.5}
-
     .eq-hdr{display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0;margin-bottom:12px}
     .eq-name{font-size:28px;font-weight:700;line-height:1;letter-spacing:-.02em}
     .eq-sub{font-size:11px;color:#6b7a94;margin-top:4px;font-weight:600}
@@ -174,20 +150,15 @@
     .b-sup{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:#10b981}
     .b-def{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#ef4444}
     .b-neu{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:#f59e0b}
-
     .eq-metrics{
       display:flex;flex:1;align-items:center;
       border-top:1px solid rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.05);
       margin:0 -6px;
     }
-    .eq-metric{
-      flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-      padding:14px 8px;border-right:1px solid rgba(255,255,255,0.05);
-    }
+    .eq-metric{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 8px;border-right:1px solid rgba(255,255,255,0.05)}
     .eq-metric:last-child{border-right:none}
     .eq-metric .mv{font-family:monospace;font-weight:700;font-size:66px;line-height:1;letter-spacing:-.02em}
     .eq-metric .ml{font-size:11px;color:#6b7a94;text-transform:uppercase;letter-spacing:.12em;margin-top:8px;font-weight:700}
-
     .eq-foot{display:flex;align-items:center;gap:10px;margin-top:12px;flex-shrink:0}
     .eq-bar-track{flex:1;height:2px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden;opacity:.5}
     .eq-bar-inner{height:100%;border-radius:3px;position:relative;overflow:hidden}
@@ -198,6 +169,60 @@
     }
     .eq-taxa-lbl{font-size:10px;color:#6b7a94;font-weight:700;text-transform:uppercase;letter-spacing:.08em;flex-shrink:0}
     .eq-taxa-val{font-family:monospace;font-size:13px;font-weight:700;flex-shrink:0}
+
+    /* ═══════════════════════════════════════
+       RITMO DIARIO
+    ═══════════════════════════════════════ */
+    #diario-list{
+      flex:1;display:flex;flex-direction:column;gap:5px;overflow:hidden;min-height:0;
+    }
+    .di-row{
+      display:flex;align-items:center;
+      padding:0 18px;border-radius:12px;
+      background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.05);
+      flex:1;min-height:0;
+    }
+    .di-rk{
+      width:38px;text-align:center;font-family:monospace;
+      font-size:15px;color:#4b5a72;font-weight:700;flex-shrink:0;
+    }
+    .di-name-col{width:148px;flex-shrink:0;padding-right:14px}
+    .di-name{
+      font-size:21px;font-weight:700;color:white;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15;
+    }
+    .di-tag{
+      display:inline-block;margin-top:3px;
+      font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px;letter-spacing:.04em;
+    }
+    .di-bar-col{flex:1;position:relative;margin:0 14px}
+    .di-track{
+      height:20px;background:rgba(255,255,255,0.04);
+      border-radius:6px;overflow:hidden;position:relative;
+    }
+    .di-fill{
+      height:100%;border-radius:6px;
+      position:relative;overflow:hidden;
+      transition:width .7s ease;
+    }
+    .di-fill-shim{
+      position:absolute;top:0;bottom:0;left:-60%;width:60%;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);
+      animation:shim-move 2.8s infinite linear;
+    }
+    .di-marker{
+      position:absolute;top:0;bottom:0;width:2px;
+      background:rgba(255,255,255,0.28);pointer-events:none;z-index:2;
+    }
+    .di-num-col{
+      width:100px;text-align:right;flex-shrink:0;
+      display:flex;align-items:baseline;justify-content:flex-end;gap:3px;
+    }
+    .di-num-big{font-family:monospace;font-weight:700;font-size:34px;line-height:1}
+    .di-num-meta{font-size:13px;color:#4b5a72;font-family:monospace;font-weight:600}
+    .di-ritmo-col{width:76px;text-align:right;flex-shrink:0;padding-left:10px}
+    .di-ritmo-val{font-family:monospace;font-size:16px;font-weight:700;line-height:1}
+    .di-ritmo-lbl{font-size:9px;color:#6b7a94;text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
   </style>
 </head>
 <body>
@@ -217,11 +242,12 @@
 
 <div id="tb">
   <button class="tab-btn on" id="btn-metas"      onclick="goTab('metas')">Metas Individuais</button>
+  <button class="tab-btn"    id="btn-diario"     onclick="goTab('diario')">Ritmo Diário</button>
   <button class="tab-btn"    id="btn-desempenho" onclick="goTab('desempenho')">Desempenho por Equipe</button>
   <div id="prog-track"><div id="prog-fill"></div></div>
   <span id="timer-lbl">30s</span>
   <button class="ctrl-btn" id="pause-btn" onclick="togglePause()">Pausar</button>
-  <button class="ctrl-btn" style="margin-left:4px" onclick="loadData()">Atualizar</button>
+  <button class="ctrl-btn" style="margin-left:4px" onclick="loadAll()">Atualizar</button>
 </div>
 
 <div id="content">
@@ -241,6 +267,16 @@
     <div id="ranking"></div>
   </div>
 
+  <!-- RITMO DIARIO -->
+  <div class="panel" id="panel-diario">
+    <div class="totals">
+      <div class="tot-card"><span class="tot-lbl">Fechados Hoje</span><span class="tot-val" id="di-total" style="color:#e2e8f6">—</span></div>
+      <div class="tot-card"><span class="tot-lbl">Meta do Dia</span>  <span class="tot-val" id="di-meta"  style="color:#6b7a94">—</span></div>
+      <div class="tot-card"><span class="tot-lbl">Saldo Dia</span>    <span class="tot-val" id="di-saldo" style="color:#e2e8f6">—</span></div>
+    </div>
+    <div id="diario-list"></div>
+  </div>
+
   <!-- DESEMPENHO -->
   <div class="panel" id="panel-desempenho">
     <div id="eq-grid"></div>
@@ -249,20 +285,22 @@
 </div>
 
 <script>
-var TV_KEY = 'tv-suporte-2026';
-var API    = '/api';
-var token  = null;
-var data   = null;
-var curTab = 'metas';
-var paused = false;
-var rotTmr = null;
-var ROT    = 12;
+var TV_KEY    = 'tv-suporte-2026';
+var API       = '/api';
+var token     = null;
+var data      = null;
+var dataDiario= null;
+var curTab    = 'metas';
+var paused    = false;
+var rotTmr    = null;
+var ROT       = 12;
+var TABS      = ['metas', 'diario', 'desempenho'];
 
 var TC = {
-  Fiscal:   { a:'#F59E0B', bg:'rgba(245,158,11,.10)', bd:'rgba(245,158,11,.28)' },
-  Producao: { a:'#10B981', bg:'rgba(16,185,129,.10)', bd:'rgba(16,185,129,.28)' },
-  G1:       { a:'#8B5CF6', bg:'rgba(139,92,246,.10)', bd:'rgba(139,92,246,.28)' },
-  GW:       { a:'#EC4899', bg:'rgba(236,72,153,.10)', bd:'rgba(236,72,153,.28)' }
+  Fiscal:   { a:'#F59E0B', bg:'rgba(245,158,11,.10)',  bd:'rgba(245,158,11,.28)' },
+  Producao: { a:'#10B981', bg:'rgba(16,185,129,.10)',  bd:'rgba(16,185,129,.28)' },
+  G1:       { a:'#8B5CF6', bg:'rgba(139,92,246,.10)',  bd:'rgba(139,92,246,.28)' },
+  GW:       { a:'#EC4899', bg:'rgba(236,72,153,.10)',  bd:'rgba(236,72,153,.28)' }
 };
 
 var MFG = ['#F59E0B', '#94a3b8', '#CD7F32'];
@@ -272,6 +310,7 @@ var MBD = ['rgba(245,158,11,.60)', 'rgba(148,163,184,.40)', 'rgba(205,127,50,.50
 function sc(v){ return v>0?'#10b981':v<0?'#ef4444':'#e2e8f6'; }
 function sg(v){ return v>0?'+':''; }
 function p2(n){ return String(n).padStart(2,'0'); }
+function rnd1(v){ return Math.round(v*10)/10; }
 
 function get(path, cb){
   var xhr = new XMLHttpRequest();
@@ -295,16 +334,28 @@ function loadData(){
   get('/painel/semanal', function(err,res){
     if(err||(res&&res.error)){ token=null; loadData(); return; }
     data = res;
-    render();
+    if(curTab==='metas' || curTab==='desempenho') render();
     document.getElementById('hd-info').textContent =
       'Semana '+res.semana_inicio+' a '+res.semana_fim+(res.updated_at?' · '+res.updated_at:'');
   });
 }
 
+function loadDiario(){
+  if(!token) return;
+  get('/painel/diario', function(err,res){
+    if(err||(res&&res.error)) return;
+    dataDiario = res;
+    if(curTab==='diario') renderDiario();
+  });
+}
+
+function loadAll(){
+  loadData();
+  loadDiario();
+}
+
 function render(){
   if(!data) return;
-
-  /* totais */
   var t = data.totais||{};
   animCount('v-entr', t.entrados||0);
   animCount('v-fech', t.fechados||0);
@@ -312,7 +363,6 @@ function render(){
   se.textContent = sg(t.saldo||0)+(t.saldo||0);
   se.style.color = sc(t.saldo||0);
 
-  /* TOP 5 ranking — sem avatar, sem banner de líder */
   var al  = data.analistas||[];
   var rk  = document.getElementById('ranking');
   rk.innerHTML = '';
@@ -322,11 +372,9 @@ function render(){
     var c  = TC[a.equipe]||TC.G1;
     var bc = sc(a.saldo);
     var bp = a.entrados>0 ? Math.min(a.fechados/a.entrados*100,100) : (a.fechados>0?100:0);
-
     var rkNode = i<3
       ? '<div class="rk-circle" style="background:'+MBG[i]+';border:2px solid '+MBD[i]+';color:'+MFG[i]+'">'+(i+1)+'</div>'
       : '<div class="rk-plain">#'+(i+1)+'</div>';
-
     var row = document.createElement('div');
     row.className = 'a-row'+(i===0?' is-leader':'');
     row.innerHTML =
@@ -344,11 +392,9 @@ function render(){
         '</div>'+
       '</div>'+
       '<div class="bar-wrap"><div class="bar-inner" style="width:'+bp+'%;background-color:'+bc+'"><div class="bar-shim"></div></div></div>';
-
     rk.appendChild(row);
   }
 
-  /* equipes */
   var eq   = data.equipes||[];
   var grid = document.getElementById('eq-grid');
   grid.innerHTML = '';
@@ -362,12 +408,10 @@ function render(){
     var isLdr = (e.saldo===topS && e.saldo>0);
     var bCls  = e.saldo>0?'b-sup':e.saldo<0?'b-def':'b-neu';
     var bTxt  = e.saldo>0?'Superavit':e.saldo<0?'Deficit':'Neutro';
-
     var card = document.createElement('div');
     card.className = 'eq-card'+(isLdr?' is-leader':'');
     card.style.borderLeftColor = c.a;
     if(isLdr) card.style.boxShadow = '0 0 32px '+c.a+'1a, inset 0 0 40px '+c.a+'08';
-
     card.innerHTML =
       (isLdr?'<div class="eq-top-line" style="background:linear-gradient(90deg,'+c.a+',transparent)"></div>':'')+
       '<div class="eq-hdr">'+
@@ -385,8 +429,105 @@ function render(){
         '<span class="eq-taxa-lbl">Taxa</span>'+
         '<span class="eq-taxa-val" style="color:'+c.a+'">'+e.taxa_resolucao+'%</span>'+
       '</div>';
-
     grid.appendChild(card);
+  }
+}
+
+function renderDiario(){
+  if(!dataDiario) return;
+
+  var al  = dataDiario.analistas || [];
+  var tot = dataDiario.totais    || {};
+
+  /* strip de totais */
+  var totalHoje = tot.fechados_hoje || 0;
+  var metaTotal = tot.meta_total    || 0;
+  var saldoDia  = totalHoje - Math.round(metaTotal);
+  document.getElementById('di-total').textContent = totalHoje;
+  document.getElementById('di-meta').textContent  = rnd1(metaTotal);
+  var sEl = document.getElementById('di-saldo');
+  sEl.textContent = (saldoDia >= 0 ? '+' : '') + saldoDia;
+  sEl.style.color = saldoDia > 0 ? '#10b981' : saldoDia < 0 ? '#ef4444' : '#e2e8f6';
+
+  /* ritmo semanal: fechados_semana / dias decorridos */
+  var semMap = {};
+  if(data && data.analistas){
+    for(var i=0; i<data.analistas.length; i++){
+      semMap[data.analistas[i].display] = data.analistas[i];
+    }
+  }
+  var wd = new Date().getDay(); /* 0=dom, 1=seg ... 5=sex, 6=sab */
+  var daysEl = (wd === 0 || wd === 6) ? 5 : wd;
+
+  /* escala global das barras: meta máxima * 2 ou fechado máximo + margem */
+  var maxMeta = 0, maxFech = 0;
+  for(var i=0; i<al.length; i++){
+    if(al[i].meta_dia    > maxMeta) maxMeta = al[i].meta_dia;
+    if(al[i].fechados_hoje > maxFech) maxFech = al[i].fechados_hoje;
+  }
+  var barMax = Math.max(maxMeta > 0 ? maxMeta * 2 : 10, maxFech * 1.1 + 1);
+
+  var list = document.getElementById('diario-list');
+  list.innerHTML = '';
+
+  for(var i=0; i<al.length; i++){
+    var a    = al[i];
+    var c    = TC[a.equipe] || TC.G1;
+    var meta = a.meta_dia      || 0;
+    var fech = a.fechados_hoje || 0;
+
+    /* ritmo da semana */
+    var semA    = semMap[a.display];
+    var fechSem = semA ? (semA.fechados || 0) : 0;
+    var ritmo   = daysEl > 0 ? rnd1(fechSem / daysEl) : fechSem;
+    var ritmoOk = meta > 0 && parseFloat(ritmo) >= meta;
+    var ritmoColor = meta > 0 ? (ritmoOk ? '#10b981' : '#f59e0b') : '#6b7a94';
+
+    /* barra */
+    var fillPct    = barMax > 0 ? Math.min(fech / barMax * 100, 100) : 0;
+    var markerPct  = (meta > 0 && barMax > 0) ? Math.min(meta / barMax * 100, 99) : 0;
+
+    var fillBg;
+    if(fech > meta && meta > 0){
+      var split = (meta / fech * 100).toFixed(1);
+      fillBg = 'linear-gradient(90deg,'+c.a+' 0%,'+c.a+' '+split+'%,#10b981 '+split+'%)';
+    } else {
+      fillBg = c.a;
+    }
+
+    var numColor = (fech >= meta && meta > 0) ? '#10b981' : '#e2e8f6';
+    var metaFmt  = meta > 0 ? '/'+rnd1(meta) : '';
+
+    var markerHtml = meta > 0
+      ? '<div class="di-marker" style="left:'+markerPct.toFixed(1)+'%"></div>'
+      : '';
+
+    var row = document.createElement('div');
+    row.className = 'di-row';
+    row.innerHTML =
+      '<div class="di-rk">#'+(i+1)+'</div>'+
+      '<div class="di-name-col">'+
+        '<div class="di-name">'+a.display+'</div>'+
+        '<span class="di-tag" style="background:'+c.bg+';color:'+c.a+';border:1px solid '+c.bd+'">'+a.equipe+'</span>'+
+      '</div>'+
+      '<div class="di-bar-col">'+
+        '<div class="di-track">'+
+          '<div class="di-fill" style="width:'+fillPct.toFixed(1)+'%;background:'+fillBg+'">'+
+            '<div class="di-fill-shim"></div>'+
+          '</div>'+
+          markerHtml+
+        '</div>'+
+      '</div>'+
+      '<div class="di-num-col">'+
+        '<span class="di-num-big" style="color:'+numColor+'">'+fech+'</span>'+
+        '<span class="di-num-meta">'+metaFmt+'</span>'+
+      '</div>'+
+      '<div class="di-ritmo-col">'+
+        '<div class="di-ritmo-val" style="color:'+ritmoColor+'">'+ritmo+'</div>'+
+        '<div class="di-ritmo-lbl">ritmo/dia</div>'+
+      '</div>';
+
+    list.appendChild(row);
   }
 }
 
@@ -422,11 +563,21 @@ function tick(){
 
 function goTab(tab){
   curTab = tab;
-  document.getElementById('panel-metas').className      = 'panel'+(tab==='metas'?' on':'');
-  document.getElementById('panel-desempenho').className = 'panel'+(tab==='desempenho'?' on':'');
-  document.getElementById('btn-metas').className        = 'tab-btn'+(tab==='metas'?' on':'');
-  document.getElementById('btn-desempenho').className   = 'tab-btn'+(tab==='desempenho'?' on':'');
+  document.getElementById('panel-metas').className      = 'panel'+(tab==='metas'      ?' on':'');
+  document.getElementById('panel-diario').className     = 'panel'+(tab==='diario'     ?' on':'');
+  document.getElementById('panel-desempenho').className = 'panel'+(tab==='desempenho' ?' on':'');
+  document.getElementById('btn-metas').className        = 'tab-btn'+(tab==='metas'      ?' on':'');
+  document.getElementById('btn-diario').className       = 'tab-btn'+(tab==='diario'     ?' on':'');
+  document.getElementById('btn-desempenho').className   = 'tab-btn'+(tab==='desempenho' ?' on':'');
+  if(tab==='diario'   ) renderDiario();
+  if(tab==='metas' || tab==='desempenho') render();
   startRot();
+}
+
+function nextTab(){
+  var idx  = TABS.indexOf(curTab);
+  var next = TABS[(idx+1) % TABS.length];
+  goTab(next);
 }
 
 function startRot(){
@@ -437,7 +588,7 @@ function startRot(){
     var el=(Date.now()-start)/1000, left=Math.max(0,ROT-el);
     document.getElementById('prog-fill').style.width = ((ROT-left)/ROT*100)+'%';
     document.getElementById('timer-lbl').textContent = Math.ceil(left)+'s';
-    if(el>=ROT && !switched){ switched=true; goTab(curTab==='metas'?'desempenho':'metas'); }
+    if(el>=ROT && !switched){ switched=true; nextTab(); }
   }, 250);
 }
 
@@ -451,9 +602,10 @@ function togglePause(){
 
 setInterval(tick, 1000);
 tick();
-setInterval(loadData, 2*60*1000);
+setInterval(loadAll, 12*1000);
 startRot();
 loadData();
+loadDiario();
 </script>
 </body>
 </html>
