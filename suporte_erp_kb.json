@@ -1,0 +1,3560 @@
+[
+  {
+    "titulo": "NFC-e — Configuração inicial",
+    "resumo": "Passos para configurar a emissão de NFC-e no FarmaFácil",
+    "problema": "Cliente precisa configurar emissão de NFC-e pela primeira vez ou após reinstalação",
+    "causa": "Configurações de empresa, certificado digital e série não preenchidas",
+    "solucao": "Preencher Configurações > Empresa > Dados Fiscais e Configurações > NFC-e com CNPJ, IE, certificado, ambiente e série",
+    "passos": [
+      "1. Configurações > Empresa > Dados Fiscais — CNPJ, IE, Regime Tributário",
+      "2. Configurações > NFC-e — Ambiente (1=Produção, 2=Homologação)",
+      "3. Configurações > NFC-e — Certificado digital (A1: .pfx + senha | A3: número de série)",
+      "4. Configurações > NFC-e — Série (ex: 001) e próximo número",
+      "5. Testar emissão"
+    ],
+    "tags": [
+      "nfce",
+      "configuracao",
+      "certificado",
+      "cnpj",
+      "serie",
+      "ambiente",
+      "fiscal"
+    ],
+    "bloco": 2000
+  },
+  {
+    "titulo": "NFC-e — Erro TLS/SSL no Windows 7 (OpenSSL 3.4.1 incompatível)",
+    "resumo": "OpenSSL 3.4.1 da DLL nova não funciona no Windows 7 / Server 2008",
+    "problema": "Erro TLS/SSL ao emitir NFC-e após atualização em Windows 7 / Server 2008",
+    "causa": "OpenSSL 3.4.1 não inicializa no Windows 7",
+    "solucao": "Substituir DLL nova pela versão antiga (old) para suportar Windows 7. Solução definitiva: instalar KB3140245 e ajustar registro.",
+    "passos": [
+      "1. Fechar FarmaFacil",
+      "2. Renomear Prisma5NFCe.dll → Prisma5NFCe_novo.dll",
+      "3. Renomear Prisma5NFCe(old).dll → Prisma5NFCe.dll",
+      "4. Testar",
+      "--- Solução definitiva ---",
+      "1. Instalar KB3140245 (Windows Update)",
+      "2. Regedit: HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\WinHttp",
+      "3. DWORD DefaultSecureProtocols = 0x00000A00",
+      "4. Repetir em Wow6432Node\\... mesmo caminho",
+      "5. Reiniciar Windows"
+    ],
+    "tags": [
+      "nfce",
+      "windows7",
+      "tls",
+      "ssl",
+      "openssl",
+      "dll",
+      "prisma5nfce",
+      "erro"
+    ],
+    "bloco": 2001
+  },
+  {
+    "titulo": "NFC-e — Contingência (SEFAZ inacessível)",
+    "resumo": "Emissão offline quando SEFAZ está fora do ar",
+    "problema": "SEFAZ inacessível; sistema precisa continuar emitindo",
+    "causa": "Queda de conexão ou indisponibilidade da SEFAZ estadual",
+    "solucao": "Sistema emite em modo DPEC ou FS-DA. Ao SEFAZ retornar, transmitir lote pendente.",
+    "passos": [
+      "Ativar em: Configurações > NFC-e > Contingência",
+      "Sistema emite em modo DPEC ou FS-DA",
+      "Ao SEFAZ retornar: transmitir lote pendente pela tela TFM_RESUMOENVIOCONTINGENCIA"
+    ],
+    "tags": [
+      "nfce",
+      "contingencia",
+      "dpec",
+      "fsda",
+      "offline",
+      "sefaz"
+    ],
+    "bloco": 2002
+  },
+  {
+    "titulo": "NFC-e — Códigos de rejeição SEFAZ (cStat)",
+    "resumo": "Tabela completa dos status SEFAZ para NFC-e",
+    "problema": "NFC-e rejeitada pela SEFAZ com código numérico (cStat)",
+    "causa": "Cada código indica motivo específico de rejeição",
+    "solucao": "cStat 100: Autorizado — sucesso\ncStat 101: Cancelamento homologado\ncStat 110: Uso Denegado\ncStat 135: Evento vinculado a NF-e cancelada\ncStat 204: Duplicidade de NF-e\ncStat 207: Cancelamento fora do prazo\ncStat 301: Uso Denegado — irregularidade fiscal do emitente\ncStat 302: Uso Denegado — irregularidade fiscal do destinatário\ncStat 431: CNPJ Emitente não cadastrado na SEFAZ\ncStat 451: CNPJ-Base do emitente difere do certificado digital\ncStat 528: NFC-e emitida fora do período de validade\ncStat 539: Duplicidade com chave de acesso divergente\ncStat 591: NF-e não autorizada com chave divergente\ncStat 656: Assinatura digital incorreta\ncStat 999: Erro não catalogado — verificar mensagem complementar",
+    "passos": [
+      "100 Autorizado: sucesso",
+      "431 CNPJ não cadastrado: habilitar CNPJ na SEFAZ estadual",
+      "451 CNPJ-Base difere do certificado: usar certificado do emissor correto",
+      "656 Assinatura inválida: verificar certificado digital",
+      "204 Duplicidade: NFC-e já emitida com mesmo número",
+      "207 Cancelamento fora do prazo: emitir CC-e ou devolução",
+      "999 Erro não catalogado: verificar mensagem complementar no log"
+    ],
+    "tags": [
+      "nfce",
+      "rejeicao",
+      "sefaz",
+      "cstat",
+      "100",
+      "431",
+      "451",
+      "656",
+      "204",
+      "207",
+      "999"
+    ],
+    "bloco": 2003
+  },
+  {
+    "titulo": "NFC-e — Erro: Erro TLS/SSL",
+    "resumo": "",
+    "problema": "NFC-e apresenta erro: Erro TLS/SSL",
+    "causa": "OpenSSL 3.4.1 + Windows 7",
+    "solucao": "Usar Prisma5NFCe(old).dll",
+    "passos": [],
+    "tags": [
+      "nfce",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2004
+  },
+  {
+    "titulo": "NFC-e — Erro: Certificado inválido",
+    "resumo": "",
+    "problema": "NFC-e apresenta erro: Certificado inválido",
+    "causa": "Expirado ou senha errada",
+    "solucao": "Renovar ou corrigir senha",
+    "passos": [],
+    "tags": [
+      "nfce",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2005
+  },
+  {
+    "titulo": "NFC-e — Erro: cStat 431 — CNPJ não cadastrado",
+    "resumo": "",
+    "problema": "NFC-e apresenta erro: cStat 431 — CNPJ não cadastrado",
+    "causa": "CNPJ não habilitado na SEFAZ",
+    "solucao": "Habilitar na SEFAZ do estado",
+    "passos": [],
+    "tags": [
+      "nfce",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2006
+  },
+  {
+    "titulo": "NFC-e — Erro: cStat 656 — Assinatura inválida",
+    "resumo": "",
+    "problema": "NFC-e apresenta erro: cStat 656 — Assinatura inválida",
+    "causa": "Certificado do CNPJ errado",
+    "solucao": "Usar certificado do CNPJ emissor",
+    "passos": [],
+    "tags": [
+      "nfce",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2007
+  },
+  {
+    "titulo": "NFC-e — Erro: NFC-e em homologação",
+    "resumo": "",
+    "problema": "NFC-e apresenta erro: NFC-e em homologação",
+    "causa": "Ambiente errado",
+    "solucao": "Configurações > NFC-e > Ambiente = Produção",
+    "passos": [],
+    "tags": [
+      "nfce",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2008
+  },
+  {
+    "titulo": "NF-e — Operações disponíveis e formulários",
+    "resumo": "Nota Fiscal Eletrônica modelo 55 — saídas B2B, remessas, entradas",
+    "problema": "Analista precisa saber quais operações NF-e existem no sistema e onde encontrá-las",
+    "causa": "",
+    "solucao": "NF-e modelo 55 cobre: Emissão, Cancelamento, Carta de Correção (CC-e), Inutilização, Manifesto do destinatário, Distribuição DFe",
+    "passos": [
+      "Emissão: TFM_NOTAFISCAL",
+      "Entrada: TFM_NOTAFISCALENTRADA",
+      "Cancelamento: TFM_CANCELAMENTONFE (prazo 24h)",
+      "Carta de Correção: TFM_CARTACORRECAONFE",
+      "Inutilização: TFM_SELECAOINUTILIZANF",
+      "Manifesto destinatário: TFM_MANIFESTO"
+    ],
+    "tags": [
+      "nfe",
+      "nota fiscal eletronica",
+      "modelo 55",
+      "emissao",
+      "cancelamento",
+      "carta correcao"
+    ],
+    "bloco": 2009
+  },
+  {
+    "titulo": "NF-e — Erro: NF-e rejeitada cStat 431",
+    "resumo": "",
+    "problema": "NF-e rejeitada cStat 431",
+    "causa": "CNPJ não habilitado",
+    "solucao": "Habilitar CNPJ na SEFAZ estadual",
+    "passos": [],
+    "tags": [
+      "nfe",
+      "erro",
+      "fiscal",
+      "rejeicao"
+    ],
+    "bloco": 2010
+  },
+  {
+    "titulo": "NF-e — Erro: Assinatura inválida",
+    "resumo": "",
+    "problema": "Assinatura inválida",
+    "causa": "Certificado errado ou expirado",
+    "solucao": "Verificar certificado",
+    "passos": [],
+    "tags": [
+      "nfe",
+      "erro",
+      "fiscal",
+      "rejeicao"
+    ],
+    "bloco": 2011
+  },
+  {
+    "titulo": "NF-e — Erro: Cancelamento recusado cStat 207",
+    "resumo": "",
+    "problema": "Cancelamento recusado cStat 207",
+    "causa": "Prazo de 24h encerrado",
+    "solucao": "Emitir CC-e ou NF-e de devolução",
+    "passos": [],
+    "tags": [
+      "nfe",
+      "erro",
+      "fiscal",
+      "rejeicao"
+    ],
+    "bloco": 2012
+  },
+  {
+    "titulo": "NFS-e — Visão geral e arquivos críticos",
+    "resumo": "Nota Fiscal de Serviço Eletrônica para farmácias de manipulação",
+    "problema": "Farmácia de manipulação não consegue emitir NFS-e ou precisa configurar do zero",
+    "causa": "Arquivo nfseLocais.ini ausente ou provedor não configurado",
+    "solucao": "Verificar arquivos críticos e campos do XML de configuração",
+    "passos": [
+      "DLL: Prisma5NFSe.dll (62 MB)",
+      "Arquivo CRÍTICO: C:\\nfseLocais.ini (CRÍTICO — ausência bloqueia tudo) — ausência bloqueia tudo",
+      "Arquivo de serviços: C:\\FarmaFacil\\EXE\\ACBrNFSeXServicos.ini (888 KB)",
+      "XML de envelope: C:\\FarmaFacil\\EXE\\NFSe\\<numero_rps>-Env.xml",
+      "Schemas: C:\\FarmaFacil\\EXE\\Acbr\\Schemas\\PadraoNacional\\",
+      "Provedores disponíveis: ABRASF 1.0/2.0/2.03/2.04, ISSNet, GINFES, Betha, BethaV2, Equiplano, SigISS, eGoverne, SystemPro, GISS (e mais 14)"
+    ],
+    "tags": [
+      "nfse",
+      "nota fiscal servico",
+      "nfselocais",
+      "provedor",
+      "manipulacao",
+      "fiscal"
+    ],
+    "bloco": 2013
+  },
+  {
+    "titulo": "NFS-e — EspdNFSeFileNotFoundException: Arquivo 'C:\\nfseLocais.ini' n",
+    "resumo": "",
+    "problema": "EspdNFSeFileNotFoundException: Arquivo 'C:\\nfseLocais.ini' não foi encontrado",
+    "causa": "Arquivo nfseLocais.ini ausente na raiz C:\\",
+    "solucao": [
+      "Reconfigurar municípios em Fiscal > NFS-e > Configurações"
+    ],
+    "passos": "Arquivo C:\\nfseLocais.ini existe após salvar configurações",
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2014
+  },
+  {
+    "titulo": "NFS-e — Arquivo schema_v101-ISSNet.xsd Não encontrado",
+    "resumo": "",
+    "problema": "Arquivo schema_v101-ISSNet.xsd Não encontrado",
+    "causa": "Schemas ACBr ausentes",
+    "solucao": [
+      "Extrair Acbr.rar para C:\\FarmaFacil\\EXE\\Acbr\\"
+    ],
+    "passos": "Arquivo existe em Acbr\\Schemas\\PadraoNacional\\1.01\\",
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2015
+  },
+  {
+    "titulo": "NFS-e — CNPJ/CPF do prestador não autorizado a emitir NFS-e",
+    "resumo": "",
+    "problema": "CNPJ/CPF do prestador não autorizado a emitir NFS-e",
+    "causa": "CNPJ não habilitado na prefeitura",
+    "solucao": [
+      "Orientar cliente a contatar Secretaria de Fazenda Municipal"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "escalacao"
+    ],
+    "bloco": 2016
+  },
+  {
+    "titulo": "NFS-e — DadosPFX, ArquivoPFX, URLPFX ou NumeroSerie não especificado",
+    "resumo": "",
+    "problema": "DadosPFX, ArquivoPFX, URLPFX ou NumeroSerie não especificados!, erro: $00000000",
+    "causa": "Certificado digital não configurado",
+    "solucao": [
+      "Configurar .pfx em Configurações > NFS-e"
+    ],
+    "passos": "Testar leitura do certificado nas configurações",
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2017
+  },
+  {
+    "titulo": "NFS-e — Erro de Conexão: Data de Validade do Certificado já expirou:",
+    "resumo": "",
+    "problema": "Erro de Conexão: Data de Validade do Certificado já expirou: DD/MM/AAAA",
+    "causa": "Certificado digital vencido",
+    "solucao": [
+      "Renovar junto à AC (Serasa, Certisign, Safeweb)",
+      "Atualizar caminho nas configurações"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "escalacao"
+    ],
+    "bloco": 2018
+  },
+  {
+    "titulo": "NFS-e — Certificado Série: 'XXXX', não encontrado!, erro: $00000000",
+    "resumo": "",
+    "problema": "Certificado Série: 'XXXX', não encontrado!, erro: $00000000",
+    "causa": "Token A3 não conectado ou driver não instalado",
+    "solucao": [
+      "Conectar token USB",
+      "Instalar driver da certificadora"
+    ],
+    "passos": "Token aparece no Gerenciador de Dispositivos",
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2019
+  },
+  {
+    "titulo": "NFS-e — Número do RPS inválido.(Numero RPS: NNNN)",
+    "resumo": "",
+    "problema": "Número do RPS inválido.(Numero RPS: NNNN)",
+    "causa": "Sequência de RPS dessincronizada",
+    "solucao": [
+      "Corrigir próximo número RPS em Configurações > NFS-e",
+      "Confirmar sequência com a prefeitura"
+    ],
+    "passos": "Envio aceito com novo número",
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2020
+  },
+  {
+    "titulo": "NFS-e — Série do RPS inválida.(Numero RPS: NNNN)",
+    "resumo": "",
+    "problema": "Série do RPS inválida.(Numero RPS: NNNN)",
+    "causa": "Série não aceita pela prefeitura",
+    "solucao": [
+      "Corrigir série para máx 5 dígitos",
+      "Confirmar série aceita com a prefeitura"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2021
+  },
+  {
+    "titulo": "NFS-e — Data de competência superior a de emissão do RPS.(Numero RPS",
+    "resumo": "",
+    "problema": "Data de competência superior a de emissão do RPS.(Numero RPS: NNNN)",
+    "causa": "Data de competência futura em relação à emissão",
+    "solucao": [
+      "Verificar datas — competência deve ser <= emissão"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2022
+  },
+  {
+    "titulo": "NFS-e — Já existe um lote declarado com esta numeração.",
+    "resumo": "",
+    "problema": "Já existe um lote declarado com esta numeração.",
+    "causa": "Reenvio com mesmo número de lote",
+    "solucao": [
+      "Incrementar número do lote em Configurações > NFS-e"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2023
+  },
+  {
+    "titulo": "NFS-e — Inscrição Municipal do prestador do serviço não encontrada n",
+    "resumo": "",
+    "problema": "Inscrição Municipal do prestador do serviço não encontrada na base de dados do município.(Numero RPS: NNNN)",
+    "causa": "Inscrição municipal (CCM) incorreta",
+    "solucao": [
+      "Verificar CCM em Configurações > Empresa",
+      "Confirmar com a prefeitura"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2024
+  },
+  {
+    "titulo": "NFS-e — s:Client - Start element 'RecepcionarLoteRps' from namespace",
+    "resumo": "",
+    "problema": "s:Client - Start element 'RecepcionarLoteRps' from namespace 'http://nfse.abrasf.org.br' expected. Found element 'RecepcionarLoteRps' from namespace 'http://www.issnetonline.com.br/webservice/nfd'",
+    "causa": "Provedor configurado incorretamente (ISSNet vs ABRASF trocados)",
+    "solucao": [
+      "Identificar provedor correto da prefeitura",
+      "Alterar em Configurações > NFS-e > Município"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2025
+  },
+  {
+    "titulo": "NFS-e — O CPF/CNPJ do usuário autorizado a enviar a mensagem XML não",
+    "resumo": "",
+    "problema": "O CPF/CNPJ do usuário autorizado a enviar a mensagem XML não confere com o CPF/CNPJ usado na comunicação.",
+    "causa": "Certificado de CNPJ diferente do emissor configurado",
+    "solucao": [
+      "Usar certificado do mesmo CNPJ configurado como emissor"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2026
+  },
+  {
+    "titulo": "NFS-e — Element 'pTotTribSN': value '200.00' not accepted by pattern",
+    "resumo": "",
+    "problema": "Element 'pTotTribSN': value '200.00' not accepted by pattern",
+    "causa": "Alíquota Simples Nacional fora do range (deve ser 0-99.99)",
+    "solucao": [
+      "Corrigir alíquota — ex: 6.00 para 6%, não 200.00"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2027
+  },
+  {
+    "titulo": "NFS-e — Código de tributação municipal deve conter exatamente 3 cara",
+    "resumo": "",
+    "problema": "Código de tributação municipal deve conter exatamente 3 caracteres",
+    "causa": "Código tributação municipal com dígitos a mais",
+    "solucao": [
+      "Corrigir código para 3 dígitos em Configurações > NFS-e > Serviços"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2028
+  },
+  {
+    "titulo": "NFS-e — cNBS não informado — era esperado um dos 'cNBS'",
+    "resumo": "",
+    "problema": "cNBS não informado — era esperado um dos 'cNBS'",
+    "causa": "Código NBS ausente (obrigatório para padrão Betha/DPS)",
+    "solucao": [
+      "Preencher NBS no cadastro de serviço (farmácia: 1.0404.21.00)"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2029
+  },
+  {
+    "titulo": "NFS-e — ItemListaServico: length 6 exceeds maxLength 5",
+    "resumo": "",
+    "problema": "ItemListaServico: length 6 exceeds maxLength 5",
+    "causa": "Código de serviço com 6 dígitos, padrão aceita até 5",
+    "solucao": [
+      "Corrigir código de serviço para 4 ou 5 dígitos"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2030
+  },
+  {
+    "titulo": "NFS-e — A assinatura deve ser feita com o certificado digital do emi",
+    "resumo": "",
+    "problema": "A assinatura deve ser feita com o certificado digital do emitente da DPS.",
+    "causa": "Certificado não é do emitente (CNPJ diferente)",
+    "solucao": [
+      "Verificar e corrigir qual certificado está sendo usado"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2031
+  },
+  {
+    "titulo": "NFS-e — 12030 - A conexão com o servidor foi redefinida ou encerrada",
+    "resumo": "",
+    "problema": "12030 - A conexão com o servidor foi redefinida ou encerrada, ou um protocolo SSL incompatível foi encontrado",
+    "causa": "Incompatibilidade TLS com webservice da prefeitura",
+    "solucao": [
+      "Verificar Cssllib e SslType na config NFS-e",
+      "SslType=5 força TLS 1.2"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2032
+  },
+  {
+    "titulo": "NFS-e — Null Pointer Exception — Script: LoadEnvio — Arquivo: SetarC",
+    "resumo": "",
+    "problema": "Null Pointer Exception — Script: LoadEnvio — Arquivo: SetarCamposMunicipioDs.txt",
+    "causa": "Arquivo configuração TecnoSpeed ausente ou corrompido",
+    "solucao": [
+      "Reconfigurar município",
+      "Escalar para PrismaFive"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "escalacao"
+    ],
+    "bloco": 2033
+  },
+  {
+    "titulo": "NFS-e — Ocorreu um erro inesperado: Falha catastrófica",
+    "resumo": "",
+    "problema": "Ocorreu um erro inesperado: Falha catastrófica",
+    "causa": "Falha componente .NET/COM do módulo TecnoSpeed",
+    "solucao": [
+      "Verificar .NET Framework 4.x instalado",
+      "Executar como Administrador",
+      "Executar RegistrarDLLs.exe na pasta DLLs\\",
+      "Escalar para PrismaFive"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "escalacao"
+    ],
+    "bloco": 2034
+  },
+  {
+    "titulo": "NFS-e — Número do lote já utilizado",
+    "resumo": "",
+    "problema": "Número do lote já utilizado",
+    "causa": "Número do lote já enviado antes",
+    "solucao": [
+      "Incrementar número do lote"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2035
+  },
+  {
+    "titulo": "NFS-e — Valor Total de Serviços não confere com o enviado",
+    "resumo": "",
+    "problema": "Valor Total de Serviços não confere com o enviado",
+    "causa": "Arredondamento no somatório dos itens",
+    "solucao": [
+      "Verificar configurações de arredondamento em NFS-e"
+    ],
+    "passos": [],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal"
+    ],
+    "bloco": 2036
+  },
+  {
+    "titulo": "SNGPC — Sistema Nacional de Gerenciamento de Produtos Controlados (ANVISA)",
+    "resumo": "Envio de movimentação de medicamentos controlados ao SNGPC",
+    "problema": "Farmácia precisa transmitir SNGPC ou há erro no envio",
+    "causa": "Arquivo XML incorreto ou conectividade com ANVISA",
+    "solucao": "Verificar XML, cnpjEmissor e conectividade com portal ANVISA",
+    "passos": [
+      "1. Módulo SNGPC registra movimentações automaticamente",
+      "2. Gerar arquivo XML em Módulos > SNGPC > Gerar Arquivo",
+      "3. Transmitir pelo portal SNGPC da ANVISA",
+      "4. Verificar retorno de protocolo"
+    ],
+    "tags": [
+      "sngpc",
+      "anvisa",
+      "controlados",
+      "xml",
+      "transmissao",
+      "fiscal",
+      "regulatorio"
+    ],
+    "bloco": 2037
+  },
+  {
+    "titulo": "Certificados Digitais — A1 e A3 no FarmaFácil",
+    "resumo": "Configuração e solução de problemas com certificado digital",
+    "problema": "Erro de certificado ao emitir NFC-e, NF-e ou NFS-e",
+    "causa": "Certificado expirado, senha errada ou CNPJ diferente",
+    "solucao": "Verificar validade, senha e CNPJ do certificado",
+    "passos": [
+      "A1: arquivo .pfx — instalar e configurar senha em Configurações > Certificado",
+      "A3: token/smartcard — informar número de série",
+      "Verificar data de validade",
+      "Confirmar que CNPJ do certificado = CNPJ da empresa no sistema",
+      "Erro 'senha inválida': re-instalar certificado"
+    ],
+    "tags": [
+      "certificado",
+      "a1",
+      "a3",
+      "pfx",
+      "token",
+      "smartcard",
+      "nfce",
+      "nfe",
+      "nfse"
+    ],
+    "bloco": 2038
+  },
+  {
+    "titulo": "SAT/CFe — Sistema Autenticador e Transmissor",
+    "resumo": "CF-e SAT — Cupom Fiscal Eletrônico via SAT (obrigatório em São Paulo)",
+    "problema": "Dúvidas ou erros relacionados a SAT/CFe — Sistema Autenticador e Transmissor",
+    "causa": "",
+    "solucao": "CF-e SAT — Cupom Fiscal Eletrônico via SAT (obrigatório em São Paulo)",
+    "passos": [],
+    "tags": [
+      "sat",
+      "cfe",
+      "fiscal"
+    ],
+    "bloco": 2039
+  },
+  {
+    "titulo": "PAF-ECF — Programa Aplicativo Fiscal",
+    "resumo": "PAF-ECF — Programa Aplicativo Fiscal para ECF (ECF legado)",
+    "problema": "Dúvidas ou erros relacionados a PAF-ECF — Programa Aplicativo Fiscal",
+    "causa": "",
+    "solucao": "PAF-ECF — Programa Aplicativo Fiscal para ECF (ECF legado)",
+    "passos": [],
+    "tags": [
+      "paf",
+      "ecf",
+      "fiscal"
+    ],
+    "bloco": 2040
+  },
+  {
+    "titulo": "SPED — Sistema Público de Escrituração Digital",
+    "resumo": "SPED — Sistema Público de Escrituração Digital",
+    "problema": "Dúvidas ou erros relacionados a SPED — Sistema Público de Escrituração Digital",
+    "causa": "",
+    "solucao": "SPED — Sistema Público de Escrituração Digital",
+    "passos": [],
+    "tags": [
+      "sped",
+      "fiscal",
+      "escrituracao"
+    ],
+    "bloco": 2041
+  },
+  {
+    "titulo": "SINTEGRA — Sistema Integrado de Informações",
+    "resumo": "SINTEGRA — arquivo magnético para ICMS interestaduais",
+    "problema": "Dúvidas ou erros relacionados a SINTEGRA — Sistema Integrado de Informações",
+    "causa": "",
+    "solucao": "SINTEGRA — arquivo magnético para ICMS interestaduais",
+    "passos": [],
+    "tags": [
+      "sintegra",
+      "fiscal"
+    ],
+    "bloco": 2042
+  },
+  {
+    "titulo": "Produção — Ordens de Produção (fluxo completo)",
+    "resumo": "Ciclo de vida de uma ordem de produção de fórmula magistral",
+    "problema": "Analista precisa entender o fluxo de produção ou resolver dúvida de cliente",
+    "causa": "",
+    "solucao": "Ordem passa pelos status: Aberta → Em produção → Aprovada → Entregue",
+    "passos": [
+      "1. Venda gera ordem de produção automaticamente",
+      "2. Produção avalia fórmula e insumos",
+      "3. Pesagem monitorada: TFM_PESAGEM",
+      "4. Apontamentos de produção",
+      "5. Controle de qualidade",
+      "6. Embalagem e entrega"
+    ],
+    "tags": [
+      "producao",
+      "ordem producao",
+      "formula magistral",
+      "manipulacao",
+      "fluxo"
+    ],
+    "bloco": 2043
+  },
+  {
+    "titulo": "Produção — Cadastro de Fórmulas Magistrais",
+    "resumo": "Como cadastrar e gerenciar fórmulas no FarmaFácil",
+    "problema": "Cliente não sabe como cadastrar fórmula ou há erro no cadastro",
+    "causa": "",
+    "solucao": "Cadastro e gestão de fórmulas padrão e magistrais",
+    "passos": [
+      "Cadastros > Fórmulas > Nova",
+      "Informar nome, forma farmacêutica, componentes e quantidades",
+      "Definir rendimento e embalagem",
+      "Associar ao produto de venda"
+    ],
+    "tags": [
+      "producao",
+      "formula",
+      "magistral",
+      "cadastro",
+      "componente"
+    ],
+    "bloco": 2044
+  },
+  {
+    "titulo": "Produção — Homeopatia (Escalas CH, DH, FC, LM)",
+    "resumo": "Preparação homeopática com escala de diluição",
+    "problema": "Dúvida sobre escalas homeopáticas ou erro no cálculo de diluição",
+    "causa": "",
+    "solucao": "Módulo específico para farmácias homeopáticas — dinamizações, matrizes, preparações",
+    "passos": [
+      "CH: 1 parte + 99 partes de solvente por dinamização",
+      "DH: 1 parte + 9 partes de solvente",
+      "FC: fluxo contínuo de potência (menos comum)",
+      "LM: 1 parte + 50.000 partes"
+    ],
+    "tags": [
+      "producao",
+      "homeopatia",
+      "ch",
+      "dh",
+      "lm",
+      "fc",
+      "escala",
+      "diluicao"
+    ],
+    "bloco": 2045
+  },
+  {
+    "titulo": "Produção — Florais de Bach e outros florais",
+    "resumo": "Essências florais — preparação e cadastro no FarmaFácil",
+    "problema": "Dúvida sobre florais ou como cadastrar no sistema",
+    "causa": "",
+    "solucao": "Florais de Bach e outras terapias florais",
+    "passos": [],
+    "tags": [
+      "producao",
+      "florais",
+      "bach",
+      "essencia",
+      "manipulacao"
+    ],
+    "bloco": 2046
+  },
+  {
+    "titulo": "Produção — Controle de Qualidade (Ensaios CQ)",
+    "resumo": "Ensaios de controle de qualidade para produtos manipulados",
+    "problema": "Como registrar ensaios de CQ ou entender os testes realizados",
+    "causa": "",
+    "solucao": "Controle de Qualidade — ensaios de matérias-primas e produtos acabados",
+    "passos": [],
+    "tags": [
+      "producao",
+      "controle qualidade",
+      "cq",
+      "ensaio",
+      "farmacopeia",
+      "manipulacao"
+    ],
+    "bloco": 2047
+  },
+  {
+    "titulo": "Produção — Problema: Ordem de produção não fecha",
+    "resumo": "",
+    "problema": "Ordem de produção não fecha",
+    "causa": "Lotes de insumos não vinculados",
+    "solucao": "Verificar TFM_MANUTENCAOLOTE — insumos com lote válido",
+    "passos": [],
+    "tags": [
+      "producao",
+      "erro",
+      "manipulacao"
+    ],
+    "bloco": 2048
+  },
+  {
+    "titulo": "Produção — Problema: Pesagem não registra",
+    "resumo": "",
+    "problema": "Pesagem não registra",
+    "causa": "Balança não comunicando",
+    "solucao": "Verificar porta COM e DLL LerBalancaDLL.dll — TFRMMANUTENCAOBALANCA",
+    "passos": [],
+    "tags": [
+      "producao",
+      "erro",
+      "manipulacao"
+    ],
+    "bloco": 2049
+  },
+  {
+    "titulo": "Produção — Problema: Fórmula sem custo calculado",
+    "resumo": "",
+    "problema": "Fórmula sem custo calculado",
+    "causa": "Produto sem preço de custo cadastrado",
+    "solucao": "Verificar TFM_CUSTOFORMULA — preço dos insumos",
+    "passos": [],
+    "tags": [
+      "producao",
+      "erro",
+      "manipulacao"
+    ],
+    "bloco": 2050
+  },
+  {
+    "titulo": "Produção — Problema: Ensaio não aparece na ordem",
+    "resumo": "",
+    "problema": "Ensaio não aparece na ordem",
+    "causa": "Ensaio não vinculado ao produto",
+    "solucao": "Verificar TFM_ENSAIO — vínculo produto × ensaio",
+    "passos": [],
+    "tags": [
+      "producao",
+      "erro",
+      "manipulacao"
+    ],
+    "bloco": 2051
+  },
+  {
+    "titulo": "Produção — Problema: Relatório de ordem em branco",
+    "resumo": "",
+    "problema": "Relatório de ordem em branco",
+    "causa": "Período sem ordens ou permissão",
+    "solucao": "Verificar permissões de usuário e período selecionado",
+    "passos": [],
+    "tags": [
+      "producao",
+      "erro",
+      "manipulacao"
+    ],
+    "bloco": 2052
+  },
+  {
+    "titulo": "Produção — Pesagem Monitorada",
+    "resumo": "Pesagem monitorada — integração com balança durante a manipulação",
+    "problema": "Dúvida ou erro relacionado a Produção — Pesagem Monitorada",
+    "causa": "",
+    "solucao": "Pesagem monitorada — integração com balança durante a manipulação",
+    "passos": [],
+    "tags": [
+      "producao",
+      "pesagem",
+      "balanca"
+    ],
+    "bloco": 2053
+  },
+  {
+    "titulo": "Produção — Apontamentos de Produção",
+    "resumo": "Registro de etapas do processo produtivo — rastreabilidade",
+    "problema": "Dúvida ou erro relacionado a Produção — Apontamentos de Produção",
+    "causa": "",
+    "solucao": "Registro de etapas do processo produtivo — rastreabilidade",
+    "passos": [],
+    "tags": [
+      "producao",
+      "apontamento"
+    ],
+    "bloco": 2054
+  },
+  {
+    "titulo": "Produção — PCP (Planejamento e Controle da Produção)",
+    "resumo": "PCP — Planejamento e Controle da Produção",
+    "problema": "Dúvida ou erro relacionado a Produção — PCP (Planejamento e Controle da Produção)",
+    "causa": "",
+    "solucao": "PCP — Planejamento e Controle da Produção",
+    "passos": [],
+    "tags": [
+      "producao",
+      "pcp",
+      "planejamento"
+    ],
+    "bloco": 2055
+  },
+  {
+    "titulo": "Produção — Lotes e Validade de Insumos",
+    "resumo": "Controle de lotes com validade — rastreabilidade de insumos e produtos acabados",
+    "problema": "Dúvida ou erro relacionado a Produção — Lotes e Validade de Insumos",
+    "causa": "",
+    "solucao": "Controle de lotes com validade — rastreabilidade de insumos e produtos acabados",
+    "passos": [],
+    "tags": [
+      "producao",
+      "lote",
+      "validade",
+      "insumo"
+    ],
+    "bloco": 2056
+  },
+  {
+    "titulo": "FarmaFácil — Sistema não abre / não inicia",
+    "resumo": "Diagnóstico quando o Prisma5_MD.exe não inicia",
+    "problema": "Sistema não abre ao dar duplo clique no ícone",
+    "causa": "PostgreSQL parado, farmafacil.ini errado, serviço de licença parado ou processo duplicado",
+    "solucao": "Verificar todos os pontos em sequência",
+    "passos": [
+      "PostgreSQL rodando? (services.msc)",
+      "farmafacil.ini com HOST correto?",
+      "Ping para o servidor de banco funciona?",
+      "PrismaFivePortal Service rodando? (services.msc)",
+      "Outro processo Prisma5_MD.exe já aberto? (Gerenciador de Tarefas)",
+      "Janela fora da tela: Excluir C:\\FarmaFacil\\EXE\\confprop.ini — recria automaticamente"
+    ],
+    "tags": [
+      "inicializacao",
+      "nao abre",
+      "farmafacil.ini",
+      "postgresql",
+      "licenca",
+      "diagnostico"
+    ],
+    "bloco": 2057
+  },
+  {
+    "titulo": "Vendas — Fluxo de venda no PDV (passo a passo)",
+    "resumo": "Como realizar uma venda no FarmaFácil do início ao fim",
+    "problema": "Analista ou cliente não sabe como registrar uma venda",
+    "causa": "",
+    "solucao": "Fluxo: Abrir caixa → Registrar produtos → Selecionar pagamento → Emitir NFC-e → Fechar caixa",
+    "passos": [
+      "1. Abrir caixa (TFM_CAIXA)",
+      "2. Informar fundo de caixa inicial",
+      "3. Registrar produtos (TFM_VENDA) — código de barras ou busca",
+      "4. Para controlados: sistema pede dados da receita (TFM_DADOSRECEITA)",
+      "5. Selecionar forma de pagamento",
+      "6. Finalizar — sistema emite NFC-e automaticamente",
+      "7. Fechar caixa ao fim do turno (TFM_FECHAMENTOCAIXA)"
+    ],
+    "tags": [
+      "venda",
+      "pdv",
+      "caixa",
+      "nfce",
+      "cupom",
+      "fluxo"
+    ],
+    "bloco": 2058
+  },
+  {
+    "titulo": "Vendas — Problema: Venda não finaliza",
+    "resumo": "",
+    "problema": "Venda não finaliza",
+    "causa": "NFC-e com erro de transmissão",
+    "solucao": "Verificar Log\\LogErro.txt — problema de certificado ou conectividade",
+    "passos": [],
+    "tags": [
+      "venda",
+      "pdv",
+      "erro"
+    ],
+    "bloco": 2059
+  },
+  {
+    "titulo": "Vendas — Problema: Desconto não autorizado",
+    "resumo": "",
+    "problema": "Desconto não autorizado",
+    "causa": "Acima do limite do operador",
+    "solucao": "Solicitar autorização de supervisor (TFM_AUTORIZADESCONTO)",
+    "passos": [],
+    "tags": [
+      "venda",
+      "pdv",
+      "erro"
+    ],
+    "bloco": 2060
+  },
+  {
+    "titulo": "Vendas — Problema: Produto não aparece na busca",
+    "resumo": "",
+    "problema": "Produto não aparece na busca",
+    "causa": "Inativo ou sem estoque mínimo",
+    "solucao": "Verificar cadastro e status do produto",
+    "passos": [],
+    "tags": [
+      "venda",
+      "pdv",
+      "erro"
+    ],
+    "bloco": 2061
+  },
+  {
+    "titulo": "Vendas — Problema: TEF não responde",
+    "resumo": "",
+    "problema": "TEF não responde",
+    "causa": "Terminal desconectado ou software cliente",
+    "solucao": "Verificar cabo e software do terminal TEF",
+    "passos": [],
+    "tags": [
+      "venda",
+      "pdv",
+      "erro"
+    ],
+    "bloco": 2062
+  },
+  {
+    "titulo": "Caixa — Abertura, fechamento e sangria",
+    "resumo": "Operações de caixa no FarmaFácil",
+    "problema": "Dúvida sobre como abrir/fechar caixa ou realizar sangria/suprimento",
+    "causa": "",
+    "solucao": "Operações em TFM_CAIXA e TFM_FECHAMENTOCAIXA",
+    "passos": [],
+    "tags": [
+      "caixa",
+      "abertura",
+      "fechamento",
+      "sangria",
+      "suprimento",
+      "fundo"
+    ],
+    "bloco": 2063
+  },
+  {
+    "titulo": "Estoque — Gestão de estoque e compras",
+    "resumo": "Controle de estoque, entradas, saídas e pedidos de compra",
+    "problema": "Dúvida sobre estoque negativo, inventário ou nota de entrada",
+    "causa": "Lançamento indevido ou venda sem entrada prévia",
+    "solucao": "Verificar movimentações e ajustar via inventário",
+    "passos": [],
+    "tags": [
+      "estoque",
+      "compras",
+      "nota entrada",
+      "inventario",
+      "negativo",
+      "lote"
+    ],
+    "bloco": 2064
+  },
+  {
+    "titulo": "Financeiro — Contas a pagar, receber e boletos",
+    "resumo": "Módulo financeiro do FarmaFácil",
+    "problema": "Dúvida sobre financeiro, boletos ou conciliação bancária",
+    "causa": "",
+    "solucao": "Acesso em Financeiro > Contas",
+    "passos": [],
+    "tags": [
+      "financeiro",
+      "contas pagar",
+      "contas receber",
+      "boleto",
+      "conciliacao"
+    ],
+    "bloco": 2065
+  },
+  {
+    "titulo": "Cadastros — Clientes",
+    "resumo": "Cadastro de clientes no FarmaFácil",
+    "problema": "Dúvida ou erro no cadastro de clientes",
+    "causa": "",
+    "solucao": "",
+    "passos": [],
+    "tags": [
+      "cadastro",
+      "clientes",
+      "farmafacil"
+    ],
+    "bloco": 2066
+  },
+  {
+    "titulo": "Cadastros — Produtos",
+    "resumo": "Cadastro de produtos no FarmaFácil",
+    "problema": "Dúvida ou erro no cadastro de produtos",
+    "causa": "",
+    "solucao": "",
+    "passos": [],
+    "tags": [
+      "cadastro",
+      "produtos",
+      "farmafacil"
+    ],
+    "bloco": 2067
+  },
+  {
+    "titulo": "Cadastros — Medicos",
+    "resumo": "Cadastro de medicos no FarmaFácil",
+    "problema": "Dúvida ou erro no cadastro de medicos",
+    "causa": "",
+    "solucao": "",
+    "passos": [],
+    "tags": [
+      "cadastro",
+      "medicos",
+      "farmafacil"
+    ],
+    "bloco": 2068
+  },
+  {
+    "titulo": "Cadastros — Fornecedores",
+    "resumo": "Cadastro de fornecedores no FarmaFácil",
+    "problema": "Dúvida ou erro no cadastro de fornecedores",
+    "causa": "",
+    "solucao": "",
+    "passos": [],
+    "tags": [
+      "cadastro",
+      "fornecedores",
+      "farmafacil"
+    ],
+    "bloco": 2069
+  },
+  {
+    "titulo": "Integração — ifood",
+    "resumo": "Marketplace iFood — venda online de produtos",
+    "problema": "Dúvida ou erro na integração ifood",
+    "causa": "",
+    "solucao": "Marketplace iFood — venda online de produtos",
+    "passos": [],
+    "tags": [
+      "integracao",
+      "ifood",
+      "farmafacil"
+    ],
+    "bloco": 2070
+  },
+  {
+    "titulo": "Integração — whatsapp",
+    "resumo": "Envio de orçamentos via WhatsApp",
+    "problema": "Dúvida ou erro na integração whatsapp",
+    "causa": "",
+    "solucao": "Envio de orçamentos via WhatsApp",
+    "passos": [],
+    "tags": [
+      "integracao",
+      "whatsapp",
+      "farmafacil"
+    ],
+    "bloco": 2071
+  },
+  {
+    "titulo": "Integração — dotz",
+    "resumo": "Programa de fidelidade Dotz",
+    "problema": "Dúvida ou erro na integração dotz",
+    "causa": "",
+    "solucao": "Programa de fidelidade Dotz",
+    "passos": [],
+    "tags": [
+      "integracao",
+      "dotz",
+      "farmafacil"
+    ],
+    "bloco": 2072
+  },
+  {
+    "titulo": "Integração — cashback",
+    "resumo": "Programa de cashback próprio",
+    "problema": "Dúvida ou erro na integração cashback",
+    "causa": "",
+    "solucao": "Programa de cashback próprio",
+    "passos": [],
+    "tags": [
+      "integracao",
+      "cashback",
+      "farmafacil"
+    ],
+    "bloco": 2073
+  },
+  {
+    "titulo": "Integração — pbm_epharma",
+    "resumo": "PBM ePharma — descontos em medicamentos",
+    "problema": "Dúvida ou erro na integração pbm_epharma",
+    "causa": "",
+    "solucao": "PBM ePharma — descontos em medicamentos",
+    "passos": [],
+    "tags": [
+      "integracao",
+      "pbm_epharma",
+      "farmafacil"
+    ],
+    "bloco": 2074
+  },
+  {
+    "titulo": "Integração — pbm_pharmalink",
+    "resumo": "",
+    "problema": "Dúvida ou erro na integração pbm_pharmalink",
+    "causa": "",
+    "solucao": "",
+    "passos": [],
+    "tags": [
+      "integracao",
+      "pbm_pharmalink",
+      "farmafacil"
+    ],
+    "bloco": 2075
+  },
+  {
+    "titulo": "Integração — farmacia_popular",
+    "resumo": "Programa Farmácia Popular do Governo Federal",
+    "problema": "Dúvida ou erro na integração farmacia_popular",
+    "causa": "",
+    "solucao": "Programa Farmácia Popular do Governo Federal",
+    "passos": [],
+    "tags": [
+      "integracao",
+      "farmacia_popular",
+      "farmafacil"
+    ],
+    "bloco": 2076
+  },
+  {
+    "titulo": "Integração — tef",
+    "resumo": "Terminal Eletrônico de Fundos — pagamento com cartão no PDV",
+    "problema": "Dúvida ou erro na integração tef",
+    "causa": "",
+    "solucao": "Terminal Eletrônico de Fundos — pagamento com cartão no PDV",
+    "passos": [],
+    "tags": [
+      "integracao",
+      "tef",
+      "farmafacil"
+    ],
+    "bloco": 2077
+  },
+  {
+    "titulo": "Integração — b2b_ecommerce",
+    "resumo": "Portal B2B para pedidos atacadistas",
+    "problema": "Dúvida ou erro na integração b2b_ecommerce",
+    "causa": "",
+    "solucao": "Portal B2B para pedidos atacadistas",
+    "passos": [],
+    "tags": [
+      "integracao",
+      "b2b_ecommerce",
+      "farmafacil"
+    ],
+    "bloco": 2078
+  },
+  {
+    "titulo": "FAQ — Sistema não abre — trava no carregamento",
+    "resumo": "",
+    "problema": "Sistema não abre — trava no carregamento",
+    "causa": "",
+    "solucao": "Verificar: PostgreSQL rodando (services.msc), farmafacil.ini com HOST correto, PrismaFivePortal Service rodando na porta 2502.",
+    "passos": [],
+    "tags": [
+      "faq",
+      "duvida",
+      "farmafacil"
+    ],
+    "bloco": 2079
+  },
+  {
+    "titulo": "FAQ — Janela abre fora da tela",
+    "resumo": "",
+    "problema": "Janela abre fora da tela",
+    "causa": "",
+    "solucao": "Excluir C:\\FarmaFacil\\EXE\\confprop.ini — o sistema recria na posição padrão.",
+    "passos": [],
+    "tags": [
+      "faq",
+      "duvida",
+      "farmafacil"
+    ],
+    "bloco": 2080
+  },
+  {
+    "titulo": "FAQ — Produto não aparece na venda",
+    "resumo": "",
+    "problema": "Produto não aparece na venda",
+    "causa": "",
+    "solucao": "Produto inativo, sem estoque ou sem código de barras. Verificar cadastro em Produtos.",
+    "passos": [],
+    "tags": [
+      "faq",
+      "duvida",
+      "farmafacil"
+    ],
+    "bloco": 2081
+  },
+  {
+    "titulo": "FAQ — Relatório fica em branco",
+    "resumo": "",
+    "problema": "Relatório fica em branco",
+    "causa": "",
+    "solucao": "Verificar: há dados no período? Permissão de usuário? Pasta pdf\\ tem escrita? Testar com período menor.",
+    "passos": [],
+    "tags": [
+      "faq",
+      "duvida",
+      "farmafacil"
+    ],
+    "bloco": 2082
+  },
+  {
+    "titulo": "FAQ — Como ver os erros recentes?",
+    "resumo": "",
+    "problema": "Como ver os erros recentes?",
+    "causa": "",
+    "solucao": "1) C:\\FarmaFacil\\EXE\\Log\\LogErro.txt  2) C:\\FarmaFacil\\EXE\\Mensagens\\ (arquivos com data e hora)",
+    "passos": [],
+    "tags": [
+      "faq",
+      "duvida",
+      "farmafacil"
+    ],
+    "bloco": 2083
+  },
+  {
+    "titulo": "FAQ — iFood não sincroniza",
+    "resumo": "",
+    "problema": "iFood não sincroniza",
+    "causa": "",
+    "solucao": "Reautenticar em TFM_IFOODAUTENTICACAO. Token do iFood expira periodicamente.",
+    "passos": [],
+    "tags": [
+      "faq",
+      "duvida",
+      "farmafacil"
+    ],
+    "bloco": 2084
+  },
+  {
+    "titulo": "FAQ — TEF não responde",
+    "resumo": "",
+    "problema": "TEF não responde",
+    "causa": "",
+    "solucao": "Verificar cabo, software cliente do terminal, porta COM/USB. Reiniciar terminal físico.",
+    "passos": [],
+    "tags": [
+      "faq",
+      "duvida",
+      "farmafacil"
+    ],
+    "bloco": 2085
+  },
+  {
+    "titulo": "FAQ — DLLs do portal B2B com erro COM",
+    "resumo": "",
+    "problema": "DLLs do portal B2B com erro COM",
+    "causa": "",
+    "solucao": "Executar C:\\FarmaFacil\\EXE\\DLLs\\RegistrarDLLs.exe como Administrador.",
+    "passos": [],
+    "tags": [
+      "faq",
+      "duvida",
+      "farmafacil"
+    ],
+    "bloco": 2086
+  },
+  {
+    "titulo": "FAQ — Chave duplicada ao salvar",
+    "resumo": "",
+    "problema": "Chave duplicada ao salvar",
+    "causa": "",
+    "solucao": "Sequência PostgreSQL dessincronizada. Escalar para DBA corrigir a SEQUENCE da tabela afetada.",
+    "passos": [],
+    "tags": [
+      "faq",
+      "duvida",
+      "farmafacil"
+    ],
+    "bloco": 2087
+  },
+  {
+    "titulo": "FAQ — Impressora fiscal não imprime",
+    "resumo": "",
+    "problema": "Impressora fiscal não imprime",
+    "causa": "",
+    "solucao": "Verificar: cabo, porta no .ini (ELGIN.INI, etc.), driver instalado, papel, impressora em modo fiscal.",
+    "passos": [],
+    "tags": [
+      "faq",
+      "duvida",
+      "farmafacil"
+    ],
+    "bloco": 2088
+  },
+  {
+    "titulo": "FAQ — Serviço de licença não está rodando",
+    "resumo": "",
+    "problema": "Serviço de licença não está rodando",
+    "causa": "",
+    "solucao": "services.msc > PrismaFivePortal Service > Iniciar. Se não existe: executar InstaladorServico.exe como Admin.",
+    "passos": [],
+    "tags": [
+      "faq",
+      "duvida",
+      "farmafacil"
+    ],
+    "bloco": 2089
+  },
+  {
+    "titulo": "Usuários — Gestão de usuários e permissões",
+    "resumo": "Criação, alteração e controle de acesso no FarmaFácil",
+    "problema": "Como criar usuário, redefinir senha ou definir permissões",
+    "causa": "",
+    "solucao": "Acessar Configurações > Usuários",
+    "passos": [],
+    "tags": [
+      "usuario",
+      "senha",
+      "permissao",
+      "acesso",
+      "configuracoes"
+    ],
+    "bloco": 2090
+  },
+  {
+    "titulo": "Multifilial — Configuração e gestão de filiais",
+    "resumo": "Gerenciamento de múltiplas filiais no FarmaFácil",
+    "problema": "Dúvida sobre filiais ou erro ao trocar de filial",
+    "causa": "",
+    "solucao": "Gerenciar em Configurações > Filiais",
+    "passos": [],
+    "tags": [
+      "filial",
+      "multifilial",
+      "configuracoes"
+    ],
+    "bloco": 2091
+  },
+  {
+    "titulo": "Banco de Dados — Configuração do farmafacil.ini",
+    "resumo": "Como configurar a conexão com PostgreSQL no FarmaFácil",
+    "problema": "Sistema não conecta ao banco de dados / erro de conexão",
+    "causa": "farmafacil.ini com HOST incorreto ou PostgreSQL parado",
+    "solucao": "Arquivo: C:\\FarmaFacil\\EXE\\farmafacil.ini — Formato: HOST=<ip_ou_hostname>:<porta>/<nome_banco>",
+    "passos": [
+      "Formato: HOST=<ip_ou_hostname>:<porta>/<nome_banco>",
+      "Regra: Apenas UMA linha HOST ativa (sem #). Demais comentadas.",
+      "Exemplos: HOST=192.168.0.10:5432/farmafacil | HOST=127.0.0.1:5432/farmafacil_teste | HOST=SERVIDOR:5432/farmafacil",
+      "Porta padrão: 5432"
+    ],
+    "tags": [
+      "banco dados",
+      "postgresql",
+      "farmafacil.ini",
+      "host",
+      "conexao",
+      "configuracao"
+    ],
+    "bloco": 2092
+  },
+  {
+    "titulo": "Banco — Tabelas do módulo: cadastros basicos",
+    "resumo": "Tabelas PostgreSQL do módulo cadastros_basicos",
+    "problema": "Quais tabelas pertencem ao módulo cadastros_basicos?",
+    "causa": "",
+    "solucao": "Tabelas: produto, cliente, fornecedor, medico, vendedor, visitador, laboratorio, usuario, filial, grupo, bairro, cidade, estado, banco, portador, unidade, turno, moeda, naturezaoperacao, especialidade, posologia, regiao, mensagenspadrao, principioativo, classe, especie, subprograma, programa, modulo, tipodocumento, cotacaomoeda, metodo",
+    "passos": [],
+    "tags": [
+      "banco dados",
+      "tabela",
+      "sql",
+      "postgresql",
+      "cadastros basicos"
+    ],
+    "bloco": 2093
+  },
+  {
+    "titulo": "Banco — Tabelas do módulo: vendas caixa",
+    "resumo": "Tabelas PostgreSQL do módulo vendas_caixa",
+    "problema": "Quais tabelas pertencem ao módulo vendas_caixa?",
+    "causa": "",
+    "solucao": "Tabelas: venda, caixa, operadorcaixa, cupomfiscal, contareceber, maquinapos, posadquirente, amplacard, formapagamento, transacao, totalizador, gestaoentrega, localentrega, entregador, taxaentrega, vendamanutencao",
+    "passos": [],
+    "tags": [
+      "banco dados",
+      "tabela",
+      "sql",
+      "postgresql",
+      "vendas caixa"
+    ],
+    "bloco": 2094
+  },
+  {
+    "titulo": "Banco — Tabelas do módulo: estoque producao",
+    "resumo": "Tabelas PostgreSQL do módulo estoque_producao",
+    "problema": "Quais tabelas pertencem ao módulo estoque_producao?",
+    "causa": "",
+    "solucao": "Tabelas: lote, compras, movimentoproduto, acertoestoque, transferencia, arquivoestoque, arquivoproduto, associacaoproduto, validadeproduto, listacontrolado, controlado, produtoexcecaosngpc, ordemproducao, formulapadrao, setorproducao, funcionariolaboratorio, ensaio, farmacopeia, metodo, tabelafloral, tabelahomeopatia, formafarmaceutica, formavolume, tipocapsula",
+    "passos": [],
+    "tags": [
+      "banco dados",
+      "tabela",
+      "sql",
+      "postgresql",
+      "estoque producao"
+    ],
+    "bloco": 2095
+  },
+  {
+    "titulo": "Banco — Tabelas do módulo: financeiro fiscal",
+    "resumo": "Tabelas PostgreSQL do módulo financeiro_fiscal",
+    "problema": "Quais tabelas pertencem ao módulo financeiro_fiscal?",
+    "causa": "",
+    "solucao": "Tabelas: faturapagar, faturareceber, contacorrente, planocontas, notafiscal, notafiscalentrada, fiscal, sngpc, sintegra, manifesto, farmaciapopular, receita",
+    "passos": [],
+    "tags": [
+      "banco dados",
+      "tabela",
+      "sql",
+      "postgresql",
+      "financeiro fiscal"
+    ],
+    "bloco": 2096
+  },
+  {
+    "titulo": "Banco — Tabelas do módulo: integracoes",
+    "resumo": "Tabelas PostgreSQL do módulo integracoes",
+    "problema": "Quais tabelas pertencem ao módulo integracoes?",
+    "causa": "",
+    "solucao": "Tabelas: convenio, conveniobig, epharma, pharmalink, pbm, prevsaude, fidelidade, cashback, administradoracartao, ifood, b2b, exportacaoimportacao, arquivoempresa, balanca, etiqueta",
+    "passos": [],
+    "tags": [
+      "banco dados",
+      "tabela",
+      "sql",
+      "postgresql",
+      "integracoes"
+    ],
+    "bloco": 2097
+  },
+  {
+    "titulo": "Banco — Tabelas do módulo: sistema",
+    "resumo": "Tabelas PostgreSQL do módulo sistema",
+    "problema": "Quais tabelas pertencem ao módulo sistema?",
+    "causa": "",
+    "solucao": "Tabelas: acessousuario, grupousuario, parametro, arquivoparametro, skins, campomodelo, manutencaogeral, relatoriovenda, relatorioicms, relatoriogestaoentrega, graficosvendas, controlereclamacao, analiseproduto",
+    "passos": [],
+    "tags": [
+      "banco dados",
+      "tabela",
+      "sql",
+      "postgresql",
+      "sistema"
+    ],
+    "bloco": 2098
+  },
+  {
+    "titulo": "Banco de Dados — Diagnóstico de problemas de conexão",
+    "resumo": "Passo a passo para diagnosticar falhas de conexão com PostgreSQL",
+    "problema": "Sistema não conecta ao banco de dados",
+    "causa": "PostgreSQL parado, firewall bloqueando ou farmafacil.ini errado",
+    "solucao": "Verificar sequência de diagnóstico",
+    "passos": [
+      "1. PostgreSQL rodando? services.msc > postgresql-x64-9.x",
+      "2. Ping para o servidor de banco funciona?",
+      "3. farmafacil.ini com HOST correto?",
+      "4. Firewall libera porta 5432?",
+      "5. Testar com PgAdmin"
+    ],
+    "tags": [
+      "banco dados",
+      "postgresql",
+      "conexao",
+      "diagnostico",
+      "firewall",
+      "postgresql"
+    ],
+    "bloco": 2099
+  },
+  {
+    "titulo": "Banco de Dados — Manutenção rotineira (VACUUM, REINDEX, backup)",
+    "resumo": "Comandos de manutenção preventiva do PostgreSQL",
+    "problema": "Banco lento ou precisa de manutenção",
+    "causa": "Tabelas inchadas por atualizações sem vacuum",
+    "solucao": "Executar VACUUM ANALYZE e REINDEX periodicamente",
+    "passos": [
+      "VACUUM ANALYZE; -- limpeza e estatísticas",
+      "REINDEX DATABASE farmafacil; -- recria índices",
+      "pg_dump -h host -U usuario farmafacil > backup.sql",
+      "pg_restore -h host -U usuario farmafacil < backup.sql"
+    ],
+    "tags": [
+      "banco dados",
+      "postgresql",
+      "vacuum",
+      "reindex",
+      "backup",
+      "manutencao"
+    ],
+    "bloco": 2100
+  },
+  {
+    "titulo": "Banco — Erro: ",
+    "resumo": "",
+    "problema": "",
+    "causa": "Sequence PostgreSQL dessincronizada após restore ou falha",
+    "solucao": "DBA deve executar: SELECT setval('<tabela>_id_seq', (SELECT MAX(id) FROM <tabela>) + 1);",
+    "passos": [],
+    "tags": [
+      "banco dados",
+      "postgresql",
+      "erro",
+      "sql"
+    ],
+    "bloco": 2101
+  },
+  {
+    "titulo": "Banco — Erro: ",
+    "resumo": "",
+    "problema": "",
+    "causa": "Serviço PostgreSQL parado",
+    "solucao": "Iniciar serviço: services.msc > postgresql > Iniciar",
+    "passos": [],
+    "tags": [
+      "banco dados",
+      "postgresql",
+      "erro",
+      "sql"
+    ],
+    "bloco": 2102
+  },
+  {
+    "titulo": "Banco — Erro: ",
+    "resumo": "",
+    "problema": "",
+    "causa": "Senha incorreta ou usuário não existe",
+    "solucao": "Verificar usuário/senha no pg_hba.conf e farmafacil.ini",
+    "passos": [],
+    "tags": [
+      "banco dados",
+      "postgresql",
+      "erro",
+      "sql"
+    ],
+    "bloco": 2103
+  },
+  {
+    "titulo": "Banco — Erro: ",
+    "resumo": "",
+    "problema": "",
+    "causa": "Nome do banco errado no farmafacil.ini",
+    "solucao": "Corrigir nome do banco no HOST= do farmafacil.ini; verificar bancos: psql -l",
+    "passos": [],
+    "tags": [
+      "banco dados",
+      "postgresql",
+      "erro",
+      "sql"
+    ],
+    "bloco": 2104
+  },
+  {
+    "titulo": "Banco — Erro: ",
+    "resumo": "",
+    "problema": "",
+    "causa": "Conexão SSL entre cliente e PostgreSQL interrompida",
+    "solucao": "Verificar configuração SSL no postgresql.conf (desativar se desnecessário na LAN)",
+    "passos": [],
+    "tags": [
+      "banco dados",
+      "postgresql",
+      "erro",
+      "sql"
+    ],
+    "bloco": 2105
+  },
+  {
+    "titulo": "Banco — Erro: ",
+    "resumo": "",
+    "problema": "",
+    "causa": "Consulta retornando volume excessivo de dados",
+    "solucao": "Limitar período nos relatórios; aumentar work_mem no postgresql.conf",
+    "passos": [],
+    "tags": [
+      "banco dados",
+      "postgresql",
+      "erro",
+      "sql"
+    ],
+    "bloco": 2106
+  },
+  {
+    "titulo": "Banco — Erro: ",
+    "resumo": "",
+    "problema": "",
+    "causa": "Arquivo de dados do PostgreSQL corrompido ou disco cheio",
+    "solucao": "Verificar espaço em disco no servidor; verificar integridade com pg_dump",
+    "passos": [],
+    "tags": [
+      "banco dados",
+      "postgresql",
+      "erro",
+      "sql"
+    ],
+    "bloco": 2107
+  },
+  {
+    "titulo": "Banco — Erro: ",
+    "resumo": "",
+    "problema": "",
+    "causa": "Dois processos aguardando o mesmo registro simultaneamente",
+    "solucao": "Geralmente auto-resolve; se frequente, verificar transações longas abertas",
+    "passos": [],
+    "tags": [
+      "banco dados",
+      "postgresql",
+      "erro",
+      "sql"
+    ],
+    "bloco": 2108
+  },
+  {
+    "titulo": "Banco de Dados — Performance e lentidão no PostgreSQL",
+    "resumo": "Diagnóstico e solução de problemas de performance",
+    "problema": "Sistema lento / queries demoradas",
+    "causa": "Falta de índices, tabelas inchadas ou conexões excessivas",
+    "solucao": "VACUUM ANALYZE + verificar explain analyze nas queries lentas",
+    "passos": [],
+    "tags": [
+      "banco dados",
+      "postgresql",
+      "performance",
+      "lentidao",
+      "indice"
+    ],
+    "bloco": 2109
+  },
+  {
+    "titulo": "Logs — Onde encontrar arquivos de log no FarmaFácil",
+    "resumo": "Localização dos logs para diagnóstico",
+    "problema": "Preciso encontrar o log de erros ou transmissão",
+    "causa": "",
+    "solucao": "Logs ficam em C:\\FarmaFacil\\EXE\\",
+    "passos": [
+      "erros_gerais: C:\\FarmaFacil\\EXE\\Log\\LogErro.txt",
+      "mensagens_com_janela: C:\\FarmaFacil\\EXE\\Mensagens\\*.txt",
+      "servico_licenca: C:\\FarmaFacil\\EXE\\ChaveFarmaFacil\\LogService.Log",
+      "jsons_tef: C:\\FarmaFacil\\EXE\\JsonStreamEnvio.txt e JsonStreamRetorno.txt"
+    ],
+    "tags": [
+      "log",
+      "erro",
+      "diagnostico",
+      "arquivo",
+      "logerro"
+    ],
+    "bloco": 2110
+  },
+  {
+    "titulo": "Configuração — Arquivo farmafacil.ini",
+    "resumo": "Arquivo principal de conexão ao banco PostgreSQL. Lido na inicialização do sistema.",
+    "problema": "Dúvida sobre o arquivo de configuração farmafacil.ini",
+    "causa": "  duas_linhas_ativas: O sistema usa a primeira HOST encontrada — remover # das erradas por engano\n  ip_errado: Sistema não conecta — verificar IP do servidor na rede\n  banco_errado: Erro de autenticação ou banco inexistente\n  porta_errada: Timeout — verificar se PostgreSQL usa porta padrão 5432 ou personalizada",
+    "solucao": "Arquivo principal de conexão ao banco PostgreSQL. Lido na inicialização do sistema.",
+    "passos": [
+      "Caminho: C:\\FarmaFacil\\EXE\\farmafacil.ini"
+    ],
+    "tags": [
+      "configuracao",
+      "farmafacilini",
+      "arquivo"
+    ],
+    "bloco": 2111
+  },
+  {
+    "titulo": "Configuração — Arquivo confprop.ini",
+    "resumo": "Salva estado e posição da janela principal. Gerado automaticamente.",
+    "problema": "Dúvida sobre o arquivo de configuração confprop.ini",
+    "causa": "",
+    "solucao": "Excluir este arquivo resolve problemas de janela fora da tela ou tamanho errado. O sistema recria automaticamente.",
+    "passos": [
+      "Caminho: C:\\FarmaFacil\\EXE\\confprop.ini",
+      "  WINSTATE: maximizada | (vazio para manual)\n  ALT: altura em pixels\n  LAR: largura em pixels\n  TOP: posição vertical\n  ESQ: posição horizontal"
+    ],
+    "tags": [
+      "configuracao",
+      "confpropini",
+      "arquivo"
+    ],
+    "bloco": 2112
+  },
+  {
+    "titulo": "Configuração — Arquivo ELGIN.INI",
+    "resumo": "Configuração da impressora fiscal Elgin.",
+    "problema": "Dúvida sobre o arquivo de configuração ELGIN.INI",
+    "causa": "",
+    "solucao": "Configuração da impressora fiscal Elgin.",
+    "passos": [
+      "Caminho: C:\\FarmaFacil\\EXE\\ELGIN.INI",
+      "  ModeloImp: Modelo: ELGIN_FIT, ELGIN_I9, ELGIN_i7, ELGIN_i8\n  Porta: Porta: COM1, COM2, USB, TCP/IP\n  Path: Caminho base (normalmente C:\\)\n  HabilitaICMSCupom: 0=não imprime ICMS, 1=imprime ICMS no cupom\n  TimeOutRedZ: Timeout para Redução Z em segundos (padrão 40)\n  TimeOutComandos: Timeout geral de comandos em segundos (padrão 10)\n  EspacamentoDocumentos: Espaçamento entre documentos em mm\n  ChecaCTS: 1=verifica sinal CTS da serial\n  CorrigeRelogioZ: 1=corrige horário na Redução Z\n  SANGRIA: 1=habilita sangria no caixa\n  SUPRIMENTO: 1=habilita suprimento no caixa\n  LMFAutomatico: 1=Leitura de Memória Fiscal automática"
+    ],
+    "tags": [
+      "configuracao",
+      "elginini",
+      "arquivo"
+    ],
+    "bloco": 2113
+  },
+  {
+    "titulo": "Configuração — Arquivo InterfaceEpson.xml",
+    "resumo": "Configuração da impressora fiscal Epson (TM-T20, TM-T70, etc.).",
+    "problema": "Dúvida sobre o arquivo de configuração InterfaceEpson.xml",
+    "causa": "",
+    "solucao": "Configuração da impressora fiscal Epson (TM-T20, TM-T70, etc.).",
+    "passos": [
+      "Caminho: C:\\FarmaFacil\\EXE\\InterfaceEpson.xml"
+    ],
+    "tags": [
+      "configuracao",
+      "interfaceepsonxml",
+      "arquivo"
+    ],
+    "bloco": 2114
+  },
+  {
+    "titulo": "Configuração — Arquivo Pserv.ini",
+    "resumo": "Configuração do servidor de impressão/comunicação auxiliar.",
+    "problema": "Dúvida sobre o arquivo de configuração Pserv.ini",
+    "causa": "",
+    "solucao": "Configuração do servidor de impressão/comunicação auxiliar.",
+    "passos": [
+      "Caminho: C:\\FarmaFacil\\EXE\\Pserv.ini",
+      "  ActivateTCP: 1=ativar comunicação TCP\n  DisableHP: 1=desabilitar protocolo HP (evita conflito)"
+    ],
+    "tags": [
+      "configuracao",
+      "pservini",
+      "arquivo"
+    ],
+    "bloco": 2115
+  },
+  {
+    "titulo": "Configuração — Arquivo ACBrNFSeXServicos.ini",
+    "resumo": "Catálogo de webservices NFS-e para todos os municípios brasileiros suportados (888 KB). Contém URLs de produção e homologação de cada prefeitura.",
+    "problema": "Dúvida sobre o arquivo de configuração ACBrNFSeXServicos.ini",
+    "causa": "",
+    "solucao": "Catálogo de webservices NFS-e para todos os municípios brasileiros suportados (888 KB). Contém URLs de produção e homologação de cada prefeitura.",
+    "passos": [
+      "Caminho: C:\\FarmaFacil\\EXE\\ACBrNFSeXServicos.ini"
+    ],
+    "tags": [
+      "configuracao",
+      "acbrnfsexservicosini",
+      "arquivo"
+    ],
+    "bloco": 2116
+  },
+  {
+    "titulo": "Configuração — Arquivo nfseLocais.ini",
+    "resumo": "Define os municípios configurados para emissão de NFS-e desta instalação.",
+    "problema": "Dúvida sobre o arquivo de configuração nfseLocais.ini",
+    "causa": "",
+    "solucao": "Define os municípios configurados para emissão de NFS-e desta instalação.",
+    "passos": [
+      "Caminho: C:\\nfseLocais.ini"
+    ],
+    "tags": [
+      "configuracao",
+      "nfselocaisini",
+      "arquivo"
+    ],
+    "bloco": 2117
+  },
+  {
+    "titulo": "Configuração — Arquivo ChaveFarmaFacil/Service.ini",
+    "resumo": "Configuração do serviço de licença por hardware (PrismaFivePortal.Service.exe).",
+    "problema": "Dúvida sobre o arquivo de configuração ChaveFarmaFacil/Service.ini",
+    "causa": "",
+    "solucao": "Configuração do serviço de licença por hardware (PrismaFivePortal.Service.exe).",
+    "passos": [
+      "Caminho: C:\\FarmaFacil\\EXE\\ChaveFarmaFacil\\Service.ini",
+      "  KEY: Endereço e porta do servidor de chave — padrão: 127.0.0.1:2502"
+    ],
+    "tags": [
+      "configuracao",
+      "chavefarmafacilserviceini",
+      "arquivo"
+    ],
+    "bloco": 2118
+  },
+  {
+    "titulo": "Licença — Serviço PrismaFivePortal (porta 2502)",
+    "resumo": "O FarmaFacil usa um serviço Windows local (PrismaFivePortal.Service.exe) para validação de licença por hardware.",
+    "problema": "Erro de licença — sistema não abre ou exibe erro de chave",
+    "causa": "Serviço PrismaFivePortal parado, porta 2502 bloqueada ou serviço não instalado",
+    "solucao": "Verificar e iniciar o serviço em services.msc",
+    "passos": [
+      "[servico_parado] Sistema não abre ou exibe erro de licença: 1. Abrir services.msc / 2. Localizar PrismaFivePortal Service / 3. Iniciar o serviço / 4. Verificar se está configurado como Automático",
+      "[porta_bloqueada] Serviço roda mas sistema não consegue validar: Verificar se firewall local bloqueia porta 2502 / Adicionar exceção para 127.0.0.1:2502",
+      "[servico_nao_instalado] PrismaFivePortal Service não aparece no services.msc: Executar InstaladorServico.exe como Administrador / Verificar LogService.Log para erros"
+    ],
+    "tags": [
+      "licenca",
+      "servico",
+      "porta 2502",
+      "prismafiveportal",
+      "chave"
+    ],
+    "bloco": 2119
+  },
+  {
+    "titulo": "DLLs — Pasta DLLs\\ e registro COM (RegistrarDLLs.exe)",
+    "resumo": "A pasta DLLs\\ contém a integração com o Portal PrismaFive para B2B e pedidos online.",
+    "problema": "Erro COM ao abrir módulo B2B ou integração portal falha",
+    "causa": "DLLs não registradas no Windows",
+    "solucao": "Executar RegistrarDLLs.exe como Administrador",
+    "passos": [
+      "Caminho: C:\\FarmaFacil\\EXE\\DLLs\\",
+      "Quando: Após instalação ou quando ocorre erro de COM ao abrir módulo B2B",
+      "Como: Executar RegistrarDLLs.exe como Administrador na pasta DLLs\\",
+      "DLLs: EntityFramework.dll, Npgsql.dll, EntityFramework6.Npgsql.dll, Newtonsoft.Json.dll, PrismaFivePortal.IntegracaoFarmaFacil.dll, PrismaFivePortal.IntegracaoFarmaFacil.Dominio.dll, PrismaFivePortal.IntegracaoFarmaFacil.Infra.dll, RegistrarDLLs.exe"
+    ],
+    "tags": [
+      "dlls",
+      "com",
+      "registrar",
+      "b2b",
+      "portal",
+      "prismafive"
+    ],
+    "bloco": 2120
+  },
+  {
+    "titulo": "NFC-e — Tabela completa de rejeições SEFAZ (cStat) — versão expandida",
+    "resumo": "Todos os códigos cStat documentados para NFC-e/NF-e",
+    "problema": "NFC-e ou NF-e rejeitada — identificar o motivo pelo código cStat",
+    "causa": "Cada código cStat indica causa específica",
+    "solucao": "cStat 100: Autorizado o uso da NF-e (sucesso)\ncStat 101: Cancelamento de NF-e homologado\ncStat 110: Uso Denegado\ncStat 135: Evento registrado e vinculado a NF-e cancelada\ncStat 204: Duplicidade de NF-e\ncStat 206: NF-e complementar ou de ajuste não pode ser cancelada\ncStat 207: Cancelamento fora do prazo\ncStat 301: Uso Denegado — irregularidade fiscal do emitente\ncStat 302: Uso Denegado — irregularidade fiscal do destinatário\ncStat 409: Campo cUF inexistente\ncStat 410: Campo cNF inexistente\ncStat 411: Campo natOp não informado\ncStat 431: Rejeição — CNPJ Emitente não cadastrado\ncStat 451: CNPJ-Base do Emitente difere do CNPJ-Base do Certificado Digital\ncStat 528: NFC-e emitida fora do período de validade\ncStat 539: Rejeição — Duplicidade NF-e, com diferença na chave de acesso\ncStat 591: Rejeição — NF-e não autorizada com chave de acesso divergente\ncStat 656: Rejeição — Assinatura difere do calculado\ncStat 702: Rejeição — Chave de Acesso da NF Referenciada inexistente\ncStat 999: Erro não catalogado — verificar mensagem complementar",
+    "passos": [
+      "cStat 100: Autorizado o uso da NF-e (sucesso)",
+      "cStat 101: Cancelamento de NF-e homologado",
+      "cStat 110: Uso Denegado",
+      "cStat 135: Evento registrado e vinculado a NF-e cancelada",
+      "cStat 204: Duplicidade de NF-e",
+      "cStat 206: NF-e complementar ou de ajuste não pode ser cancelada",
+      "cStat 207: Cancelamento fora do prazo",
+      "cStat 301: Uso Denegado — irregularidade fiscal do emitente",
+      "cStat 302: Uso Denegado — irregularidade fiscal do destinatário",
+      "cStat 409: Campo cUF inexistente",
+      "cStat 410: Campo cNF inexistente",
+      "cStat 411: Campo natOp não informado",
+      "cStat 431: Rejeição — CNPJ Emitente não cadastrado",
+      "cStat 451: CNPJ-Base do Emitente difere do CNPJ-Base do Certificado Digital",
+      "cStat 528: NFC-e emitida fora do período de validade",
+      "cStat 539: Rejeição — Duplicidade NF-e, com diferença na chave de acesso",
+      "cStat 591: Rejeição — NF-e não autorizada com chave de acesso divergente",
+      "cStat 656: Rejeição — Assinatura difere do calculado",
+      "cStat 702: Rejeição — Chave de Acesso da NF Referenciada inexistente",
+      "cStat 999: Erro não catalogado — verificar mensagem complementar"
+    ],
+    "tags": [
+      "nfce",
+      "nfe",
+      "rejeicao",
+      "sefaz",
+      "cstat",
+      "100",
+      "101",
+      "110",
+      "135",
+      "204",
+      "206",
+      "207",
+      "301",
+      "302",
+      "409",
+      "410",
+      "411",
+      "431",
+      "451",
+      "528",
+      "539",
+      "591",
+      "656",
+      "702",
+      "999"
+    ],
+    "bloco": 2121
+  },
+  {
+    "titulo": "NFC-e — Versões de DLL (atual x compatível com Windows 7)",
+    "resumo": "",
+    "problema": "Qual DLL de NFC-e usar em Windows 7 vs Windows 10/11?",
+    "causa": "OpenSSL 3.4.1 (nova) não funciona em Windows 7",
+    "solucao": "Windows 7: usar Prisma5NFCe(old).dll. Windows 10+: usar Prisma5NFCe.dll atual.",
+    "passos": [
+      "DLL atual: Prisma5NFCe.dll (5.1 MB) — OpenSSL 3.4.1 — NÃO funciona Win7",
+      "DLL antiga: Prisma5NFCe(old).dll (4.8 MB) — OpenSSL 1.0.2u — funciona Win7",
+      "Para usar a antiga: renomear (old) para Prisma5NFCe.dll"
+    ],
+    "tags": [
+      "nfce",
+      "dll",
+      "windows7",
+      "openssl",
+      "prisma5nfce",
+      "versao"
+    ],
+    "bloco": 2122
+  },
+  {
+    "titulo": "NFS-e — Todos os campos do XML de configuração (referência completa)",
+    "resumo": "Referência completa de todos os campos do arquivo XML de configuração NFS-e",
+    "problema": "Como preencher corretamente cada campo do XML de configuração da NFS-e?",
+    "causa": "",
+    "solucao": "TipoAmbiente: 1=Produção, 2=Homologação\nProvedor: Nome do provedor (ISSNet, ABRASF, GINFES, SilTecnologia, Betha, etc.)\nCodigoMunicipio: Código IBGE do município (7 dígitos, ex: 3205200 = Vila Velha/ES)\nUfEmitente: UF em texto (ex: ES, SP, RJ)\nCaminhoCertificado: Pasta onde está o arquivo .pfx do certificado\nNumeroCertificado: Número de série do certificado (para A3/token)\nSenhaCertificado: Senha do certificado A1 (.pfx)\nUserWeb: CNPJ da farmácia (usado para autenticação no webservice)\nSenhaWeb: Senha de acesso ao webservice da prefeitura\nPathSchema: Caminho dos XSD de validação (ex: C:\\FarmaFacil\\EXE\\Acbr\\Schemas\\)\nPathIniCidades: Pasta com INIs de configuração por cidade (C:\\FarmaFacil\\EXE\\Acbr\\ArqINI)\nPathProvedor: Pasta com INIs do provedor (igual ao PathIniCidades normalmente)\nFormatoAliquota: 100 = alíquota em formato centesimal (5.00 = 5%, não 0.05)\nTimeOut: Timeout de comunicação em ms (padrão 120000 = 2 minutos)\nTipoDANFE: 0=não gerar PDF, 1=gerar PDF da NFS-e\nPathPDF: Caminho para salvar PDFs da NFS-e\nEmissaoPathNFSE: True=salvar XML na pasta NFSe\\\nSepararPorMes: True=criar subpasta por mês dentro de NFSe\\\nSalvarSOAP: True=salvar envelope SOAP para debug (deixar False em produção)\nCssllib: Tipo biblioteca SSL: 1=WinHttp, 4=OpenSSL\nCsscryptlib: Tipo biblioteca criptografia: 3=WinCrypt, 4=OpenSSL\nSslType: Tipo SSL: 5=TLS 1.2",
+    "passos": [
+      "TipoAmbiente: 1=Produção, 2=Homologação",
+      "Provedor: Nome do provedor (ISSNet, ABRASF, GINFES, SilTecnologia, Betha, etc.)",
+      "CodigoMunicipio: Código IBGE do município (7 dígitos, ex: 3205200 = Vila Velha/ES)",
+      "UfEmitente: UF em texto (ex: ES, SP, RJ)",
+      "CaminhoCertificado: Pasta onde está o arquivo .pfx do certificado",
+      "NumeroCertificado: Número de série do certificado (para A3/token)",
+      "SenhaCertificado: Senha do certificado A1 (.pfx)",
+      "UserWeb: CNPJ da farmácia (usado para autenticação no webservice)",
+      "SenhaWeb: Senha de acesso ao webservice da prefeitura",
+      "PathSchema: Caminho dos XSD de validação (ex: C:\\FarmaFacil\\EXE\\Acbr\\Schemas\\)",
+      "PathIniCidades: Pasta com INIs de configuração por cidade (C:\\FarmaFacil\\EXE\\Acbr\\ArqINI)",
+      "PathProvedor: Pasta com INIs do provedor (igual ao PathIniCidades normalmente)",
+      "FormatoAliquota: 100 = alíquota em formato centesimal (5.00 = 5%, não 0.05)",
+      "TimeOut: Timeout de comunicação em ms (padrão 120000 = 2 minutos)",
+      "TipoDANFE: 0=não gerar PDF, 1=gerar PDF da NFS-e",
+      "PathPDF: Caminho para salvar PDFs da NFS-e",
+      "EmissaoPathNFSE: True=salvar XML na pasta NFSe\\",
+      "SepararPorMes: True=criar subpasta por mês dentro de NFSe\\",
+      "SalvarSOAP: True=salvar envelope SOAP para debug (deixar False em produção)",
+      "Cssllib: Tipo biblioteca SSL: 1=WinHttp, 4=OpenSSL",
+      "Csscryptlib: Tipo biblioteca criptografia: 3=WinCrypt, 4=OpenSSL",
+      "SslType: Tipo SSL: 5=TLS 1.2"
+    ],
+    "tags": [
+      "nfse",
+      "xml",
+      "configuracao",
+      "campos",
+      "tipoambiente",
+      "provedor",
+      "municipio",
+      "aliquota",
+      "certificado",
+      "ssl"
+    ],
+    "bloco": 2123
+  },
+  {
+    "titulo": "NFS-e — Campos do RPS (Recibo Provisório de Serviços)",
+    "resumo": "Campos obrigatórios no RPS para emissão de NFS-e",
+    "problema": "Quais campos são obrigatórios no RPS para emissão de NFS-e?",
+    "causa": "",
+    "solucao": "NumeroRps: Número sequencial do RPS (deve seguir a sequência da prefeitura)\nSerie: Série do RPS (máx 5 dígitos, ex: '1', 'A', 'NF')\nDataEmissaoRps: Data de emissão no formato DD/MM/AAAA\nDiscriminacao: Descrição do serviço prestado (texto livre, obrigatório)\nValorServicos: Valor bruto do serviço\nAliquota: Alíquota ISS em centésimos (500 = 5%)\nIssRetido: 1=ISS retido pelo tomador, 2=ISS não retido\nItemListaServico: Código de serviço da lista ABRASF (4-5 dígitos, ex: 040701)\nCodigoTributacaoMunicipio: Código municipal de tributação (3 dígitos para alguns padrões)\nCodigoAtividade: CNAE ou código de atividade\nCodigoCnae: CNAE da atividade (ex: 4771702 = farmácias)\ncNBS: Código NBS — Nomenclatura Brasileira de Serviços (9 dígitos)\nOptanteSimplesNacional: 1=Não optante, 2=Optante, 3=ME/EPP\nNaturezaOperacao: 1=Tributação no município, etc.\nExigibilidadeISS: 1=Exigível, 2=Não incidência, 3=Isenção, etc.\nRegimeEspecialTributacao: 0=Nenhum, 1=Microempresa municipal, etc.",
+    "passos": [
+      "NumeroRps: Número sequencial do RPS (deve seguir a sequência da prefeitura)",
+      "Serie: Série do RPS (máx 5 dígitos, ex: '1', 'A', 'NF')",
+      "DataEmissaoRps: Data de emissão no formato DD/MM/AAAA",
+      "Discriminacao: Descrição do serviço prestado (texto livre, obrigatório)",
+      "ValorServicos: Valor bruto do serviço",
+      "Aliquota: Alíquota ISS em centésimos (500 = 5%)",
+      "IssRetido: 1=ISS retido pelo tomador, 2=ISS não retido",
+      "ItemListaServico: Código de serviço da lista ABRASF (4-5 dígitos, ex: 040701)",
+      "CodigoTributacaoMunicipio: Código municipal de tributação (3 dígitos para alguns padrões)",
+      "CodigoAtividade: CNAE ou código de atividade",
+      "CodigoCnae: CNAE da atividade (ex: 4771702 = farmácias)",
+      "cNBS: Código NBS — Nomenclatura Brasileira de Serviços (9 dígitos)",
+      "OptanteSimplesNacional: 1=Não optante, 2=Optante, 3=ME/EPP",
+      "NaturezaOperacao: 1=Tributação no município, etc.",
+      "ExigibilidadeISS: 1=Exigível, 2=Não incidência, 3=Isenção, etc.",
+      "RegimeEspecialTributacao: 0=Nenhum, 1=Microempresa municipal, etc."
+    ],
+    "tags": [
+      "nfse",
+      "rps",
+      "campos",
+      "numerorps",
+      "serie",
+      "discriminacao",
+      "aliquota",
+      "iss"
+    ],
+    "bloco": 2124
+  },
+  {
+    "titulo": "NFS-e — Lista de provedores suportados",
+    "resumo": "Provedores de NFS-e suportados pelo FarmaFácil via Prisma5NFSe.dll",
+    "problema": "Qual provedor usar para o município do cliente?",
+    "causa": "",
+    "solucao": "ABRASF:  1.0 / 2.0 / 2.03 / 2.04\nISSNet: ISSNet Online — utilizado em muitos municípios SP/RS \nGINFES: Gestão Integrada NFS-e — Londrina, Maringá, etc. \nBetha: Provedor Betha Sistemas Betha / BethaV2\nSilTecnologia: Vila Velha/ES e outros municípios ES \nGISS: GISS Online — vários municípios \nFiorilli: Fiorilli Software — municípios interior SP \nEquiplano: Equiplano Sistemas \nSigISS: SigISS — vários municípios, incluindo RS \neGoverne: eGoverne — municípios nordeste e centro-oeste \nSystemPro: SystemPro \nTinus:  Tinus / TinusV2\neNFS: eNFS — municípios MG \nSpeedGov: SpeedGov \nFintel: Fintel Informática \nDatasmart: Datasmart \nFISCO: FISCO \nNFSeBrasil: NFS-e Brasil \nElotech: Elotech Gestão Pública \nAbase: Abase Sistemas \neReceita: eReceita \nSPED Nacional / DPS RFB: Padrão nacional DPS da Receita Federal — novos municípios migrados \nTecnoSpeed: TecnoSpeed — integração via API com vários municípios \nTributosmunicipais: Tributos Municipais \nMegasoft: Megasoft \nCTAConsult: CTAConsult ",
+    "passos": [
+      "ABRASF: ",
+      "ISSNet: ISSNet Online — utilizado em muitos municípios SP/RS",
+      "GINFES: Gestão Integrada NFS-e — Londrina, Maringá, etc.",
+      "Betha: Provedor Betha Sistemas",
+      "SilTecnologia: Vila Velha/ES e outros municípios ES",
+      "GISS: GISS Online — vários municípios",
+      "Fiorilli: Fiorilli Software — municípios interior SP",
+      "Equiplano: Equiplano Sistemas",
+      "SigISS: SigISS — vários municípios, incluindo RS",
+      "eGoverne: eGoverne — municípios nordeste e centro-oeste",
+      "SystemPro: SystemPro",
+      "Tinus: ",
+      "eNFS: eNFS — municípios MG",
+      "SpeedGov: SpeedGov",
+      "Fintel: Fintel Informática",
+      "Datasmart: Datasmart",
+      "FISCO: FISCO",
+      "NFSeBrasil: NFS-e Brasil",
+      "Elotech: Elotech Gestão Pública",
+      "Abase: Abase Sistemas",
+      "eReceita: eReceita",
+      "SPED Nacional / DPS RFB: Padrão nacional DPS da Receita Federal — novos municípios migrados",
+      "TecnoSpeed: TecnoSpeed — integração via API com vários municípios",
+      "Tributosmunicipais: Tributos Municipais",
+      "Megasoft: Megasoft",
+      "CTAConsult: CTAConsult"
+    ],
+    "tags": [
+      "nfse",
+      "provedor",
+      "issnet",
+      "abrasf",
+      "ginfes",
+      "betha",
+      "fiorilli",
+      "siltecnologia",
+      "giss",
+      "equiplano",
+      "sigiss",
+      "municipio"
+    ],
+    "bloco": 2125
+  },
+  {
+    "titulo": "NFS-e — nfseLocais_ini_ausente",
+    "resumo": "",
+    "problema": "EspdNFSeFileNotFoundException: Arquivo 'C:\\nfseLocais.ini' não foi encontrado",
+    "causa": "Arquivo ausente na raiz C:\\",
+    "solucao": "Reconfigurar municípios em Fiscal > NFS-e > Configurações\nO sistema recria o arquivo ao salvar",
+    "passos": [
+      "Reconfigurar municípios em Fiscal > NFS-e > Configurações",
+      "O sistema recria o arquivo ao salvar"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2126
+  },
+  {
+    "titulo": "NFS-e — schema_xsd_ausente",
+    "resumo": "",
+    "problema": "Arquivo schema_v101-ISSNet.xsd Não encontrado",
+    "causa": "Schemas ACBr ausentes",
+    "solucao": "Extrair Acbr.rar para C:\\FarmaFacil\\EXE\\Acbr\\\nVerificar pastas Schemas\\PadraoNacional\\1.01\\ e 2.04\\",
+    "passos": [
+      "Extrair Acbr.rar para C:\\FarmaFacil\\EXE\\Acbr\\",
+      "Verificar pastas Schemas\\PadraoNacional\\1.01\\ e 2.04\\"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2127
+  },
+  {
+    "titulo": "NFS-e — cnpj_nao_autorizado",
+    "resumo": "",
+    "problema": "CNPJ/CPF do prestador não autorizado a emitir NFS-e",
+    "causa": "CNPJ não habilitado na prefeitura",
+    "solucao": "Cliente deve solicitar habilitação na prefeitura do município\nPode levar dias úteis",
+    "passos": [
+      "Cliente deve solicitar habilitação na prefeitura do município",
+      "Pode levar dias úteis"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2128
+  },
+  {
+    "titulo": "NFS-e — certificado_nao_configurado",
+    "resumo": "",
+    "problema": "DadosPFX, ArquivoPFX, URLPFX ou NumeroSerie não especificados",
+    "causa": "Certificado digital não configurado",
+    "solucao": "Configurar .pfx em Configurações > NFS-e\nPreencher caminho, senha ou número de série do token",
+    "passos": [
+      "Configurar .pfx em Configurações > NFS-e",
+      "Preencher caminho, senha ou número de série do token"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2129
+  },
+  {
+    "titulo": "NFS-e — certificado_expirado",
+    "resumo": "",
+    "problema": "Erro de Conexão: Data de Validade do Certificado já expirou: DD/MM/AAAA",
+    "causa": "Certificado digital vencido",
+    "solucao": "Renovar certificado junto à AC (Serasa, Certisign, Safeweb, etc.)\nAtualizar caminho/senha nas configurações NFS-e",
+    "passos": [
+      "Renovar certificado junto à AC (Serasa, Certisign, Safeweb, etc.)",
+      "Atualizar caminho/senha nas configurações NFS-e"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2130
+  },
+  {
+    "titulo": "NFS-e — certificado_serie_nao_encontrado",
+    "resumo": "",
+    "problema": "Certificado Série: 'XXXXXX', não encontrado!",
+    "causa": "Token A3 não conectado ou driver não instalado",
+    "solucao": "Conectar o token USB\nInstalar driver da certificadora\nVerificar número de série correto",
+    "passos": [
+      "Conectar o token USB",
+      "Instalar driver da certificadora",
+      "Verificar número de série correto"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2131
+  },
+  {
+    "titulo": "NFS-e — numero_rps_invalido",
+    "resumo": "",
+    "problema": "Número do RPS inválido / Série do RPS inválida",
+    "causa": "Sequência de numeração errada ou série inválida",
+    "solucao": "Corrigir próximo número RPS em Configurações > NFS-e\nConfirmar última numeração com a prefeitura\nSérie máx 5 dígitos",
+    "passos": [
+      "Corrigir próximo número RPS em Configurações > NFS-e",
+      "Confirmar última numeração com a prefeitura",
+      "Série máx 5 dígitos"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2132
+  },
+  {
+    "titulo": "NFS-e — data_competencia_futura",
+    "resumo": "",
+    "problema": "Data de competência superior à de emissão do RPS",
+    "causa": "A data de competência está definida para uma data futura",
+    "solucao": "Data de competência deve ser igual ou anterior à data de emissão\nCorrigir data de competência nas configurações",
+    "passos": [
+      "Data de competência deve ser igual ou anterior à data de emissão",
+      "Corrigir data de competência nas configurações"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2133
+  },
+  {
+    "titulo": "NFS-e — lote_ja_declarado",
+    "resumo": "",
+    "problema": "Já existe um lote declarado com esta numeração",
+    "causa": "Reenvio com mesmo número de lote",
+    "solucao": "Incrementar número do lote em Configurações > NFS-e\nVerificar se lote anterior foi processado antes",
+    "passos": [
+      "Incrementar número do lote em Configurações > NFS-e",
+      "Verificar se lote anterior foi processado antes"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2134
+  },
+  {
+    "titulo": "NFS-e — inscricao_municipal_nao_encontrada",
+    "resumo": "",
+    "problema": "Inscrição Municipal do prestador não encontrada na base de dados do município",
+    "causa": "Inscrição municipal (CCM) incorreta",
+    "solucao": "Verificar inscrição municipal em Configurações > Empresa\nConfirmar número com a prefeitura",
+    "passos": [
+      "Verificar inscrição municipal em Configurações > Empresa",
+      "Confirmar número com a prefeitura"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2135
+  },
+  {
+    "titulo": "NFS-e — namespace_incorreto",
+    "resumo": "",
+    "problema": "s:Client — Start element RecepcionarLoteRps from namespace X expected, found namespace Y",
+    "causa": "Provedor configurado incorretamente (ISSNet vs ABRASF)",
+    "solucao": "Identificar provedor correto da prefeitura\nAlterar em Configurações > NFS-e > Município",
+    "passos": [
+      "Identificar provedor correto da prefeitura",
+      "Alterar em Configurações > NFS-e > Município"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2136
+  },
+  {
+    "titulo": "NFS-e — cnpj_assinatura_diferente",
+    "resumo": "",
+    "problema": "CPF/CNPJ do usuário autorizado não confere com o CPF/CNPJ da comunicação",
+    "causa": "Certificado de CNPJ diferente do emissor",
+    "solucao": "Usar certificado do mesmo CNPJ configurado como emissor",
+    "passos": [
+      "Usar certificado do mesmo CNPJ configurado como emissor"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2137
+  },
+  {
+    "titulo": "NFS-e — simples_nacional_incorreto",
+    "resumo": "",
+    "problema": "Situação perante o Simples Nacional na DPS não está de acordo com o cadastro",
+    "causa": "Regime tributário divergente da Receita Federal",
+    "solucao": "Verificar regime tributário atual com o contador\nCorrigir OptanteSimplesNacional em Configurações",
+    "passos": [
+      "Verificar regime tributário atual com o contador",
+      "Corrigir OptanteSimplesNacional em Configurações"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2138
+  },
+  {
+    "titulo": "NFS-e — pTotTribSN_invalido",
+    "resumo": "",
+    "problema": "Element pTotTribSN: value '200.00' not accepted by pattern",
+    "causa": "Alíquota Simples Nacional fora do padrão (deve ser 0 a 99.99)",
+    "solucao": "Corrigir alíquota — ex: 6.00 para 6%, não 200.00",
+    "passos": [
+      "Corrigir alíquota — ex: 6.00 para 6%, não 200.00"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2139
+  },
+  {
+    "titulo": "NFS-e — cTribMun_formato",
+    "resumo": "",
+    "problema": "cTribMun deve ter exatamente 3 caracteres",
+    "causa": "Código de tributação municipal com dígitos a mais",
+    "solucao": "Verificar e corrigir código de tributação em Configurações > NFS-e > Serviço",
+    "passos": [
+      "Verificar e corrigir código de tributação em Configurações > NFS-e > Serviço"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2140
+  },
+  {
+    "titulo": "NFS-e — cNBS_ausente",
+    "resumo": "",
+    "problema": "cServ não está completo — era esperado cNBS",
+    "causa": "Código NBS não preenchido (obrigatório para padrão Betha/DPS)",
+    "solucao": "Preencher código NBS no cadastro do serviço NFS-e\nNBS farmacêutico comum: 1.0404.21.00",
+    "passos": [
+      "Preencher código NBS no cadastro do serviço NFS-e",
+      "NBS farmacêutico comum: 1.0404.21.00"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2141
+  },
+  {
+    "titulo": "NFS-e — codigo_servico_muito_longo",
+    "resumo": "",
+    "problema": "ItemListaServico: length 6 exceeds maxLength 5",
+    "causa": "Código de serviço tem 6 dígitos mas o padrão aceita até 5",
+    "solucao": "Corrigir código de serviço para 4 ou 5 dígitos conforme aceito pela prefeitura",
+    "passos": [
+      "Corrigir código de serviço para 4 ou 5 dígitos conforme aceito pela prefeitura"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2142
+  },
+  {
+    "titulo": "NFS-e — regime_especial_invalido",
+    "resumo": "",
+    "problema": "regEspTrib: value '' not in set {'0','1','2','3','4','5','6'}",
+    "causa": "Regime especial de tributação vazio ou inválido",
+    "solucao": "Preencher RegimeEspecialTributacao com valor válido: 0=Nenhum, 1=Microempresa, 5=Cooperativa",
+    "passos": [
+      "Preencher RegimeEspecialTributacao com valor válido: 0=Nenhum, 1=Microempresa, 5=Cooperativa"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2143
+  },
+  {
+    "titulo": "NFS-e — ssl_erro_conexao_12030",
+    "resumo": "",
+    "problema": "12030 - A conexão com o servidor foi redefinida ou um protocolo SSL incompatível foi encontrado",
+    "causa": "Incompatibilidade de versão TLS com o servidor da prefeitura",
+    "solucao": "Verificar configurações Cssllib e SslType\nTentar SslType=5 (TLS 1.2)\nPode requerer atualização do ACBr",
+    "passos": [
+      "Verificar configurações Cssllib e SslType",
+      "Tentar SslType=5 (TLS 1.2)",
+      "Pode requerer atualização do ACBr"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2144
+  },
+  {
+    "titulo": "NFS-e — valor_total_servicos_nao_confere",
+    "resumo": "",
+    "problema": "Valor Total de Serviços não confere com o enviado",
+    "causa": "Somatório dos itens não bate com o total — problema de arredondamento",
+    "solucao": "Verificar cálculos de desconto e arredondamento nas configurações de NFS-e",
+    "passos": [
+      "Verificar cálculos de desconto e arredondamento nas configurações de NFS-e"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2145
+  },
+  {
+    "titulo": "NFS-e — tecnospeed_null_pointer",
+    "resumo": "",
+    "problema": "Null Pointer Exception — Script: LoadEnvio — Arquivo: SetarCamposMunicipioDs.txt",
+    "causa": "Arquivo de configuração TecnoSpeed corrompido ou ausente",
+    "solucao": "Reconfigurar município no TecnoSpeed\nSe persistir: escalar para PrismaFive",
+    "passos": [
+      "Reconfigurar município no TecnoSpeed",
+      "Se persistir: escalar para PrismaFive"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2146
+  },
+  {
+    "titulo": "NFS-e — tecnospeed_falha_catastrofica",
+    "resumo": "",
+    "problema": "Ocorreu um erro inesperado: Falha catastrófica",
+    "causa": "Falha de componente .NET ou COM do módulo TecnoSpeed",
+    "solucao": "Verificar .NET Framework 4.x instalado\nExecutar como Administrador\nExecutar RegistrarDLLs.exe em DLLs\\\nEscalar para PrismaFive",
+    "passos": [
+      "Verificar .NET Framework 4.x instalado",
+      "Executar como Administrador",
+      "Executar RegistrarDLLs.exe em DLLs\\",
+      "Escalar para PrismaFive"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2147
+  },
+  {
+    "titulo": "NFS-e — xml_nao_pode_ser_validado",
+    "resumo": "",
+    "problema": "Não foi possível validar o xml — Favor entrar em contato com o suporte técnico",
+    "causa": "Erro interno de validação XML",
+    "solucao": "Escalar para PrismaFive com o XML completo para análise",
+    "passos": [
+      "Escalar para PrismaFive com o XML completo para análise"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2148
+  },
+  {
+    "titulo": "NFS-e — im_prestador_nao_deve_ser_informado",
+    "resumo": "",
+    "problema": "IM do prestador não deve ser informado, pois não existem informações complementares registradas no CNC NFS-e",
+    "causa": "Inscrição Municipal preenchida mas o município não aceita este campo no DPS",
+    "solucao": "Deixar campo Inscrição Municipal em branco para este município específico",
+    "passos": [
+      "Deixar campo Inscrição Municipal em branco para este município específico"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2149
+  },
+  {
+    "titulo": "NFS-e — protocolo_nao_informado",
+    "resumo": "",
+    "problema": "Número do Protocolo não informado",
+    "causa": "Prefeitura não retornou protocolo — timeout ou falha no processamento",
+    "solucao": "Aguardar e consultar o lote depois\nVerificar situação do lote em Fiscal > NFS-e > Consultar Lote",
+    "passos": [
+      "Aguardar e consultar o lote depois",
+      "Verificar situação do lote em Fiscal > NFS-e > Consultar Lote"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2150
+  },
+  {
+    "titulo": "NFS-e — usuario_contribuinte_nao_identificado",
+    "resumo": "",
+    "problema": "Usuário/Contribuinte Não Identificado (Erro 1) [Cód. Usuário: 123, Cód. Contribuinte: 123]",
+    "causa": "Credenciais UserWeb/SenhaWeb incorretas ou não cadastradas na prefeitura",
+    "solucao": "Verificar UserWeb (deve ser o CNPJ) e SenhaWeb\nSolicitar credenciais corretas à prefeitura",
+    "passos": [
+      "Verificar UserWeb (deve ser o CNPJ) e SenhaWeb",
+      "Solicitar credenciais corretas à prefeitura"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2151
+  },
+  {
+    "titulo": "NFS-e — rejeicao_regras_municipais_data",
+    "resumo": "",
+    "problema": "Rejeitado pelas regras municipais: A data de emissão do RPS não pode ser inferior a DD/MM/AAAA",
+    "causa": "Tentativa de emitir NFS-e com data retroativa além do limite da prefeitura",
+    "solucao": "Verificar data do RPS\nAlgumas prefeituras não aceitam emissão retroativa além de 30 dias",
+    "passos": [
+      "Verificar data do RPS",
+      "Algumas prefeituras não aceitam emissão retroativa além de 30 dias"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2152
+  },
+  {
+    "titulo": "NFS-e — erro_assinatura_x509",
+    "resumo": "",
+    "problema": "Não foi possível realizar a geração da NF-e: Cannot create X509Certificate",
+    "causa": "Erro ao carregar certificado digital — arquivo corrompido ou senha errada",
+    "solucao": "Verificar se arquivo .pfx está íntegro\nVerificar senha\nTentar reimportar o certificado",
+    "passos": [
+      "Verificar se arquivo .pfx está íntegro",
+      "Verificar senha",
+      "Tentar reimportar o certificado"
+    ],
+    "tags": [
+      "nfse",
+      "erro",
+      "fiscal",
+      "nfselocais",
+      "xml"
+    ],
+    "bloco": 2153
+  },
+  {
+    "titulo": "SNGPC — Guia completo de transmissão ANVISA",
+    "resumo": "Sistema Nacional de Gerenciamento de Produtos Controlados. Obrigatório para farmácias que comercializam medicamentos sujeitos a controle especial (psicotrópicos, entorpecentes, etc.).",
+    "problema": "Farmácia precisa transmitir SNGPC ou há erro na transmissão",
+    "causa": "",
+    "solucao": "",
+    "passos": [
+      "1. SNGPC registra movimentações automaticamente",
+      "2. Gerar XML: Módulos > SNGPC > Gerar Arquivo",
+      "3. Transmitir via portal ANVISA",
+      "4. Verificar protocolo de retorno"
+    ],
+    "tags": [
+      "sngpc",
+      "anvisa",
+      "controlados",
+      "xml",
+      "transmissao",
+      "regulatorio"
+    ],
+    "bloco": 2154
+  },
+  {
+    "titulo": "Módulos — Telas do grupo: vendas_pdv",
+    "resumo": "Descrição das telas do módulo vendas_pdv no FarmaFácil",
+    "problema": "Quais telas existem no módulo vendas_pdv e o que cada uma faz?",
+    "causa": "",
+    "solucao": "TFM_VENDA: Tela principal de venda (PDV) — onde o atendente registra produtos, aplica descontos e finaliza a venda\nTFM_CAIXA: Abertura, fechamento e controle do caixa\nTFM_FECHAMENTOCAIXA: Fechamento de caixa com totais por forma de pagamento\nTFM_CANCELAMENTOVENDA: Cancelamento de venda já registrada\nTFM_AUTORIZADESCONTO: Solicita autorização de supervisor para aplicar desconto acima do limite\nTFM_AUTORIZATROCAVENDEDOR: Autoriza troca do vendedor responsável durante a venda\nTFM_FUNCOESTEF: Funções de TEF — acionamento do terminal de cartão durante a venda\nTFM_MENSAGEMTEF: Exibe mensagens do terminal TEF para o operador\nTFM_ULTIMASVENDAS: Consulta as últimas vendas realizadas\nTFM_CONCOMITANCIAITENS: Verifica incompatibilidade/interações entre medicamentos na venda\nTFM_IDENTIFICACAOPAFNFCE: Identifica o tipo de documento fiscal (PAF-ECF ou NFC-e)\nTFM_GESTAOENTREGA: Gestão de entregas a domicílio\nTFM_MANUTENCAOVENDA: Manutenção/correção de vendas já registradas\nTFM_OPERADORCAIXA: Cadastro e gerenciamento de operadores de caixa",
+    "passos": [
+      "TFM_VENDA: Tela principal de venda (PDV) — onde o atendente registra produtos, aplica descontos e finaliza a venda",
+      "TFM_CAIXA: Abertura, fechamento e controle do caixa",
+      "TFM_FECHAMENTOCAIXA: Fechamento de caixa com totais por forma de pagamento",
+      "TFM_CANCELAMENTOVENDA: Cancelamento de venda já registrada",
+      "TFM_AUTORIZADESCONTO: Solicita autorização de supervisor para aplicar desconto acima do limite",
+      "TFM_AUTORIZATROCAVENDEDOR: Autoriza troca do vendedor responsável durante a venda",
+      "TFM_FUNCOESTEF: Funções de TEF — acionamento do terminal de cartão durante a venda",
+      "TFM_MENSAGEMTEF: Exibe mensagens do terminal TEF para o operador",
+      "TFM_ULTIMASVENDAS: Consulta as últimas vendas realizadas",
+      "TFM_CONCOMITANCIAITENS: Verifica incompatibilidade/interações entre medicamentos na venda",
+      "TFM_IDENTIFICACAOPAFNFCE: Identifica o tipo de documento fiscal (PAF-ECF ou NFC-e)",
+      "TFM_GESTAOENTREGA: Gestão de entregas a domicílio",
+      "TFM_MANUTENCAOVENDA: Manutenção/correção de vendas já registradas",
+      "TFM_OPERADORCAIXA: Cadastro e gerenciamento de operadores de caixa"
+    ],
+    "tags": [
+      "modulo",
+      "tela",
+      "formulario",
+      "vendas_pdv",
+      "farmafacil"
+    ],
+    "bloco": 2155
+  },
+  {
+    "titulo": "Módulos — Telas do grupo: manipulacao",
+    "resumo": "Descrição das telas do módulo manipulacao no FarmaFácil",
+    "problema": "Quais telas existem no módulo manipulacao e o que cada uma faz?",
+    "causa": "",
+    "solucao": "TFM_ORDEMPRODUCAO: Ordem de produção — receita magistral completa com fórmulas, insumos e processo\nTFM_FORMULAPADRAO: Cadastro de fórmulas padrão pré-definidas\nTFM_DOSEFORMULA: Cálculo de doses para fórmulas\nTFM_CUSTOFORMULA: Cálculo de custo da fórmula para precificação\nTFM_DINAMIZACAO: Dinamizações homeopáticas (CH, DH, FC, LM)\nTFM_APONTAMENTO: Apontamento de produção — registro de etapas do processo produtivo\nTFM_ENSAIO: Ensaios de controle de qualidade de insumos e produtos\nTFM_TABELAFLORAL: Tabela de florais de Bach e outras terapias florais\nTFM_TABELAHOMEOPATIA: Tabela de preparações homeopáticas\nTFM_PESAGEMMONITORADA: Pesagem monitorada com registro automático de dados da balança\nTFM_SELECAOGERAORDEM: Seleção de ordens de produção para geração em lote\nTFM_SELECAOCONCLUIORDEM: Conclusão em lote de ordens de produção\nTFM_ORDEMPRODUCAOCONCLUIRLOTES: Conclusão de ordens com múltiplos lotes",
+    "passos": [
+      "TFM_ORDEMPRODUCAO: Ordem de produção — receita magistral completa com fórmulas, insumos e processo",
+      "TFM_FORMULAPADRAO: Cadastro de fórmulas padrão pré-definidas",
+      "TFM_DOSEFORMULA: Cálculo de doses para fórmulas",
+      "TFM_CUSTOFORMULA: Cálculo de custo da fórmula para precificação",
+      "TFM_DINAMIZACAO: Dinamizações homeopáticas (CH, DH, FC, LM)",
+      "TFM_APONTAMENTO: Apontamento de produção — registro de etapas do processo produtivo",
+      "TFM_ENSAIO: Ensaios de controle de qualidade de insumos e produtos",
+      "TFM_TABELAFLORAL: Tabela de florais de Bach e outras terapias florais",
+      "TFM_TABELAHOMEOPATIA: Tabela de preparações homeopáticas",
+      "TFM_PESAGEMMONITORADA: Pesagem monitorada com registro automático de dados da balança",
+      "TFM_SELECAOGERAORDEM: Seleção de ordens de produção para geração em lote",
+      "TFM_SELECAOCONCLUIORDEM: Conclusão em lote de ordens de produção",
+      "TFM_ORDEMPRODUCAOCONCLUIRLOTES: Conclusão de ordens com múltiplos lotes"
+    ],
+    "tags": [
+      "modulo",
+      "tela",
+      "formulario",
+      "manipulacao",
+      "farmafacil"
+    ],
+    "bloco": 2156
+  },
+  {
+    "titulo": "Módulos — Telas do grupo: notas_fiscais",
+    "resumo": "Descrição das telas do módulo notas_fiscais no FarmaFácil",
+    "problema": "Quais telas existem no módulo notas_fiscais e o que cada uma faz?",
+    "causa": "",
+    "solucao": "TFM_NOTAFISCAL: Emissão de NF-e saída (venda para pessoa jurídica, remessa, etc.)\nTFM_NOTAFISCALENTRADA: Entrada de NF-e (recebimento de mercadorias)\nTFM_NOTAFISCALENVIARLOTE: Transmissão de NF-e em lote para SEFAZ\nTFM_CANCELAMENTONFE: Cancelamento de NF-e\nTFM_CARTACORRECAONFE: Carta de Correção Eletrônica (CC-e) de NF-e\nTFM_EXPORTACAONFE: Exportação de XMLs de NF-e\nTFM_MANIFESTO: Manifesto de Destinatário (confirmação de recebimento de NF-e)\nTFM_AJUSTANFCE: Ajuste de NFC-e (correção de dados após emissão)\nTFM_MENUFISCAL: Menu principal de funções fiscais\nTFM_MENUFISCAL_NFCE: Menu de funções NFC-e\nTFM_RESUMOENVIOCONTINGENCIA: Resumo de NFC-e emitidas em contingência aguardando transmissão",
+    "passos": [
+      "TFM_NOTAFISCAL: Emissão de NF-e saída (venda para pessoa jurídica, remessa, etc.)",
+      "TFM_NOTAFISCALENTRADA: Entrada de NF-e (recebimento de mercadorias)",
+      "TFM_NOTAFISCALENVIARLOTE: Transmissão de NF-e em lote para SEFAZ",
+      "TFM_CANCELAMENTONFE: Cancelamento de NF-e",
+      "TFM_CARTACORRECAONFE: Carta de Correção Eletrônica (CC-e) de NF-e",
+      "TFM_EXPORTACAONFE: Exportação de XMLs de NF-e",
+      "TFM_MANIFESTO: Manifesto de Destinatário (confirmação de recebimento de NF-e)",
+      "TFM_AJUSTANFCE: Ajuste de NFC-e (correção de dados após emissão)",
+      "TFM_MENUFISCAL: Menu principal de funções fiscais",
+      "TFM_MENUFISCAL_NFCE: Menu de funções NFC-e",
+      "TFM_RESUMOENVIOCONTINGENCIA: Resumo de NFC-e emitidas em contingência aguardando transmissão"
+    ],
+    "tags": [
+      "modulo",
+      "tela",
+      "formulario",
+      "notas_fiscais",
+      "farmafacil"
+    ],
+    "bloco": 2157
+  },
+  {
+    "titulo": "Módulos — Telas do grupo: estoque_compras",
+    "resumo": "Descrição das telas do módulo estoque_compras no FarmaFácil",
+    "problema": "Quais telas existem no módulo estoque_compras e o que cada uma faz?",
+    "causa": "",
+    "solucao": "TFM_ACERTOESTOQUE: Acerto manual de estoque (inventário físico vs sistema)\nTFM_ARQUIVOESTOQUE: Exportação/importação de arquivo de estoque\nTFM_FALTASENCOMENDAS: Lista de produtos em falta com registro de encomendas\nTFM_TRANSFERENCIA: Transferência de produtos entre filiais\nTFM_LOTE: Cadastro e controle de lotes com validade\nTFM_COTACAOCOMPRAS: Cotação de preços com fornecedores para compras\nTFM_PEDIDOCOMPRACONSULTA: Consulta de pedidos de compra\nTFM_MANUTENCAOINVENTARIO: Manutenção do inventário (contagem física)\nTFM_INCLUSAOPRODUTOCOTACAO: Inclusão de produtos na cotação de compras",
+    "passos": [
+      "TFM_ACERTOESTOQUE: Acerto manual de estoque (inventário físico vs sistema)",
+      "TFM_ARQUIVOESTOQUE: Exportação/importação de arquivo de estoque",
+      "TFM_FALTASENCOMENDAS: Lista de produtos em falta com registro de encomendas",
+      "TFM_TRANSFERENCIA: Transferência de produtos entre filiais",
+      "TFM_LOTE: Cadastro e controle de lotes com validade",
+      "TFM_COTACAOCOMPRAS: Cotação de preços com fornecedores para compras",
+      "TFM_PEDIDOCOMPRACONSULTA: Consulta de pedidos de compra",
+      "TFM_MANUTENCAOINVENTARIO: Manutenção do inventário (contagem física)",
+      "TFM_INCLUSAOPRODUTOCOTACAO: Inclusão de produtos na cotação de compras"
+    ],
+    "tags": [
+      "modulo",
+      "tela",
+      "formulario",
+      "estoque_compras",
+      "farmafacil"
+    ],
+    "bloco": 2158
+  },
+  {
+    "titulo": "Módulos — Telas do grupo: financeiro",
+    "resumo": "Descrição das telas do módulo financeiro no FarmaFácil",
+    "problema": "Quais telas existem no módulo financeiro e o que cada uma faz?",
+    "causa": "",
+    "solucao": "TFM_FATURAPAGAR: Contas a pagar — cadastro e gerenciamento de títulos\nTFM_FATURARECEBER: Contas a receber — controle de recebimentos\nTFM_CONTACORRENTE: Extrato e movimentos de conta corrente bancária\nTFM_PLANOCONTAS: Plano de contas contábil\nTFM_CONCILIACAOBANCARIA: Conciliação bancária (extrato banco vs sistema)\nTFM_COBRANCAINTEGRADA: Geração de boletos bancários (cobrança integrada)\nTFM_COBRANCAINTEGRADARETORNO: Processamento de arquivo de retorno bancário\nTFM_DEBITOCLIENTE: Débito automático de clientes",
+    "passos": [
+      "TFM_FATURAPAGAR: Contas a pagar — cadastro e gerenciamento de títulos",
+      "TFM_FATURARECEBER: Contas a receber — controle de recebimentos",
+      "TFM_CONTACORRENTE: Extrato e movimentos de conta corrente bancária",
+      "TFM_PLANOCONTAS: Plano de contas contábil",
+      "TFM_CONCILIACAOBANCARIA: Conciliação bancária (extrato banco vs sistema)",
+      "TFM_COBRANCAINTEGRADA: Geração de boletos bancários (cobrança integrada)",
+      "TFM_COBRANCAINTEGRADARETORNO: Processamento de arquivo de retorno bancário",
+      "TFM_DEBITOCLIENTE: Débito automático de clientes"
+    ],
+    "tags": [
+      "modulo",
+      "tela",
+      "formulario",
+      "financeiro",
+      "farmafacil"
+    ],
+    "bloco": 2159
+  },
+  {
+    "titulo": "Módulos — Telas do grupo: controlados_sngpc",
+    "resumo": "Descrição das telas do módulo controlados_sngpc no FarmaFácil",
+    "problema": "Quais telas existem no módulo controlados_sngpc e o que cada uma faz?",
+    "causa": "",
+    "solucao": "TFM_DADOSRECEITA: Cadastro dos dados da receita médica para controlados\nTFM_LISTACONTROLADO: Lista de produtos controlados cadastrados\nTFM_RETENCAORECEITA: Registro de retenção de receita\nTFM_MANUTENCAOLANCARPERDASSNGPC: Lançamento de perdas de medicamentos controlados no SNGPC\nTFM_PRODUTOEXCECAOSNGPC: Cadastro de produtos com exceção de notificação SNGPC\nTFRM_SNGPC: Módulo principal do SNGPC — geração e transmissão de arquivos",
+    "passos": [
+      "TFM_DADOSRECEITA: Cadastro dos dados da receita médica para controlados",
+      "TFM_LISTACONTROLADO: Lista de produtos controlados cadastrados",
+      "TFM_RETENCAORECEITA: Registro de retenção de receita",
+      "TFM_MANUTENCAOLANCARPERDASSNGPC: Lançamento de perdas de medicamentos controlados no SNGPC",
+      "TFM_PRODUTOEXCECAOSNGPC: Cadastro de produtos com exceção de notificação SNGPC",
+      "TFRM_SNGPC: Módulo principal do SNGPC — geração e transmissão de arquivos"
+    ],
+    "tags": [
+      "modulo",
+      "tela",
+      "formulario",
+      "controlados_sngpc",
+      "farmafacil"
+    ],
+    "bloco": 2160
+  },
+  {
+    "titulo": "Módulos — Telas do grupo: convenios_pbm",
+    "resumo": "Descrição das telas do módulo convenios_pbm no FarmaFácil",
+    "problema": "Quais telas existem no módulo convenios_pbm e o que cada uma faz?",
+    "causa": "",
+    "solucao": "TFM_LOGINEPHARMA: Login e configuração do PBM ePharma\nTFM_CANCELAMENTOEPHARMA: Cancelamento de transação ePharma\nTFM_LOGINPHARMALINK: Login PharmaLink\nTFM_LOGINCONVENIOBIG: Login convênio BIG\nTFM_PESQUISAPBM: Pesquisa de preço/desconto em PBM genérico\nTFM_LOGINPREVSAUDE: Login PrevSaúde\nTFM_LOGINNOVARTIS: Programa parceria Novartis",
+    "passos": [
+      "TFM_LOGINEPHARMA: Login e configuração do PBM ePharma",
+      "TFM_CANCELAMENTOEPHARMA: Cancelamento de transação ePharma",
+      "TFM_LOGINPHARMALINK: Login PharmaLink",
+      "TFM_LOGINCONVENIOBIG: Login convênio BIG",
+      "TFM_PESQUISAPBM: Pesquisa de preço/desconto em PBM genérico",
+      "TFM_LOGINPREVSAUDE: Login PrevSaúde",
+      "TFM_LOGINNOVARTIS: Programa parceria Novartis"
+    ],
+    "tags": [
+      "modulo",
+      "tela",
+      "formulario",
+      "convenios_pbm",
+      "farmafacil"
+    ],
+    "bloco": 2161
+  },
+  {
+    "titulo": "Módulos — Telas do grupo: fidelidade",
+    "resumo": "Descrição das telas do módulo fidelidade no FarmaFácil",
+    "problema": "Quais telas existem no módulo fidelidade e o que cada uma faz?",
+    "causa": "",
+    "solucao": "TFM_DOTZ: Acúmulo e resgate de pontos Dotz na venda\nTFM_CONSULTACASHBACK: Consulta de saldo de cashback do cliente\nTFM_SALDODISPONIVELCASHBACK: Exibe saldo disponível para resgate de cashback\nTFM_FUNCOESADMCASHBACK: Funções administrativas do programa cashback\nTFM_ALERTAPONTUACAOFIDELIDADE: Alerta quando cliente atinge pontuação para resgate",
+    "passos": [
+      "TFM_DOTZ: Acúmulo e resgate de pontos Dotz na venda",
+      "TFM_CONSULTACASHBACK: Consulta de saldo de cashback do cliente",
+      "TFM_SALDODISPONIVELCASHBACK: Exibe saldo disponível para resgate de cashback",
+      "TFM_FUNCOESADMCASHBACK: Funções administrativas do programa cashback",
+      "TFM_ALERTAPONTUACAOFIDELIDADE: Alerta quando cliente atinge pontuação para resgate"
+    ],
+    "tags": [
+      "modulo",
+      "tela",
+      "formulario",
+      "fidelidade",
+      "farmafacil"
+    ],
+    "bloco": 2162
+  },
+  {
+    "titulo": "Relatórios — Grupo: vendas",
+    "resumo": "Relatórios disponíveis no grupo vendas",
+    "problema": "Quais relatórios existem para vendas?",
+    "causa": "",
+    "solucao": "TQR_VENDAPERIODOANALITICO: Vendas do período com detalhe por item — para análise detalhada\nTQR_VENDAPERIODOSINTETICO: Resumo de vendas por período — totais por dia/semana\nTQR_VENDAPERIODOGERAL: Vendas geral do período — visão consolidada\nTQR_VENDAPERIODODIARIO: Fechamento diário de vendas\nTQR_VENDAPRODUTOGERAL: Vendas por produto — ranking de produtos mais vendidos\nTQR_VENDAPRODUTOCMV: Custo da mercadoria vendida (CMV) por produto\nTQR_VENDAMEDICO: Vendas por médico prescritor — para análise de indicações\nTQR_VENDAVENDEDOR: Comissões e vendas por vendedor\nTQR_VENDACLIENTE: Histórico de compras por cliente\nTQR_VENDACLIENTEFAIXA: Clientes segmentados por faixa de gasto\nTQR_VENDASFORMAPAGAMENTO: Totais por forma de pagamento (dinheiro, cartão, etc.)\nTQR_VENDAESPECIE: Vendas por espécie (drogaria, manipulação, homeopático, etc.)\nTQR_TOTALIZACAOORIGEMVENDA: Origem das vendas (balcão, delivery, online)\nTQR_VENDAFORMULA: Vendas de fórmulas magistrais detalhadas\nTQR_VENDASDOTZ: Vendas com pontuação Dotz\nTQR_VENDASCASHBACK: Vendas com cashback\nTQR_VENDASTATUS: Vendas por status (entregue, cancelado, pendente)\nTQR_VENDAUSOCONTINUO: Medicamentos de uso contínuo — controle de retorno do cliente\nTQR_VENDASCARTAO: Vendas pagas com cartão — para conferência com adquirente",
+    "passos": [
+      "TQR_VENDAPERIODOANALITICO: Vendas do período com detalhe por item — para análise detalhada",
+      "TQR_VENDAPERIODOSINTETICO: Resumo de vendas por período — totais por dia/semana",
+      "TQR_VENDAPERIODOGERAL: Vendas geral do período — visão consolidada",
+      "TQR_VENDAPERIODODIARIO: Fechamento diário de vendas",
+      "TQR_VENDAPRODUTOGERAL: Vendas por produto — ranking de produtos mais vendidos",
+      "TQR_VENDAPRODUTOCMV: Custo da mercadoria vendida (CMV) por produto",
+      "TQR_VENDAMEDICO: Vendas por médico prescritor — para análise de indicações",
+      "TQR_VENDAVENDEDOR: Comissões e vendas por vendedor",
+      "TQR_VENDACLIENTE: Histórico de compras por cliente",
+      "TQR_VENDACLIENTEFAIXA: Clientes segmentados por faixa de gasto",
+      "TQR_VENDASFORMAPAGAMENTO: Totais por forma de pagamento (dinheiro, cartão, etc.)",
+      "TQR_VENDAESPECIE: Vendas por espécie (drogaria, manipulação, homeopático, etc.)",
+      "TQR_TOTALIZACAOORIGEMVENDA: Origem das vendas (balcão, delivery, online)",
+      "TQR_VENDAFORMULA: Vendas de fórmulas magistrais detalhadas",
+      "TQR_VENDASDOTZ: Vendas com pontuação Dotz",
+      "TQR_VENDASCASHBACK: Vendas com cashback",
+      "TQR_VENDASTATUS: Vendas por status (entregue, cancelado, pendente)",
+      "TQR_VENDAUSOCONTINUO: Medicamentos de uso contínuo — controle de retorno do cliente",
+      "TQR_VENDASCARTAO: Vendas pagas com cartão — para conferência com adquirente"
+    ],
+    "tags": [
+      "relatorio",
+      "impressao",
+      "vendas",
+      "farmafacil"
+    ],
+    "bloco": 2163
+  },
+  {
+    "titulo": "Relatórios — Grupo: producao",
+    "resumo": "Relatórios disponíveis no grupo producao",
+    "problema": "Quais relatórios existem para producao?",
+    "causa": "",
+    "solucao": "TQR_ORDEMPRODUCAO: Relatório de ordens de produção — formato padrão A4\nTQR_ORDEMPRODUCAOFORMULA: Ordem de produção com fórmula detalhada\nTQR_ORDEMPRODUCAOVENDA: Ordem de produção no formato venda\nTQR_ORDEMPRODUCAOHOMEOPATIA: Ordem de produção homeopática\nTQR_ORDEMPRODUCAOVENDALASER: Ordem de produção para impressão em impressora laser\nTQR_ORDEMPRODUCAOFORMULA2LINHAS: Ordem de produção com 2 linhas de fórmula\nTQR_FICHATECNICA: Ficha técnica do produto manipulado\nTQR_FICHATECNICALOTE: Ficha técnica com informações de lote\nTQR_FICHATECNICOPRODUTO: Ficha técnica do insumo/matéria-prima\nTQR_APONTAMENTO: Relatório de apontamentos de produção\nTQR_ENSAIO: Laudos de ensaio de controle de qualidade\nTQR_ENSAIOLOTE: Laudo de ensaio por lote\nTQR_TABELAFLORAL: Tabela de florais de Bach\nTQR_ESPECIFICATIPOCAPSULA: Especificação técnica de cápsulas\nTQR_LISTABASICADINAMICA: Lista básica de dinamizações homeopáticas",
+    "passos": [
+      "TQR_ORDEMPRODUCAO: Relatório de ordens de produção — formato padrão A4",
+      "TQR_ORDEMPRODUCAOFORMULA: Ordem de produção com fórmula detalhada",
+      "TQR_ORDEMPRODUCAOVENDA: Ordem de produção no formato venda",
+      "TQR_ORDEMPRODUCAOHOMEOPATIA: Ordem de produção homeopática",
+      "TQR_ORDEMPRODUCAOVENDALASER: Ordem de produção para impressão em impressora laser",
+      "TQR_ORDEMPRODUCAOFORMULA2LINHAS: Ordem de produção com 2 linhas de fórmula",
+      "TQR_FICHATECNICA: Ficha técnica do produto manipulado",
+      "TQR_FICHATECNICALOTE: Ficha técnica com informações de lote",
+      "TQR_FICHATECNICOPRODUTO: Ficha técnica do insumo/matéria-prima",
+      "TQR_APONTAMENTO: Relatório de apontamentos de produção",
+      "TQR_ENSAIO: Laudos de ensaio de controle de qualidade",
+      "TQR_ENSAIOLOTE: Laudo de ensaio por lote",
+      "TQR_TABELAFLORAL: Tabela de florais de Bach",
+      "TQR_ESPECIFICATIPOCAPSULA: Especificação técnica de cápsulas",
+      "TQR_LISTABASICADINAMICA: Lista básica de dinamizações homeopáticas"
+    ],
+    "tags": [
+      "relatorio",
+      "impressao",
+      "producao",
+      "farmafacil"
+    ],
+    "bloco": 2164
+  },
+  {
+    "titulo": "Relatórios — Grupo: estoque",
+    "resumo": "Relatórios disponíveis no grupo estoque",
+    "problema": "Quais relatórios existem para estoque?",
+    "causa": "",
+    "solucao": "TQR_POSICAOESTOQUE: Posição atual do estoque por produto\nTQR_POSICAOESTOQUEFINANCEIRO: Posição de estoque com valor financeiro (custo)\nTQR_POSICAOESTOQUELOTE: Estoque detalhado por lote e validade\nTQR_MOVIMENTOLOTE: Movimentações de lote (entradas, saídas)\nTQR_MOVIMENTOPRODUTO: Todas as movimentações de um produto\nTQR_COBERTURAESTOQUE: Cobertura de dias de estoque (quantos dias vai durar)\nTQR_CURVAABC: Curva ABC — classificação por valor de giro\nTQR_PRODUTOSVENCER: Produtos próximos ao vencimento (manipulação)\nTQR_PRODUTOSDROGARIAVENCER: Produtos de drogaria próximos ao vencimento\nTQR_PRODUTOSEMVENDA: Produtos sem movimentação (estoque parado)\nTQR_CONFERENCIAINVENTARIO: Conferência de inventário físico vs sistema\nTQR_ALTERACAOPRODUTO: Histórico de alterações no cadastro de produtos\nTQR_ESTOQUEMINIMO: Produtos abaixo do estoque mínimo configurado\nTQR_PESAGEMMONITORADA: Relatório de pesagens monitoradas registradas",
+    "passos": [
+      "TQR_POSICAOESTOQUE: Posição atual do estoque por produto",
+      "TQR_POSICAOESTOQUEFINANCEIRO: Posição de estoque com valor financeiro (custo)",
+      "TQR_POSICAOESTOQUELOTE: Estoque detalhado por lote e validade",
+      "TQR_MOVIMENTOLOTE: Movimentações de lote (entradas, saídas)",
+      "TQR_MOVIMENTOPRODUTO: Todas as movimentações de um produto",
+      "TQR_COBERTURAESTOQUE: Cobertura de dias de estoque (quantos dias vai durar)",
+      "TQR_CURVAABC: Curva ABC — classificação por valor de giro",
+      "TQR_PRODUTOSVENCER: Produtos próximos ao vencimento (manipulação)",
+      "TQR_PRODUTOSDROGARIAVENCER: Produtos de drogaria próximos ao vencimento",
+      "TQR_PRODUTOSEMVENDA: Produtos sem movimentação (estoque parado)",
+      "TQR_CONFERENCIAINVENTARIO: Conferência de inventário físico vs sistema",
+      "TQR_ALTERACAOPRODUTO: Histórico de alterações no cadastro de produtos",
+      "TQR_ESTOQUEMINIMO: Produtos abaixo do estoque mínimo configurado",
+      "TQR_PESAGEMMONITORADA: Relatório de pesagens monitoradas registradas"
+    ],
+    "tags": [
+      "relatorio",
+      "impressao",
+      "estoque",
+      "farmafacil"
+    ],
+    "bloco": 2165
+  },
+  {
+    "titulo": "Relatórios — Grupo: sngpc_controlados",
+    "resumo": "Relatórios disponíveis no grupo sngpc_controlados",
+    "problema": "Quais relatórios existem para sngpc_controlados?",
+    "causa": "",
+    "solucao": "TQR_SNGPCENTRADAMEDICAMENTO: Entradas de medicamentos controlados para SNGPC\nTQR_SNGPCVENDAMEDICAMENTO: Vendas de medicamentos controlados para SNGPC\nTQR_LIVRORECEITUARIO: Livro de Receituário — registro de dispensação de controlados\nTQR_LIVROREGISTROESPECIFICO: Livro de Registro Específico (notificações de receita)\nTQR_LIVROREGISTROVETERINARIO: Livro de registro de medicamentos veterinários (4 modelos)\nTQR_REGISTRORECEITUARIOGERAL: Registro geral de receituário\nTQR_NOTIFICACAORECEITAA: Notificação de Receita A (entorpecentes)\nTQR_NOTIFICACAORECEITAB2: Notificação de Receita B2 (psicotrópicos)\nTQR_MAPAPOLICIACIVILANEXOI: Mapa para Polícia Civil — Anexo I (entorpecentes)\nTQR_MAPAPOLICIACIVILANEXOII: Mapa para Polícia Civil — Anexo II (psicotrópicos)\nTQR_MAPAPOLICIACIVILANEXOIII: Mapa para Polícia Civil — Anexo III (precursores)\nTQR_AQUISICAOPSICOTROPICO: Relatório de aquisição de psicotrópicos\nTQR_TERMOCONSENTIMENTORDC354: Termo de Consentimento Informado (RDC 354 — antidepressivos tricíclicos)\nTQR_BALANCOMEDICAMENTO: Balanço de medicamentos controlados\nTQR_MOVIMENTOCONTROLADOSPERIODO: Movimentação de controlados no período\nTQR_POSICAOLOTESCONTROLADOS: Posição de lotes de medicamentos controlados",
+    "passos": [
+      "TQR_SNGPCENTRADAMEDICAMENTO: Entradas de medicamentos controlados para SNGPC",
+      "TQR_SNGPCVENDAMEDICAMENTO: Vendas de medicamentos controlados para SNGPC",
+      "TQR_LIVRORECEITUARIO: Livro de Receituário — registro de dispensação de controlados",
+      "TQR_LIVROREGISTROESPECIFICO: Livro de Registro Específico (notificações de receita)",
+      "TQR_LIVROREGISTROVETERINARIO: Livro de registro de medicamentos veterinários (4 modelos)",
+      "TQR_REGISTRORECEITUARIOGERAL: Registro geral de receituário",
+      "TQR_NOTIFICACAORECEITAA: Notificação de Receita A (entorpecentes)",
+      "TQR_NOTIFICACAORECEITAB2: Notificação de Receita B2 (psicotrópicos)",
+      "TQR_MAPAPOLICIACIVILANEXOI: Mapa para Polícia Civil — Anexo I (entorpecentes)",
+      "TQR_MAPAPOLICIACIVILANEXOII: Mapa para Polícia Civil — Anexo II (psicotrópicos)",
+      "TQR_MAPAPOLICIACIVILANEXOIII: Mapa para Polícia Civil — Anexo III (precursores)",
+      "TQR_AQUISICAOPSICOTROPICO: Relatório de aquisição de psicotrópicos",
+      "TQR_TERMOCONSENTIMENTORDC354: Termo de Consentimento Informado (RDC 354 — antidepressivos tricíclicos)",
+      "TQR_BALANCOMEDICAMENTO: Balanço de medicamentos controlados",
+      "TQR_MOVIMENTOCONTROLADOSPERIODO: Movimentação de controlados no período",
+      "TQR_POSICAOLOTESCONTROLADOS: Posição de lotes de medicamentos controlados"
+    ],
+    "tags": [
+      "relatorio",
+      "impressao",
+      "sngpc_controlados",
+      "farmafacil"
+    ],
+    "bloco": 2166
+  },
+  {
+    "titulo": "Relatórios — Grupo: financeiro",
+    "resumo": "Relatórios disponíveis no grupo financeiro",
+    "problema": "Quais relatórios existem para financeiro?",
+    "causa": "",
+    "solucao": "TQR_FLUXOCAIXA: Fluxo de caixa do período\nTQR_RELATORIODRE: DRE — Demonstrativo de Resultado do Exercício\nTQR_RECEITADESPESA: Receitas vs Despesas por categoria\nTQR_FATURAARECEBER: Contas a receber em aberto\nTQR_FATURAARECEBERVENCIDA: Contas a receber vencidas (inadimplência)\nTQR_FECHAMENTOCAIXA: Relatório de fechamento de caixa\nTQR_MOVIMENTOCAIXA: Movimentos do caixa analítico\nTQR_MOVIMENTOCAIXASINTETICO: Movimentos do caixa sintético (resumo)\nTQR_RECOLHIMENTOICMS: Apuração de ICMS a recolher\nTQR_PAGAMENTOVENDACAIXA: Pagamentos de vendas por caixa",
+    "passos": [
+      "TQR_FLUXOCAIXA: Fluxo de caixa do período",
+      "TQR_RELATORIODRE: DRE — Demonstrativo de Resultado do Exercício",
+      "TQR_RECEITADESPESA: Receitas vs Despesas por categoria",
+      "TQR_FATURAARECEBER: Contas a receber em aberto",
+      "TQR_FATURAARECEBERVENCIDA: Contas a receber vencidas (inadimplência)",
+      "TQR_FECHAMENTOCAIXA: Relatório de fechamento de caixa",
+      "TQR_MOVIMENTOCAIXA: Movimentos do caixa analítico",
+      "TQR_MOVIMENTOCAIXASINTETICO: Movimentos do caixa sintético (resumo)",
+      "TQR_RECOLHIMENTOICMS: Apuração de ICMS a recolher",
+      "TQR_PAGAMENTOVENDACAIXA: Pagamentos de vendas por caixa"
+    ],
+    "tags": [
+      "relatorio",
+      "impressao",
+      "financeiro",
+      "farmafacil"
+    ],
+    "bloco": 2167
+  },
+  {
+    "titulo": "Relatórios — Grupo: boletos",
+    "resumo": "Relatórios disponíveis no grupo boletos",
+    "problema": "Quais relatórios existem para boletos?",
+    "causa": "",
+    "solucao": "TQR_BOLETOBANCODOBRASIL: Boleto bancário Banco do Brasil\nTQR_BOLETOBRADESCO: Boleto bancário Bradesco\nTQR_BOLETOSANTANDER: Boleto bancário Santander\nTQR_BOLETOBANCOSICREDI: Boleto bancário Sicredi\nTQR_BOLETOAILOS: Boleto bancário Ailos\nTQR_COBRANCAINTEGRADAREMESSA: Arquivo remessa de cobrança para banco\nTQR_COBRANCAINTEGRADARETORNO: Processamento de retorno bancário\nTQR_DUPLICATA: Duplicata mercantil",
+    "passos": [
+      "TQR_BOLETOBANCODOBRASIL: Boleto bancário Banco do Brasil",
+      "TQR_BOLETOBRADESCO: Boleto bancário Bradesco",
+      "TQR_BOLETOSANTANDER: Boleto bancário Santander",
+      "TQR_BOLETOBANCOSICREDI: Boleto bancário Sicredi",
+      "TQR_BOLETOAILOS: Boleto bancário Ailos",
+      "TQR_COBRANCAINTEGRADAREMESSA: Arquivo remessa de cobrança para banco",
+      "TQR_COBRANCAINTEGRADARETORNO: Processamento de retorno bancário",
+      "TQR_DUPLICATA: Duplicata mercantil"
+    ],
+    "tags": [
+      "relatorio",
+      "impressao",
+      "boletos",
+      "farmafacil"
+    ],
+    "bloco": 2168
+  },
+  {
+    "titulo": "Relatórios — Grupo: logistica",
+    "resumo": "Relatórios disponíveis no grupo logistica",
+    "problema": "Quais relatórios existem para logistica?",
+    "causa": "",
+    "solucao": "TQR_GESTAOENTREGAANALITICO: Relatório analítico de entregas realizadas\nTQR_GESTAOENTREGASINTETICO: Resumo de entregas por período\nTQR_ROMANEIOENTREGAEMISSAO: Romaneio de entrega para o entregador\nTQR_MANIFESTODEMONSTRATIVO: Manifesto de transporte demonstrativo\nTQR_MANIFESTOETIQUETAS: Etiquetas para volumes do manifesto",
+    "passos": [
+      "TQR_GESTAOENTREGAANALITICO: Relatório analítico de entregas realizadas",
+      "TQR_GESTAOENTREGASINTETICO: Resumo de entregas por período",
+      "TQR_ROMANEIOENTREGAEMISSAO: Romaneio de entrega para o entregador",
+      "TQR_MANIFESTODEMONSTRATIVO: Manifesto de transporte demonstrativo",
+      "TQR_MANIFESTOETIQUETAS: Etiquetas para volumes do manifesto"
+    ],
+    "tags": [
+      "relatorio",
+      "impressao",
+      "logistica",
+      "farmafacil"
+    ],
+    "bloco": 2169
+  },
+  {
+    "titulo": "Relatórios — Grupo: convenios",
+    "resumo": "Relatórios disponíveis no grupo convenios",
+    "problema": "Quais relatórios existem para convenios?",
+    "causa": "",
+    "solucao": "TQR_CONVENIO: Relatório de vendas por convênio\nTQR_VENDACONVENIOANALITICO: Vendas conveniadas com detalhe por cliente\nTQR_VENDACONVENIOSINTETICO: Resumo de vendas por convênio\nTQR_VENDACONVENIORATEIOCAIXA: Rateio de caixa por convênio\nTQR_PBM: Relatório de vendas com PBM",
+    "passos": [
+      "TQR_CONVENIO: Relatório de vendas por convênio",
+      "TQR_VENDACONVENIOANALITICO: Vendas conveniadas com detalhe por cliente",
+      "TQR_VENDACONVENIOSINTETICO: Resumo de vendas por convênio",
+      "TQR_VENDACONVENIORATEIOCAIXA: Rateio de caixa por convênio",
+      "TQR_PBM: Relatório de vendas com PBM"
+    ],
+    "tags": [
+      "relatorio",
+      "impressao",
+      "convenios",
+      "farmafacil"
+    ],
+    "bloco": 2170
+  },
+  {
+    "titulo": "Fluxo — Abertura Caixa",
+    "resumo": "",
+    "problema": "Como funciona o fluxo de abertura_caixa?",
+    "causa": "",
+    "solucao": "",
+    "passos": [
+      "1. Acessar: Caixa > Abertura de Caixa (TFM_CAIXA)",
+      "2. Selecionar operador de caixa",
+      "3. Informar fundo de caixa (valor inicial)",
+      "4. Confirmar abertura",
+      "5. Sistema libera o PDV (TFM_VENDA)"
+    ],
+    "tags": [
+      "fluxo",
+      "processo",
+      "abertura_caixa",
+      "farmafacil"
+    ],
+    "bloco": 2171
+  },
+  {
+    "titulo": "Fluxo — Fechamento Caixa",
+    "resumo": "",
+    "problema": "Como funciona o fluxo de fechamento_caixa?",
+    "causa": "",
+    "solucao": "",
+    "passos": [
+      "1. Confirmar que não há vendas abertas",
+      "2. Acessar: Caixa > Fechamento (TFM_FECHAMENTOCAIXA)",
+      "3. Conferir totais por forma de pagamento",
+      "4. Informar valor físico contado",
+      "5. Sistema calcula diferença (sobra/falta)",
+      "6. Confirmar fechamento",
+      "7. Para ECF: realizar Redução Z antes do fechamento"
+    ],
+    "tags": [
+      "fluxo",
+      "processo",
+      "fechamento_caixa",
+      "farmafacil"
+    ],
+    "bloco": 2172
+  },
+  {
+    "titulo": "Fluxo — Emitir Nfce",
+    "resumo": "",
+    "problema": "Como funciona o fluxo de emitir_nfce?",
+    "causa": "",
+    "solucao": "",
+    "passos": [
+      "1. Registrar produtos no PDV (TFM_VENDA)",
+      "2. Selecionar forma de pagamento",
+      "3. Sistema transmite automaticamente ao finalizar",
+      "4. Em caso de erro: verificar Log\\LogErro.txt",
+      "5. Para reemitir: Fiscal > NFC-e > Reenviar"
+    ],
+    "tags": [
+      "fluxo",
+      "processo",
+      "emitir_nfce",
+      "farmafacil"
+    ],
+    "bloco": 2173
+  },
+  {
+    "titulo": "Fluxo — Emitir Nfse",
+    "resumo": "",
+    "problema": "Como funciona o fluxo de emitir_nfse?",
+    "causa": "",
+    "solucao": "",
+    "passos": [
+      "1. Acessar: Fiscal > NFS-e > Nova NFS-e",
+      "2. Selecionar tomador (cliente ou CNPJ)",
+      "3. Informar serviço prestado e valor",
+      "4. Verificar código de serviço e alíquota ISS",
+      "5. Clicar em Emitir",
+      "6. Sistema assina, gera XML e transmite à prefeitura",
+      "7. Verificar retorno (autorizada, rejeitada)",
+      "8. XML salvo em: C:\\FarmaFacil\\EXE\\NFSe\\<numero>-Env.xml"
+    ],
+    "tags": [
+      "fluxo",
+      "processo",
+      "emitir_nfse",
+      "farmafacil"
+    ],
+    "bloco": 2174
+  },
+  {
+    "titulo": "Fluxo — Enviar Sngpc",
+    "resumo": "",
+    "problema": "Como funciona o fluxo de enviar_sngpc?",
+    "causa": "",
+    "solucao": "",
+    "passos": [
+      "1. Acessar: Fiscal > SNGPC > Gerar Movimentação",
+      "2. Selecionar período (normalmente semanal)",
+      "3. Confirmar geração",
+      "4. Verificar pasta C:\\FarmaFacil\\EXE\\SNGPC\\ — arquivos com tamanho > 0",
+      "5. Acessar: Fiscal > SNGPC > Transmitir",
+      "6. Aguardar confirmação da ANVISA",
+      "7. Salvar protocolo de transmissão"
+    ],
+    "tags": [
+      "fluxo",
+      "processo",
+      "enviar_sngpc",
+      "farmafacil"
+    ],
+    "bloco": 2175
+  },
+  {
+    "titulo": "Fluxo — Receita Controlado",
+    "resumo": "",
+    "problema": "Como funciona o fluxo de receita_controlado?",
+    "causa": "",
+    "solucao": "",
+    "passos": [
+      "1. Na venda, ao adicionar produto controlado, sistema solicita dados da receita",
+      "2. Tela TFM_DADOSRECEITA abre automaticamente",
+      "3. Informar: número da receita, CRM/CRMV do prescritor, data de emissão",
+      "4. Informar dados do paciente se receita nominada",
+      "5. Confirmar retenção da receita (TFM_RETENCAORECEITA) quando aplicável",
+      "6. Venda prossegue normalmente",
+      "7. Dado fica registrado para envio ao SNGPC"
+    ],
+    "tags": [
+      "fluxo",
+      "processo",
+      "receita_controlado",
+      "farmafacil"
+    ],
+    "bloco": 2176
+  },
+  {
+    "titulo": "Fluxo — Acerto Estoque",
+    "resumo": "",
+    "problema": "Como funciona o fluxo de acerto_estoque?",
+    "causa": "",
+    "solucao": "",
+    "passos": [
+      "1. Acessar: Estoque > Acerto de Estoque (TFM_ACERTOESTOQUE)",
+      "2. Selecionar produtos a inventariar",
+      "3. Informar quantidade física contada",
+      "4. Sistema calcula diferença (sistema vs físico)",
+      "5. Confirmar ajuste",
+      "6. Gerar relatório TQR_CONFERENCIAINVENTARIO para conferência"
+    ],
+    "tags": [
+      "fluxo",
+      "processo",
+      "acerto_estoque",
+      "farmafacil"
+    ],
+    "bloco": 2177
+  },
+  {
+    "titulo": "Instalação e Atualização — FarmaFácil",
+    "resumo": "Procedimentos de instalação e atualização do sistema",
+    "problema": "Como instalar o FarmaFácil ou realizar atualização de versão?",
+    "causa": "",
+    "solucao": "Seguir procedimento de instalação documentado",
+    "passos": [],
+    "tags": [
+      "instalacao",
+      "atualizacao",
+      "versao",
+      "farmafacil"
+    ],
+    "bloco": 2178
+  },
+  {
+    "titulo": "Backup e Recuperação — PostgreSQL + FarmaFácil",
+    "resumo": "Procedimentos de backup e restore do banco de dados",
+    "problema": "Como fazer backup ou restaurar o banco de dados do FarmaFácil?",
+    "causa": "",
+    "solucao": "",
+    "passos": [
+      "Backup: pg_dump -h <host> -U sistema farmafacil > backup_YYYYMMDD.sql",
+      "Restore: pg_restore -h <host> -U sistema farmafacil < backup.sql",
+      "Senha padrão: sistemafarmafacil123",
+      "Agendar backup diário via Windows Task Scheduler"
+    ],
+    "tags": [
+      "backup",
+      "restore",
+      "postgresql",
+      "pg_dump",
+      "pg_restore",
+      "recuperacao"
+    ],
+    "bloco": 2179
+  },
+  {
+    "titulo": "Regulatório — Nfce",
+    "resumo": "Nota Fiscal de Consumidor Eletrônica — substitui cupom fiscal",
+    "problema": "Dúvida ou erro relacionado a nfce",
+    "causa": "",
+    "solucao": "Nota Fiscal de Consumidor Eletrônica — substitui cupom fiscal",
+    "passos": [],
+    "tags": [
+      "regulatorio",
+      "nfce",
+      "anvisa",
+      "farmafacil"
+    ],
+    "bloco": 2180
+  },
+  {
+    "titulo": "Regulatório — Nfe",
+    "resumo": "Nota Fiscal Eletrônica modelo 55 — operações B2B, remessas, devoluções",
+    "problema": "Dúvida ou erro relacionado a nfe",
+    "causa": "",
+    "solucao": "Nota Fiscal Eletrônica modelo 55 — operações B2B, remessas, devoluções",
+    "passos": [],
+    "tags": [
+      "regulatorio",
+      "nfe",
+      "anvisa",
+      "farmafacil"
+    ],
+    "bloco": 2181
+  },
+  {
+    "titulo": "Regulatório — Nfse",
+    "resumo": "Nota Fiscal de Serviço Eletrônica — para prestação de serviços de manipulação",
+    "problema": "Dúvida ou erro relacionado a nfse",
+    "causa": "",
+    "solucao": "Nota Fiscal de Serviço Eletrônica — para prestação de serviços de manipulação",
+    "passos": [],
+    "tags": [
+      "regulatorio",
+      "nfse",
+      "anvisa",
+      "farmafacil"
+    ],
+    "bloco": 2182
+  },
+  {
+    "titulo": "Regulatório — Cfe Sat",
+    "resumo": "Cupom Fiscal Eletrônico via SAT",
+    "problema": "Dúvida ou erro relacionado a cfe_sat",
+    "causa": "",
+    "solucao": "Cupom Fiscal Eletrônico via SAT",
+    "passos": [],
+    "tags": [
+      "regulatorio",
+      "cfe_sat",
+      "anvisa",
+      "farmafacil"
+    ],
+    "bloco": 2183
+  },
+  {
+    "titulo": "Regulatório — Sngpc",
+    "resumo": "Sistema Nacional de Gerenciamento de Produtos Controlados",
+    "problema": "Dúvida ou erro relacionado a sngpc",
+    "causa": "",
+    "solucao": "Sistema Nacional de Gerenciamento de Produtos Controlados",
+    "passos": [],
+    "tags": [
+      "regulatorio",
+      "sngpc",
+      "anvisa",
+      "farmafacil"
+    ],
+    "bloco": 2184
+  },
+  {
+    "titulo": "Regulatório — Siproquim",
+    "resumo": "Sistema de Informações de Produtos Químicos — precursores de entorpecentes",
+    "problema": "Dúvida ou erro relacionado a siproquim",
+    "causa": "",
+    "solucao": "Sistema de Informações de Produtos Químicos — precursores de entorpecentes",
+    "passos": [],
+    "tags": [
+      "regulatorio",
+      "siproquim",
+      "anvisa",
+      "farmafacil"
+    ],
+    "bloco": 2185
+  },
+  {
+    "titulo": "Regulatório — Sped Fiscal",
+    "resumo": "SPED Fiscal (EFD) — escrituração digital de ICMS/IPI",
+    "problema": "Dúvida ou erro relacionado a sped_fiscal",
+    "causa": "",
+    "solucao": "SPED Fiscal (EFD) — escrituração digital de ICMS/IPI",
+    "passos": [],
+    "tags": [
+      "regulatorio",
+      "sped_fiscal",
+      "anvisa",
+      "farmafacil"
+    ],
+    "bloco": 2186
+  },
+  {
+    "titulo": "Regulatório — Sped Piscofins",
+    "resumo": "SPED PIS/COFINS (EFD Contribuições)",
+    "problema": "Dúvida ou erro relacionado a sped_piscofins",
+    "causa": "",
+    "solucao": "SPED PIS/COFINS (EFD Contribuições)",
+    "passos": [],
+    "tags": [
+      "regulatorio",
+      "sped_piscofins",
+      "anvisa",
+      "farmafacil"
+    ],
+    "bloco": 2187
+  },
+  {
+    "titulo": "Regulatório — Sintegra",
+    "resumo": "Sistema Integrado de Informações sobre Operações Interestaduais",
+    "problema": "Dúvida ou erro relacionado a sintegra",
+    "causa": "",
+    "solucao": "Sistema Integrado de Informações sobre Operações Interestaduais",
+    "passos": [],
+    "tags": [
+      "regulatorio",
+      "sintegra",
+      "anvisa",
+      "farmafacil"
+    ],
+    "bloco": 2188
+  },
+  {
+    "titulo": "Regulatório — Rdc354",
+    "resumo": "RDC 354 — Medicamentos com potencial de abuso (antidepressivos tricíclicos, etc.)",
+    "problema": "Dúvida ou erro relacionado a rdc354",
+    "causa": "",
+    "solucao": "RDC 354 — Medicamentos com potencial de abuso (antidepressivos tricíclicos, etc.)",
+    "passos": [],
+    "tags": [
+      "regulatorio",
+      "rdc354",
+      "anvisa",
+      "farmafacil"
+    ],
+    "bloco": 2189
+  },
+  {
+    "titulo": "Logs — Localização detalhada de todos os arquivos de log",
+    "resumo": "Onde encontrar cada arquivo de log no FarmaFácil para diagnóstico",
+    "problema": "Preciso encontrar o log de erros, fiscal, SNGPC ou licença",
+    "causa": "",
+    "solucao": "Cada módulo gera logs em subpastas de C:\\FarmaFacil\\EXE\\",
+    "passos": [
+      "erros_gerais: C:\\FarmaFacil\\EXE\\Log\\LogErro.txt",
+      "erros_nfse: C:\\FarmaFacil\\EXE\\nfse_exception.log",
+      "mensagens_sistema: C:\\FarmaFacil\\EXE\\Mensagens\\Mensagem DD-MM-AAAA HH_MM_SS.txt",
+      "servico_licenca: C:\\FarmaFacil\\EXE\\ChaveFarmaFacil\\LogService.Log",
+      "xmls_nfse: C:\\FarmaFacil\\EXE\\NFSe\\<numero_rps>-Env.xml",
+      "xmls_sngpc: C:\\FarmaFacil\\EXE\\SNGPC\\*.xml",
+      "jsons_tef: C:\\FarmaFacil\\EXE\\JsonStreamEnvio.txt e JsonStreamRetorno.txt",
+      "como_usar_no_diagnostico: Ao atender chamado: verificar LogErro.txt primeiro, depois Mensagens\\ para correlacionar com janela e horário do erro relatado pelo cliente."
+    ],
+    "tags": [
+      "log",
+      "diagnostico",
+      "arquivo",
+      "logerro",
+      "nfce",
+      "nfse",
+      "sngpc",
+      "licenca"
+    ],
+    "bloco": 2190
+  }
+]

@@ -1,0 +1,54 @@
+# Dados sensíveis — NUNCA commitar
+users.json
+connection.json
+senha.env.txt
+config.py
+
+# Tickets e dados do cliente (privados)
+movidesk_tickets.json
+client_profile.json
+chat_logs/
+
+# Schemas do banco (gerados automaticamente)
+db_schema_cache.json
+db_schema_full.json
+schema_data_full.txt
+schema_priority.txt
+
+# Logs e cache
+__pycache__/
+*.pyc
+*.pyo
+query_log.txt
+sincronizacao.log
+response.txt
+sincronizacao_tickets.log
+web_search_usage.json
+
+# Build outputs
+dist/
+dist_backend/
+build/
+
+# Frontend build e dependências
+frontend/node_modules/
+frontend/dist/
+frontend/dist-electron/
+frontend/.vite/
+
+# Backups e misc
+_backups/
+memory/
+painel.png
+response.txt
+
+# Arquivos internos Claude Code
+.claude/
+
+# Dados pessoais
+erica_knowledge.txt
+erica_raw.txt
+
+# Env
+.env
+

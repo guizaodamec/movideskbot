@@ -1,0 +1,19 @@
+/btw Estou com uma ideia, quero fazer uma nova aba de "Fiscal". O principal objetivo vai ser ter um deshboard para verificar se estamos passando por problemas em relação aos provedores e quais farmacias foram abetadas por isso.
+
+A estrututa é o seguinda, utilizando a API do movidesk, a ferramenta deve listar todas as farmacias e todos os municipios cadastrados. A ferramenta deve acessar https://github.com/MirrorProjetoACBr/ACBr/blob/master/Fontes/ACBrDFe/ACBrNFSeX/ACBrNFSeXServicos.ini
+
+Dentro desse .ini existem todos os municipios e seus provedores. por exemplo
+
+Nome=Pimenta Bueno
+UF=RO
+Provedor=Fiorilli
+
+Logo, eu consigo saber todos os provedores de todas as farmacias, a ferramenta também deve analisar o Jira, e assim que identificar alguma tarefa envolvendo algum provedor, deve alertar todas as farmacias que bão ser prejudicadas
+
+Por exemplo:
+Provedor Fiorilli tem tarega em aberta, logo, todas as farmacias do munipio que tem o provedor Fiorilli vão ser afetadas.
+
+A ferramenta deve ter filtro por farmacia, por provedor, e um deshboard que se atualiza
+.
+
+Voce tem mais ideias para complementar? lembrando que nada deve ser afetado no jira

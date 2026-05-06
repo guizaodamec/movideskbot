@@ -1,0 +1,47 @@
+[
+  {
+    "id": "cert-digital-caminho",
+    "titulo": "Configurar Certificado Digital no FarmaFácil — CAMINHO CORRETO",
+    "keywords": ["certificado", "certificado digital", "nfe certificado", "configurar certificado", "a1", "a3", "pfx"],
+    "conteudo": "CAMINHO CORRETO para configurar o Certificado Digital no FarmaFácil:\n\nParâmetro (ou Filial, se a farmácia tiver filial) → NFe → Certificado\n\nNÃO usar: Arquivo > Parâmetro > Configurações PrismaFive\nNÃO usar: Ctrl+F para buscar chaves como CERTIFICADODIGITAL\n\nPassos:\n1. Acesse o menu Parâmetro (ou Filial, caso a farmácia tenha filiais)\n2. Vá na aba NFe\n3. Localize a seção Certificado\n4. Configure o certificado digital nessa tela",
+    "fonte": "Correção confirmada pela equipe de suporte em 17/04/2026",
+    "data": "17/04/2026",
+    "prioridade": 100
+  },
+  {
+    "id": "corr_menu_fiscal_inexistente",
+    "titulo": "ATENÇÃO: Módulo 'Fiscal' NÃO existe no FarmaFácil",
+    "keywords": ["fiscal", "menu fiscal", "relatório fiscal", "sped", "nf-e", "nfs-e", "sat", "ecf", "apuração", "icms"],
+    "conteudo": "CORREÇÃO IMPORTANTE: Não existe módulo 'Fiscal' no menu principal do FarmaFácil.\n\nCaminhos ERRADOS que a IA não deve sugerir:\n- Fiscal > Relatórios > Livro de Apuração de ICMS (NÃO EXISTE)\n- Fiscal > Relatórios > Relatório de Entradas (NÃO EXISTE)\n- Fiscal > NF-e (NÃO EXISTE)\n- Fiscal > SAT (NÃO EXISTE)\n- Fiscal > SPED (NÃO EXISTE)\n\nCaminhos CORRETOS confirmados:\n- SPED e relatórios fiscais: F12 > 'Vendas por período'\n- Tributação de produtos: Produto > Relatório > Tributação\n\nSe não souber o caminho exato de algo fiscal, oriente o analista a verificar diretamente no sistema ou escalar para o suporte nível 2.",
+    "fonte": "Correção manual — equipe de suporte (23/04/2026). Identificado no chat log: IA inventou módulo Fiscal inexistente.",
+    "data": "23/04/2026",
+    "prioridade": 100
+  },
+  {
+    "id": "corr_relatorio_vendas_inexistente",
+    "titulo": "Caminho 'Vendas > Relatórios > Relatório de Vendas' NÃO existe",
+    "keywords": ["relatório de vendas", "vendas relatório", "relatório mensal de vendas"],
+    "conteudo": "O caminho 'Vendas > Relatórios > Relatório de Vendas' NÃO existe no FarmaFácil.\n\nPara relatórios de vendas por período, usar: F12 > 'Vendas por período'.",
+    "fonte": "Correção manual — equipe de suporte (23/04/2026)",
+    "data": "23/04/2026",
+    "prioridade": 100
+  },
+  {
+    "id": "corr_estoque_tributacao_inexistente",
+    "titulo": "Caminho 'Estoque > Relatórios > Relatório de Produtos com Tributação' NÃO existe",
+    "keywords": ["tributação produtos", "relatório tributação", "estoque tributação"],
+    "conteudo": "O caminho 'Estoque > Relatórios > Relatório de Produtos com Tributação' NÃO existe no FarmaFácil.\n\nPara ver tributação de produtos: Produto > Relatório > Tributação.",
+    "fonte": "Correção manual — equipe de suporte (23/04/2026)",
+    "data": "23/04/2026",
+    "prioridade": 100
+  },
+  {
+    "id": "corr_producao_consumo_inexistente",
+    "titulo": "Caminho 'Produção > Relatórios > Consumo de Matérias-Primas' NÃO confirmado",
+    "keywords": ["consumo matéria-prima", "consumo insumos", "relatório produção consumo"],
+    "conteudo": "O caminho 'Produção > Relatórios > Consumo de Matérias-Primas' não foi confirmado pela equipe.\n\nSe o analista perguntar sobre isso, oriente a verificar diretamente no sistema ou escalar para suporte nível 2.",
+    "fonte": "Correção manual — equipe de suporte (23/04/2026)",
+    "data": "23/04/2026",
+    "prioridade": 100
+  }
+]

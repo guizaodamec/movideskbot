@@ -1,0 +1,63 @@
+appId: com.prismafive.farmafacilassistente
+productName: FarmaFacil Assistente
+copyright: Copyright © 2025
+
+directories:
+  output: dist-electron
+
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+        - ia32
+  icon: assets/icon.ico
+  requestedExecutionLevel: asInvoker
+
+portable:
+  artifactName: FarmaFacilAssistente-${version}-${arch}.exe
+
+files:
+  - dist/**
+  - electron/**
+  - assets/**
+  - node_modules/**
+  - package.json
+
+extraResources:
+  # Backend compilado (.exe portátil) — gerado pelo compilar.bat via PyInstaller
+  - from: ../dist_backend/backend.exe
+    to: backend.exe
+    filter:
+      - "**/*"
+
+  # Fallback: arquivos Python (caso backend.exe não exista)
+  - from: ../backend
+    to: backend
+    filter:
+      - "**/*"
+      - "!**/__pycache__/**"
+      - "!**/*.pyc"
+  - from: ../
+    to: backend
+    filter:
+      - "config.py"
+      - "farmafacil_knowledge.md"
+      - "farmafacil_schema.md"
+      - "users.json"
+      - ".env"
+  - from: ../db
+    to: backend/db
+    filter:
+      - "**/*.py"
+  - from: ../ai
+    to: backend/ai
+    filter:
+      - "**/*.py"
+      - "**/*.md"
+  - from: ../utils
+    to: backend/utils
+    filter:
+      - "**/*.py"
+
+compression: maximum

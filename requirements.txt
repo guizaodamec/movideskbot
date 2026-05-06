@@ -1,0 +1,18 @@
+# ERP Assistant AI — Dependencias
+# Compativeis com Windows XP / 7 / 10 / Server
+
+# OpenAI SDK (apontando para Claude Code via compatibility layer)
+openai>=1.0.0
+
+# PostgreSQL driver (versao 2.8.x para max compatibilidade com Python 3.4/3.5)
+psycopg2-binary==2.8.6
+
+# Imagens (versao 6.x para compatibilidade com XP/Python 3.4)
+Pillow==6.2.2
+
+# Captura de tela (fallback se ImageGrab nao funcionar)
+pyautogui==0.9.50
+
+
+# Build para .exe
+pyinstaller==4.10
