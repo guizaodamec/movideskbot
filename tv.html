@@ -294,10 +294,10 @@ var ROT       = 30;
 var TABS      = ['metas', 'diario', 'desempenho'];
 
 var TC = {
-  Fiscal:   { a:'#6E4EA1', bg:'rgba(110,78,161,.10)',  bd:'rgba(110,78,161,.30)' },
-  Producao: { a:'#008B8B', bg:'rgba(0,139,139,.10)',   bd:'rgba(0,139,139,.30)'  },
-  G1:       { a:'#2F6F91', bg:'rgba(47,111,145,.10)',  bd:'rgba(47,111,145,.30)' },
-  GW:       { a:'#C04A8B', bg:'rgba(192,74,139,.10)',  bd:'rgba(192,74,139,.30)' }
+  G1:       { a:'#378ADD', bg:'rgba(55,138,221,.10)',  bd:'rgba(55,138,221,.30)',  label:'G1' },
+  Fiscal:   { a:'#D4537E', bg:'rgba(212,83,126,.10)',  bd:'rgba(212,83,126,.30)',  label:'G2' },
+  Producao: { a:'#7F77DD', bg:'rgba(127,119,221,.10)', bd:'rgba(127,119,221,.30)', label:'G3' },
+  GW:       { a:'#888780', bg:'rgba(136,135,128,.10)', bd:'rgba(136,135,128,.30)', label:'GW' }
 };
 var TC_DI = TC;
 
@@ -381,7 +381,7 @@ function render(){
         '<div class="a-name-col">'+
           '<div class="aname">'+a.display+'</div>'+
           '<span class="ttag" style="background:'+c.bg+';color:'+c.a+';border:1px solid '+c.bd+'">'+
-            (a.equipe==='Producao'?'Producao':a.equipe)+'</span>'+
+            (c.label||a.equipe)+'</span>'+
         '</div>'+
         '<div class="a-stats">'+
           '<div class="st"><div class="sl">Entr.</div><div class="sv" style="color:#94a3b8">'+a.entrados+'</div></div>'+
@@ -413,7 +413,7 @@ function render(){
     card.innerHTML =
       (isLdr?'<div class="eq-top-line" style="background:linear-gradient(90deg,'+c.a+',transparent)"></div>':'')+
       '<div class="eq-hdr">'+
-        '<div><div class="eq-name" style="color:'+c.a+'">'+e.nome+'</div>'+
+        '<div><div class="eq-name" style="color:'+c.a+'">'+(c.label||e.nome)+'</div>'+
              '<div class="eq-sub">'+e.analistas+' analistas</div></div>'+
         '<span class="badge '+bCls+'">'+bTxt+'</span>'+
       '</div>'+
