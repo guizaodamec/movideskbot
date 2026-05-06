@@ -676,6 +676,44 @@ xcopy /E /I /Y frontend\dist dist_backend\frontend\dist
 
 ---
 
+## Workflow Git
+
+**Repositório:** `https://github.com/guizaodamec/movideskbot`
+**Branch principal:** `main`
+
+**Regra:** toda alteração no código deve ser commitada no git logo em seguida.
+
+### Como fazer push
+
+Rodar `git_push.bat` na raiz do projeto:
+
+```bat
+git_push.bat
+```
+
+O script faz `git add -A`, exibe o status, pede uma mensagem de commit (ou gera uma com data/hora se Enter) e executa `git push origin main`.
+
+### O que está no .gitignore (nunca vai ao git)
+
+| Arquivo/pasta | Motivo |
+|---|---|
+| `connection.json` | Credenciais do banco + tokens Jira/Movidesk |
+| `users.json` | Usuários e senhas do sistema |
+| `config.py` / `.env` | Chave da API Anthropic |
+| `movidesk_tickets.json` | Dados de clientes (privados) |
+| `db_schema_*.json`, `schema_*.txt` | Gerados automaticamente |
+| `frontend/node_modules/`, `frontend/dist*/` | Build e dependências |
+| `_backups/`, `memory/`, `.claude/` | Cache e sessões do Claude Code |
+| `chat_logs/` | Logs de conversa (dados do cliente) |
+
+### Segredos — onde ficam localmente
+
+- **Jira** (`jira_email`, `jira_token`): em `connection.json` — carregados em `backend/main.py` via `_load_jira_creds()`
+- **Movidesk token**: em `config.py` — importado por `utils/movidesk_client.py`
+- **Anthropic API key**: em `.env` — lida pelo backend na inicialização
+
+---
+
 ## Jira — Rastreamento de Issues
 
 **REGRA ABSOLUTA: NUNCA criar, editar ou excluir issues no Jira. Apenas leitura (GET).**
