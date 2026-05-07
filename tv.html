@@ -448,13 +448,15 @@ function renderDiario(){
   sEl.textContent = (saldoDia >= 0 ? '+' : '') + saldoDia;
   sEl.style.color = saldoDia > 0 ? '#10b981' : saldoDia < 0 ? '#ef4444' : '#e2e8f6';
 
-  /* escala global das barras: meta máxima * 2 ou fechado máximo + margem */
-  var maxMeta = 0, maxFech = 0;
+  /* escala global — só analistas COM meta definem a escala para não distorcer quem não tem */
+  var maxMeta = 0, maxFechComMeta = 0;
   for(var i=0; i<al.length; i++){
-    if(al[i].meta_dia    > maxMeta) maxMeta = al[i].meta_dia;
-    if(al[i].fechados_hoje > maxFech) maxFech = al[i].fechados_hoje;
+    if(al[i].meta_dia > 0){
+      if(al[i].meta_dia      > maxMeta)        maxMeta        = al[i].meta_dia;
+      if(al[i].fechados_hoje > maxFechComMeta) maxFechComMeta = al[i].fechados_hoje;
+    }
   }
-  var barMax = Math.max(maxMeta > 0 ? maxMeta * 2 : 10, maxFech * 1.1 + 1);
+  var barMax = Math.max(maxMeta > 0 ? maxMeta * 2 : 10, maxFechComMeta * 1.1 + 1);
 
   var list = document.getElementById('diario-list');
   list.innerHTML = '';
