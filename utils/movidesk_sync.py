@@ -16,22 +16,43 @@ from utils.paths import get_data_dir
 _CACHE_FILE = "movidesk_tickets.json"
 _sync_progress = {"running": False, "done": 0, "total": 0, "msg": ""}
 
+_mem_cache = None          # cache em memória do JSON de tickets
+_mem_cache_mtime = None    # mtime do arquivo quando foi carregado
+
 
 def _cache_path():
     return os.path.join(get_data_dir(), _CACHE_FILE)
 
 
+def _invalidate_mem_cache():
+    global _mem_cache, _mem_cache_mtime
+    _mem_cache = None
+    _mem_cache_mtime = None
+
+
 def load_cache():
+    global _mem_cache, _mem_cache_mtime
     p = _cache_path()
-    if os.path.exists(p):
-        with open(p, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {"tickets": {}, "last_sync": None, "last_extraction": None}
+    if not os.path.exists(p):
+        return {"tickets": {}, "last_sync": None, "last_extraction": None}
+    try:
+        mtime = os.path.getmtime(p)
+    except OSError:
+        mtime = None
+    # Retorna do cache em memória se o arquivo não mudou desde a última leitura
+    if _mem_cache is not None and mtime == _mem_cache_mtime:
+        return _mem_cache
+    with open(p, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    _mem_cache = data
+    _mem_cache_mtime = mtime
+    return data
 
 
 def _save_cache(data):
     with open(_cache_path(), "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+    _invalidate_mem_cache()
 
 
 def sync_progress():
