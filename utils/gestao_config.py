@@ -28,7 +28,7 @@ _DEFAULT = {
     },
     # Analistas excluídos do cálculo de metas (líderes, gerentes, etc.)
     # Continuam aparecendo nos filtros de tickets, mas não entram em n_analistas nem na tabela de metas.
-    "excluir_metas": ["Guilherme Cordeiro"]
+    "excluir_metas": ["Guilherme Cordeiro", "Diego Teixeira"]
 }
 
 
