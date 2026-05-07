@@ -298,7 +298,7 @@ var TC = {
   Fiscal:   { a:'#D4537E', bg:'rgba(212,83,126,.10)',  bd:'rgba(212,83,126,.30)',  label:'G2' },
   Producao: { a:'#7F77DD', bg:'rgba(127,119,221,.10)', bd:'rgba(127,119,221,.30)', label:'G3' },
   GW:       { a:'#888780', bg:'rgba(136,135,128,.10)', bd:'rgba(136,135,128,.30)', label:'GW' },
-  Outro:    { a:'#94a3b8', bg:'rgba(148,163,184,.08)', bd:'rgba(148,163,184,.20)', label:''   }
+  Outro:    { a:'#378ADD', bg:'rgba(55,138,221,.10)',  bd:'rgba(55,138,221,.30)',  label:''   }
 };
 var TC_DI = TC;
 
@@ -474,7 +474,7 @@ function renderDiario(){
     var fillBg = (fech >= meta && meta > 0) ? '#00c853' : c.a;
 
     var numColor = (fech >= meta && meta > 0) ? '#10b981' : '#e2e8f6';
-    var metaFmt  = meta > 0 ? '/'+rnd1(meta) : '';
+    var metaFmt  = '/'+rnd1(meta);
 
     var markerHtml = meta > 0
       ? '<div class="di-marker" style="left:'+markerPct.toFixed(1)+'%"></div>'
