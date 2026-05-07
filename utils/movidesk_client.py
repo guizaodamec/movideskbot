@@ -54,10 +54,9 @@ def fetch_tickets_page(skip=0, top=50, since_date=None, until_date=None, only_cl
 
 def fetch_resolved_page(skip=0, top=50, since_date=None, until_date=None):
     """
-    Busca tickets RESOLVIDOS — mesmo critério do dashboard Movidesk:
-    status '5 - Resolvido' com lastUpdate no período.
+    Busca tickets RESOLVIDOS — status 5 (Resolvido) ou 6 (Fechado), ambos contam.
     """
-    filters = ["status eq '5 - Resolvido'"]
+    filters = ["(status eq '5 - Resolvido' or status eq '6 - Fechado')"]
     if since_date:
         filters.append(f"lastUpdate ge {_dt(since_date)}")
     if until_date:
