@@ -585,38 +585,57 @@ Arquivo `erp_assistant/tv.html` servido pela rota `GET /tv` no Flask.
 
 **Design (tv.html):**
 - Fundo escuro `#080c18`, scanline overlay sutil
+- **3 abas em rotação:** Metas Individuais → Ritmo Diário → Desempenho por Equipe
 - **Metas Individuais:** top 5 analistas apenas (não todos os 13)
   - Medalhas via CSS (círculos `1` / `2` / `3` em dourado/prata/bronze) — sem emoji (TV antiga não renderiza)
   - Sem banner "Líder da semana"
   - Sem avatar (letra inicial removida)
   - Separadores verticais entre as colunas Entr. / Fech. / Saldo para evitar confusão visual
   - Nome do analista 32px, números Entr/Fech 46px, Saldo 46px (mesma escala), rank com `margin-right` para respirar
+- **Ritmo Diário:** barra de progresso horizontal por analista mostrando avanço em relação à meta diária
+  - Meta diária = tickets entrados no mês / n_analistas / dias úteis decorridos
+  - Exibe `fechados_hoje / meta_dia` por analista; Diego exibe `0/0`
+  - Barra fica inteiramente verde (`#00c853`) quando analista atinge ou supera a meta
+  - Analistas sem meta (`meta_dia = 0`, ex: Diego) têm barra sempre azul; não influenciam a escala do gráfico
+  - `barMax` calculado apenas com analistas que têm `meta_dia > 0`
+  - Sem tag de equipe abaixo do nome; sem coluna ritmo/dia
 - **Desempenho por Equipe:** grid 2×2
   - Card com borda esquerda 4px na cor da equipe (sem bloco de cor pesado)
   - Fundo neutro escuro `rgba(255,255,255,0.025)`
   - 3 métricas centralizadas (Entrados / Fechados / Saldo) em **66px monospace**
   - Rodapé discreto com barra de progresso (2px, opacidade 0.5) + Taxa de resolução
 - Botão **Pausar / Retomar** para fixar aba; botão **Atualizar** para forçar reload
-- Rotação automática a cada 30s com barra de progresso no topo
+- Rotação automática a cada **30s** com barra de progresso no topo
 - Reconecta automaticamente se o token expirar (re-chama `/api/tv-login`)
-- Auto-refresh dos dados a cada 5 min
+- Auto-refresh dos dados a cada **12s** (backend: cache TTL 2 min)
 
 ### Analistas monitorados (`_PAINEL_ANALISTAS`)
 
-| Equipe   | Cor      | Analistas |
-|----------|----------|-----------|
-| Fiscal   | #F59E0B  | Vinicius, Rebeca, Rubens |
-| Produção | #10B981  | Matheus, Boeira, Isaac, Raul, Ruam |
-| G1       | #8B5CF6  | Alan, Marcello, Keven |
-| GW       | #EC4899  | Nathan |
+| Equipe    | Label TV | Cor TV    | Analistas |
+|-----------|----------|-----------|-----------|
+| Fiscal    | G2       | `#D4537E` | Vinicius, Rebeca, Rubens |
+| Producao  | G3       | `#7F77DD` | Matheus, Boeira, Isaac, Raul, Ruam |
+| G1        | G1       | `#378ADD` | Alan, Marcello, Keven |
+| GW        | GW       | `#888780` | Nathan, Taynara |
+| Outro     | —        | `#378ADD` | Diego Teixeira (não influencia nenhuma meta) |
 
-### Lógica de dados (`/api/painel/semanal`)
+Diego Teixeira aparece em todos os relatórios mas está em `excluir_metas` e `equipe: "Outro"` — não conta para `n_analistas` nem para o cálculo de metas.
+
+### Lógica de dados
+
+**`/api/painel/semanal`**
 - **Entrados** = tickets criados na semana (segunda a sexta) onde owner = analista
-- **Fechados** = tickets resolvidos (status 5 - Resolvido) na semana onde owner = analista
+- **Fechados** = tickets resolvidos (`5 - Resolvido` **ou** `6 - Fechado`) na semana onde owner = analista
 - **Saldo** = fechados − entrados (pode ser negativo)
 - Fonte: Movidesk API ao vivo (não usa cache local de tickets)
-- Cache em memória TTL 5 min (`_painel_cache`)
+- Cache em memória TTL 2 min (`_painel_cache`)
 - `_painel_match()` faz match case-insensitive (exact first, partial fallback ≥4 chars)
+
+**`/api/painel/diario`** (Ritmo Diário)
+- **fechados_hoje** = tickets com `resolvedDate` hoje onde owner = analista (status 5 ou 6)
+- **meta_dia** = tickets entrados no mês / n_analistas (excluindo `excluir_metas`) / dias úteis decorridos
+- Analistas em `excluir_metas` (ex: Guilherme, Diego) recebem `meta_dia = 0`
+- Cache em memória TTL 2 min (`_diario_cache`)
 
 ### Visual React (`Painel.jsx`)
 - Fundo escuro `#080c18`, overlay scanline sutil (`.painel-scanline`)
@@ -634,13 +653,18 @@ Arquivo `erp_assistant/tv.html` servido pela rota `GET /tv` no Flask.
 | `GET /api/tv-login?key=KEY` | GET | Auto-login TV — retorna token com role `lideres` |
 | `GET /tv` | GET | Serve `tv.html` (standalone, sem autenticação) |
 | `GET /api/painel/semanal` | GET | Dados da semana por analista e por equipe |
-| `POST /api/painel/reset-cache` | POST | Invalida cache (força re-busca no Movidesk) |
+| `GET /api/painel/diario` | GET | Fechados hoje + meta diária por analista (Ritmo Diário) |
+| `POST /api/painel/reset-cache` | POST | Invalida ambos os caches (`_painel_cache` e `_diario_cache`) |
 
 ### Arquivos relevantes
 ```
 erp_assistant/tv.html              → standalone HTML/CSS/JS para TV antiga (sem React)
 backend/main.py                    → _TV_KEY, _PAINEL_ANALISTAS, _painel_match,
                                      rotas /api/tv-login, /tv, /api/painel/*
+                                     _diario_cache / _diario_lock (Ritmo Diário)
+utils/movidesk_client.py           → fetch_resolved_page: filtra status 5 e 6
+utils/movidesk_sync.py             → _mem_cache / _mem_cache_mtime (cache em memória do JSON)
+utils/gestao_config.py             → excluir_metas: ["Guilherme Cordeiro", "Diego Teixeira"]
 frontend/src/pages/Painel.jsx      → página React completa + todos os sub-componentes
 frontend/src/App.jsx               → detecção ?tv=KEY, tvMode state, erp_tv_mode localStorage
 frontend/src/api/backend.js        → tvLogin(), painelSemanal(), painelResetCache()
@@ -803,3 +827,6 @@ Issues criadas em 24/04/2026 referentes à sessão de melhorias da FarmaBot:
 | 23 | Farmácias não selecionáveis (Ctrl+C não funcionava) | Sem classe `selectable` nas linhas → adicionado `selectable` nas linhas de farmácia |
 | 24 | Issues do Jira não detectadas (corpo ADF em comentários) | `str(dict)` gerava repr ilegível → `_adf_text()` agora usado para corpos de comentário; desc_text 800→3000 chars; 10→20 comentários; campo `components` adicionado |
 | 25 | `onSendToChat` não funcionava em Provedores NFS-e | `App.jsx` não passava a prop → `onSendToChat={handleSendToChat}` adicionado |
+| 26 | Chamados "Fechado" (status 6) não contavam no Painel TV | `fetch_resolved_page` filtrava só `5 - Resolvido` → filtro expandido para `status eq '5 - Resolvido' or status eq '6 - Fechado'` |
+| 27 | Chat da IA lento (leitura de tickets.json a cada mensagem) | `load_cache()` em `movidesk_sync.py` lia arquivo do disco a cada chamada → cache em memória com invalidação por mtime |
+| 28 | Barra do Diego desproporcional no Ritmo Diário | Diego sem meta (`meta_dia = 0`) inflava `barMax` para todos → `barMax` calculado só com analistas com `meta_dia > 0` |

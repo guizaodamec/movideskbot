@@ -2892,8 +2892,15 @@ def painel_diario():
         except Exception:
             meta_eq = {}
 
+        from utils.gestao_config import get_metas_fixas
+        metas_fixas = get_metas_fixas()
+
         for a in lookup.values():
-            a["meta_dia"] = meta_eq.get(a["equipe"], 0.0)
+            nome_lower = a["nome"].lower()
+            if nome_lower in metas_fixas:
+                a["meta_dia"] = metas_fixas[nome_lower]
+            else:
+                a["meta_dia"] = meta_eq.get(a["equipe"], 0.0)
 
         analistas = sorted(lookup.values(),
                            key=lambda x: x["fechados_hoje"], reverse=True)
