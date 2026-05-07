@@ -468,13 +468,7 @@ function renderDiario(){
     var fillPct    = barMax > 0 ? Math.min(fech / barMax * 100, 100) : 0;
     var markerPct  = (meta > 0 && barMax > 0) ? Math.min(meta / barMax * 100, 99) : 0;
 
-    var fillBg;
-    if(fech > meta && meta > 0){
-      var split = (meta / fech * 100).toFixed(1);
-      fillBg = 'linear-gradient(90deg,'+c.a+' 0%,'+c.a+' '+split+'%,#10b981 '+split+'%)';
-    } else {
-      fillBg = c.a;
-    }
+    var fillBg = (fech >= meta && meta > 0) ? '#00c853' : c.a;
 
     var numColor = (fech >= meta && meta > 0) ? '#10b981' : '#e2e8f6';
     var metaFmt  = meta > 0 ? '/'+rnd1(meta) : '';
