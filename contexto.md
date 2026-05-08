@@ -390,13 +390,16 @@ Acessível por todos os roles com permissão (ver tabela RBAC).
 - **G1:** Marcello, Alan, Keven — Suporte geral
 - **GW:** Nathan Lopes — Orya, e-commerce, Alcance, FarmaFácil Web
 - **Ouvidoria:** Érica Milo Nardo Portezani, Lucas Eduardo Durante, Guilherme Cordeiro, Taynara Ribeiro — reclamações, elogios, sugestões
+- **Fórmula Animal:** Diego Teixeira — atendimento exclusivo redes Fórmula Animal (cor esmeralda)
 
 **Notas sobre grupos:**
 - Guilherme Cordeiro está somente em Ouvidoria (não em Fiscal)
 - Gomes foi removido de todos os grupos (saiu da empresa)
-- `excluir_metas`: Guilherme Cordeiro (aparece nos filtros mas não entra no cálculo de metas)
+- `excluir_metas`: Guilherme Cordeiro e Diego Teixeira (aparecem nos filtros mas não entram no cálculo de metas dos outros grupos)
 - `_CATEGORIA_GRUPOS` foi removido de `movidesk_sync.py` — todos os grupos filtram por nome do analista, não por categoria
-- `get_metas_por_equipe()` inclui todos os 5 grupos: Fiscal, Producao, G1, GW, Ouvidoria
+- `get_metas_por_equipe()` inclui 6 grupos: Fiscal, Producao, G1, GW, Ouvidoria, FormulaAnimal
+- **`client_filters`** em `gestao_config.json`: grupos com filtro de cliente só contam tickets cujo `client_name` contém a substring configurada. FormulaAnimal usa `"formula animal"` — todas as filiais seguem o padrão `FORMULA ANIMAL - <cidade>`
+- `count_open_by_owner()` retorna `{owner: {'total': N, 'by_client': Counter}}` para suportar fila filtrada por cliente
 
 **Endpoints principais:**
 - `GET /api/gestao/analista-view` — fila do analista logado
@@ -671,7 +674,7 @@ backend/main.py                    → _TV_KEY, _PAINEL_ANALISTAS, _painel_match
                                      _diario_cache / _diario_lock (Ritmo Diário)
 utils/movidesk_client.py           → fetch_resolved_page: filtra status 5 e 6
 utils/movidesk_sync.py             → _mem_cache / _mem_cache_mtime (cache em memória do JSON)
-utils/gestao_config.py             → excluir_metas, metas_fixas (meta fixa por analista), get_metas_fixas()
+utils/gestao_config.py             → excluir_metas, metas_fixas, client_filters, get_metas_fixas(), get_client_filter()
 frontend/src/pages/Painel.jsx      → página React completa + todos os sub-componentes
 frontend/src/App.jsx               → detecção ?tv=KEY, tvMode state, erp_tv_mode localStorage
 frontend/src/api/backend.js        → tvLogin(), painelSemanal(), painelResetCache()
@@ -839,3 +842,4 @@ Issues criadas em 24/04/2026 referentes à sessão de melhorias da FarmaBot:
 | 28 | Barra do Diego desproporcional no Ritmo Diário | Diego sem meta (`meta_dia = 0`) inflava `barMax` para todos → `barMax` calculado só com analistas com `meta_dia > 0` |
 | 29 | Fila de chamados desatualizada ao longo do dia | Sem sync automático, cache só atualizava com clique manual → thread daemon `_auto_sync_loop` roda `sync_open_tickets` a cada 15 min |
 | 30 | Diego sem meta no Ritmo Diário (exibia `0/0`) | Estava em `excluir_metas` sem override → campo `metas_fixas` em `gestao_config.json` + `get_metas_fixas()` aplicado no `painel_diario` |
+| 31 | Fila do Diego no Gestão incluía tickets de outros clientes | Diego atende só Fórmula Animal mas fila contava todos os tickets dele → grupo `FormulaAnimal` com `client_filters: "formula animal"` filtra métricas por `client_name` |
