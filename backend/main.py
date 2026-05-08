@@ -2693,7 +2693,7 @@ _PAINEL_ANALISTAS = [
     {"nome": "Marcello Filho",                 "display": "Marcello",  "equipe": "G1"},
     {"nome": "Keven Silva dos Santos",         "display": "Keven",     "equipe": "G1"},
     {"nome": "Nathan Lopes",                   "display": "Nathan",    "equipe": "GW"},
-    {"nome": "Diego Teixeira",                 "display": "Diego",     "equipe": "Outro"},
+    {"nome": "Diego Teixeira",                 "display": "Diego",     "equipe": "FormulaAnimal"},
 ]
 
 _PAINEL_EQUIPES = {

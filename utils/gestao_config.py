@@ -34,10 +34,10 @@ _DEFAULT = {
     },
     # Analistas excluídos do cálculo de metas (líderes, gerentes, etc.)
     # Continuam aparecendo nos filtros de tickets, mas não entram em n_analistas nem na tabela de metas.
-    "excluir_metas": ["Guilherme Cordeiro", "Diego Teixeira"],
+    "excluir_metas": ["Guilherme Cordeiro"],
     # Metas diárias fixas por analista — sobrepõem o cálculo automático por equipe.
     # Útil para analistas sem equipe (ex: Diego) ou com meta diferenciada.
-    "metas_fixas": {"Diego Teixeira": 10.0}
+    "metas_fixas": {}
 }
 
 

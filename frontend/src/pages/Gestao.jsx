@@ -961,7 +961,7 @@ function AderenciaSection({ aderencia, loading, filterGrupo }) {
   )
   const analistas = aderencia?.analistas || []
   if (!analistas.length) return null
-  const gruposToShow = filterGrupo ? [filterGrupo] : ['Fiscal', 'Producao', 'G1', 'GW', 'Ouvidoria']
+  const gruposToShow = filterGrupo ? [filterGrupo] : ['Fiscal', 'Producao', 'G1', 'GW', 'Ouvidoria', 'FormulaAnimal']
 
   return (
     <div className="space-y-3">
@@ -1029,7 +1029,10 @@ export default function Gestao({ role = 'analista' }) {
     { key: 'Producao',   label: 'Produção'  },
     { key: 'G1',         label: 'G1'        },
     { key: 'GW',         label: 'GW'        },
-    ...(isLider ? [{ key: 'Ouvidoria', label: 'Ouvidoria' }] : []),
+    ...(isLider ? [
+      { key: 'Ouvidoria',     label: 'Ouvidoria'      },
+      { key: 'FormulaAnimal', label: 'Fórmula Animal' },
+    ] : []),
   ]
 
   // Período
@@ -1552,7 +1555,7 @@ export default function Gestao({ role = 'analista' }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {stats === null
                 ? [1,2,3,4].map(i => <SkeletonCard key={i} />)
-                : (filterGrupo ? [filterGrupo] : ['Fiscal', 'Producao', 'G1', 'GW', 'Ouvidoria']).map(g => (
+                : (filterGrupo ? [filterGrupo] : ['Fiscal', 'Producao', 'G1', 'GW', 'Ouvidoria', 'FormulaAnimal']).map(g => (
                     <TeamSummaryCard
                       key={g}
                       grupo={g}
@@ -1567,7 +1570,7 @@ export default function Gestao({ role = 'analista' }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {stats === null
                 ? [1,2,3,4].map(i => <SkeletonCard key={i} />)
-                : (filterGrupo ? [filterGrupo] : ['Fiscal', 'Producao', 'G1', 'GW', 'Ouvidoria']).map(g => (
+                : (filterGrupo ? [filterGrupo] : ['Fiscal', 'Producao', 'G1', 'GW', 'Ouvidoria', 'FormulaAnimal']).map(g => (
                     <GrupoAnalistasCard
                       key={g}
                       grupo={g}
@@ -1740,7 +1743,10 @@ export default function Gestao({ role = 'analista' }) {
                   { key: 'Producao',   label: 'Produção'  },
                   { key: 'G1',         label: 'G1'        },
                   { key: 'GW',         label: 'GW'        },
-                  ...(isLider ? [{ key: 'Ouvidoria', label: 'Ouvidoria' }] : []),
+                  ...(isLider ? [
+                    { key: 'Ouvidoria',     label: 'Ouvidoria'      },
+                    { key: 'FormulaAnimal', label: 'Fórmula Animal' },
+                  ] : []),
                 ]}
                 value={dupGrupo}
                 onChange={v => { setDupGrupo(v); handleLoadDuplicados(v) }}
@@ -1805,7 +1811,10 @@ export default function Gestao({ role = 'analista' }) {
                   { key: 'Producao',       label: 'Produção'       },
                   { key: 'G1',             label: 'G1'             },
                   { key: 'GW',             label: 'GW'             },
-                  { key: 'FormulaAnimal',  label: 'Fórmula Animal' },
+                  ...(isLider ? [
+                    { key: 'Ouvidoria',     label: 'Ouvidoria'      },
+                    { key: 'FormulaAnimal', label: 'Fórmula Animal' },
+                  ] : []),
                 ]}
                 value={metaGrupoFiltro}
                 onChange={setMetaGrupoFiltro}
