@@ -1093,11 +1093,11 @@ def get_metas_por_equipe(semanas_alvo=4):
         cache_dirty = True
         return owner_counts
 
-    from utils.gestao_config import get_excluir_metas
+    from utils.gestao_config import get_excluir_metas, get_client_filter
     excluir = get_excluir_metas()
 
     resultado = []
-    for grupo in ['Fiscal', 'Producao', 'G1', 'GW', 'Ouvidoria']:
+    for grupo in ['Fiscal', 'Producao', 'G1', 'GW', 'Ouvidoria', 'FormulaAnimal']:
         membros = {mb.lower() for mb in get_grupo_analistas(grupo)}
         if not membros:
             continue
@@ -1110,8 +1110,24 @@ def get_metas_por_equipe(semanas_alvo=4):
         tickets_metas = [t for t in all_tickets
                          if (t.get("owner_name") or "").lower() in membros_metas]
 
+        # Filtro de cliente (ex: FormulaAnimal → só tickets de clientes FA)
+        client_filter = get_client_filter(grupo)
+        if client_filter:
+            tickets_grupo = [t for t in tickets_grupo
+                             if client_filter in (t.get("client_name") or "").lower()]
+            tickets_metas = [t for t in tickets_metas
+                             if client_filter in (t.get("client_name") or "").lower()]
+
         # Fila ao vivo (API Movidesk) — números precisos
-        fila = sum(open_by_owner.get(mb, 0) for mb in membros_metas)
+        if client_filter:
+            fila = sum(
+                sum(cnt for cn, cnt in open_by_owner.get(mb, {}).get('by_client', {}).items()
+                    if client_filter in cn)
+                for mb in membros_metas
+            )
+        else:
+            fila = sum(open_by_owner.get(mb, {}).get('total', 0) for mb in membros_metas)
+
         # Lista do cache apenas para top_cats e nome_map (não usada nos contadores)
         abertos = [t for t in tickets_metas if _is_aberto(t)]
 
@@ -1193,7 +1209,11 @@ def get_metas_por_equipe(semanas_alvo=4):
         membros_stats = []
         for mb in membros_metas:
             nome_d        = nome_map.get(mb, mb.title())
-            mb_fila       = open_by_owner.get(mb, 0)
+            if client_filter:
+                mb_fila = sum(cnt for cn, cnt in open_by_owner.get(mb, {}).get('by_client', {}).items()
+                              if client_filter in cn)
+            else:
+                mb_fila = open_by_owner.get(mb, {}).get('total', 0)
             mb_fechou_mes = sum(1 for t in fechados_mes_g if (t.get("owner_name") or "").lower() == mb)
             mb_taxa_dia   = round(mb_fechou_mes / dias_uteis_dec, 2)
             membros_stats.append({

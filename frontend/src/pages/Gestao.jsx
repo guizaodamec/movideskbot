@@ -267,6 +267,16 @@ const GRUPOS_CONFIG = {
     headBg:  'bg-pink-500/15',
     badge:   'bg-pink-500/20 text-pink-400 border-pink-500/30',
   },
+  FormulaAnimal: {
+    label: 'Fórmula Animal', desc: 'Atendimento exclusivo para redes Fórmula Animal',
+    membros: ['Diego Teixeira'],
+    accent:  '#34d399',
+    text:    'text-emerald-400',
+    bg:      'bg-emerald-500/10',
+    border:  'border-emerald-500/30',
+    headBg:  'bg-emerald-500/15',
+    badge:   'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+  },
 }
 // Alias para manter compatibilidade com componentes que usavam os objetos antigos
 const GRUPO_INFO        = Object.fromEntries(Object.entries(GRUPOS_CONFIG).map(([k, v]) => [k, { ...v, color: v.text }]))
@@ -1790,11 +1800,12 @@ export default function Gestao({ role = 'analista' }) {
             <div className="flex items-center gap-2 flex-wrap">
               <SegmentedControl
                 options={[
-                  { key: '',         label: 'Todas'    },
-                  { key: 'Fiscal',   label: 'Fiscal'   },
-                  { key: 'Producao', label: 'Produção' },
-                  { key: 'G1',       label: 'G1'       },
-                  { key: 'GW',       label: 'GW'       },
+                  { key: '',               label: 'Todas'          },
+                  { key: 'Fiscal',         label: 'Fiscal'         },
+                  { key: 'Producao',       label: 'Produção'       },
+                  { key: 'G1',             label: 'G1'             },
+                  { key: 'GW',             label: 'GW'             },
+                  { key: 'FormulaAnimal',  label: 'Fórmula Animal' },
                 ]}
                 value={metaGrupoFiltro}
                 onChange={setMetaGrupoFiltro}

@@ -7,11 +7,17 @@ _CONFIG_FILE = "gestao_config.json"
 
 _DEFAULT = {
     "grupos": {
-        "Fiscal":   ["Vinicius", "Rebeca medeiros", "Rubens Milton Destro Junior"],
-        "Producao": ["Isaac Santos", "Raul Neto", "Matheus Miranda de Lima Araujo", "Boeira", "Ruam Pereira de Sá"],
-        "G1":       ["Marcello Filho", "Alan vieira", "Keven Silva dos Santos"],
-        "GW":       ["Nathan Lopes", "Taynara Pereira", "Taynara Ribeiro"],
-        "Ouvidoria": ["Erica Milo Nardo Portezani", "Lucas Eduardo Durante", "Guilherme Cordeiro", "Taynara Ribeiro"],
+        "Fiscal":        ["Vinicius", "Rebeca medeiros", "Rubens Milton Destro Junior"],
+        "Producao":      ["Isaac Santos", "Raul Neto", "Matheus Miranda de Lima Araujo", "Boeira", "Ruam Pereira de Sá"],
+        "G1":            ["Marcello Filho", "Alan vieira", "Keven Silva dos Santos"],
+        "GW":            ["Nathan Lopes", "Taynara Pereira", "Taynara Ribeiro"],
+        "Ouvidoria":     ["Erica Milo Nardo Portezani", "Lucas Eduardo Durante", "Guilherme Cordeiro", "Taynara Ribeiro"],
+        "FormulaAnimal": ["Diego Teixeira"],
+    },
+    # Filtro de cliente por grupo — quando definido, apenas tickets cujo client_name
+    # contém essa substring (case-insensitive) entram nas métricas do grupo.
+    "client_filters": {
+        "FormulaAnimal": "formula animal",
     },
     # Palavras-chave de categoria por grupo — usadas para classificar tickets
     # quando o filtro por grupo está ativo (além do filtro por analista)
@@ -77,6 +83,13 @@ def get_metas_fixas():
     """Retorna dict {nome_lower: meta_dia_float} de metas fixas por analista."""
     cfg = load_config()
     return {k.lower(): float(v) for k, v in cfg.get("metas_fixas", {}).items()}
+
+
+def get_client_filter(grupo_nome):
+    """Retorna substring de filtro de cliente para o grupo (lowercase), ou '' se não definido."""
+    cfg = load_config()
+    f = cfg.get("client_filters", {}).get(grupo_nome, "")
+    return f.lower() if f else ""
 
 
 def get_grupo_categorias(grupo_nome):

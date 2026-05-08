@@ -130,11 +130,12 @@ def fetch_open_tickets_page(skip=0, top=50):
 
 def count_open_by_owner(max_tickets=5000):
     """
-    Busca todos os tickets abertos ao vivo e retorna {owner_name_lower: count}.
+    Busca todos os tickets abertos ao vivo.
+    Retorna {owner_name_lower: {'total': N, 'by_client': {client_lower: count}}}.
     Usa paginação — percorre até max_tickets resultados.
     """
-    from collections import defaultdict
-    counts = defaultdict(int)
+    from collections import defaultdict, Counter
+    result = defaultdict(lambda: {'total': 0, 'by_client': Counter()})
     top  = 100
     skip = 0
     while skip < max_tickets:
@@ -142,14 +143,19 @@ def count_open_by_owner(max_tickets=5000):
         if not page:
             break
         for t in page:
-            owner = (t.get("owner") or {})
-            name  = (owner.get("businessName") or "").strip().lower()
-            if name:
-                counts[name] += 1
+            owner       = (t.get("owner") or {})
+            owner_name  = (owner.get("businessName") or "").strip().lower()
+            if not owner_name:
+                continue
+            clients     = t.get("clients") or []
+            client_name = ((clients[0].get("businessName") if clients else "") or "").strip().lower()
+            result[owner_name]['total'] += 1
+            if client_name:
+                result[owner_name]['by_client'][client_name] += 1
         if len(page) < top:
             break
         skip += top
-    return dict(counts)
+    return dict(result)
 
 
 def fetch_ticket_actions(ticket_id):
