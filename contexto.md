@@ -395,11 +395,13 @@ Acessível por todos os roles com permissão (ver tabela RBAC).
 **Notas sobre grupos:**
 - Guilherme Cordeiro está somente em Ouvidoria (não em Fiscal)
 - Gomes foi removido de todos os grupos (saiu da empresa)
-- `excluir_metas`: Guilherme Cordeiro e Diego Teixeira (aparecem nos filtros mas não entram no cálculo de metas dos outros grupos)
+- `excluir_metas`: apenas Guilherme Cordeiro (não entra no cálculo de metas)
+- Diego Teixeira é membro regular do grupo FormulaAnimal — **não está** em `excluir_metas`
 - `_CATEGORIA_GRUPOS` foi removido de `movidesk_sync.py` — todos os grupos filtram por nome do analista, não por categoria
 - `get_metas_por_equipe()` inclui 6 grupos: Fiscal, Producao, G1, GW, Ouvidoria, FormulaAnimal
 - **`client_filters`** em `gestao_config.json`: grupos com filtro de cliente só contam tickets cujo `client_name` contém a substring configurada. FormulaAnimal usa `"formula animal"` — todas as filiais seguem o padrão `FORMULA ANIMAL - <cidade>`
 - `count_open_by_owner()` retorna `{owner: {'total': N, 'by_client': Counter}}` para suportar fila filtrada por cliente
+- Filtros de grupo (Dashboard, Duplicados, Metas, cards) mostram Ouvidoria e Fórmula Animal somente para `isLider` (lideres/administrador)
 
 **Endpoints principais:**
 - `GET /api/gestao/analista-view` — fila do analista logado
@@ -619,9 +621,9 @@ Arquivo `erp_assistant/tv.html` servido pela rota `GET /tv` no Flask.
 | Producao  | G3       | `#7F77DD` | Matheus, Boeira, Isaac, Raul, Ruam |
 | G1        | G1       | `#378ADD` | Alan, Marcello, Keven |
 | GW        | GW       | `#888780` | Nathan, Taynara |
-| Outro     | —        | `#378ADD` | Diego Teixeira |
+| FormulaAnimal | FA   | `#34d399` | Diego Teixeira |
 
-Diego Teixeira aparece em todos os relatórios mas está em `excluir_metas` e `equipe: "Outro"` — não conta para `n_analistas` nem para o cálculo de metas de equipe. Tem **meta fixa de 10.0/dia** configurada em `metas_fixas` no `gestao_config.json`.
+Diego Teixeira pertence ao grupo FormulaAnimal. Sua meta diária é calculada dinamicamente pelos tickets da Fórmula Animal (igual aos outros grupos), sem valor fixo.
 
 ### Lógica de dados
 
@@ -636,8 +638,8 @@ Diego Teixeira aparece em todos os relatórios mas está em `excluir_metas` e `e
 **`/api/painel/diario`** (Ritmo Diário)
 - **fechados_hoje** = tickets com `resolvedDate` hoje onde owner = analista (status 5 ou 6)
 - **meta_dia** = tickets entrados no mês / n_analistas (excluindo `excluir_metas`) / dias úteis decorridos
-- Analistas em `excluir_metas` recebem `meta_dia = 0` por padrão, **a menos que** estejam em `metas_fixas` (ex: Diego → 10.0)
-- `metas_fixas` em `gestao_config.json` sobrepõe o cálculo automático por equipe para analistas específicos
+- Analistas em `excluir_metas` recebem `meta_dia = 0` (ex: Guilherme Cordeiro)
+- `metas_fixas` em `gestao_config.json` pode sobrepor o cálculo automático para analistas específicos (atualmente vazio)
 - Cache em memória TTL 2 min (`_diario_cache`)
 
 ### Sync automático de tickets abertos
@@ -843,3 +845,4 @@ Issues criadas em 24/04/2026 referentes à sessão de melhorias da FarmaBot:
 | 29 | Fila de chamados desatualizada ao longo do dia | Sem sync automático, cache só atualizava com clique manual → thread daemon `_auto_sync_loop` roda `sync_open_tickets` a cada 15 min |
 | 30 | Diego sem meta no Ritmo Diário (exibia `0/0`) | Estava em `excluir_metas` sem override → campo `metas_fixas` em `gestao_config.json` + `get_metas_fixas()` aplicado no `painel_diario` |
 | 31 | Fila do Diego no Gestão incluía tickets de outros clientes | Diego atende só Fórmula Animal mas fila contava todos os tickets dele → grupo `FormulaAnimal` com `client_filters: "formula animal"` filtra métricas por `client_name` |
+| 32 | Métricas do grupo FormulaAnimal zeradas no Gestão → Metas | Diego estava em `excluir_metas` → `membros_metas` ficava vazio, todas as métricas eram 0 → removido de `excluir_metas`; equipe alterada para `"FormulaAnimal"` no `_PAINEL_ANALISTAS` |
