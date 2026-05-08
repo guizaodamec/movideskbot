@@ -19,6 +19,11 @@ _sync_progress = {"running": False, "done": 0, "total": 0, "msg": ""}
 _mem_cache = None          # cache em memória do JSON de tickets
 _mem_cache_mtime = None    # mtime do arquivo quando foi carregado
 
+# Cache da contagem ao vivo de tickets abertos por dono (TTL 5 min)
+_open_count_cache = None
+_open_count_ts    = 0.0
+_OPEN_COUNT_TTL   = 300
+
 
 def _cache_path():
     return os.path.join(get_data_dir(), _CACHE_FILE)
@@ -1025,6 +1030,7 @@ def get_metas_por_equipe(semanas_alvo=4):
         busca da API on-demand e salva no cache.
     """
     import calendar as _cal
+    import time as _time
     from datetime import datetime, timedelta
     from datetime import date as _date
     from utils.gestao_config import get_grupo_analistas
@@ -1033,6 +1039,18 @@ def get_metas_por_equipe(semanas_alvo=4):
     all_tickets = list(cache["tickets"].values())
     hoje        = datetime.now().date()
     DIAS_UTEIS  = 22  # dias úteis por mês
+
+    # Fila ao vivo — busca da API com cache de 5 min
+    global _open_count_cache, _open_count_ts
+    now_ts = _time.time()
+    if _open_count_cache is None or (now_ts - _open_count_ts) > _OPEN_COUNT_TTL:
+        try:
+            from utils.movidesk_client import count_open_by_owner
+            _open_count_cache = count_open_by_owner()
+            _open_count_ts    = now_ts
+        except Exception:
+            _open_count_cache = {}
+    open_by_owner = _open_count_cache
     cache_dirty = False  # se precisarmos salvar cache no final
 
     def _prev_months(n):
@@ -1091,8 +1109,11 @@ def get_metas_por_equipe(semanas_alvo=4):
         # Tickets só dos analistas que entram na meta (exclui líderes)
         tickets_metas = [t for t in all_tickets
                          if (t.get("owner_name") or "").lower() in membros_metas]
+
+        # Fila ao vivo (API Movidesk) — números precisos
+        fila = sum(open_by_owner.get(mb, 0) for mb in membros_metas)
+        # Lista do cache apenas para top_cats e nome_map (não usada nos contadores)
         abertos = [t for t in tickets_metas if _is_aberto(t)]
-        fila    = len(abertos)
 
         # Histórico mensal (últimos 3 meses)
         dias_uteis_dec = _dias_uteis_decorridos(hoje)
@@ -1172,7 +1193,7 @@ def get_metas_por_equipe(semanas_alvo=4):
         membros_stats = []
         for mb in membros_metas:
             nome_d        = nome_map.get(mb, mb.title())
-            mb_fila       = sum(1 for t in abertos        if (t.get("owner_name") or "").lower() == mb)
+            mb_fila       = open_by_owner.get(mb, 0)
             mb_fechou_mes = sum(1 for t in fechados_mes_g if (t.get("owner_name") or "").lower() == mb)
             mb_taxa_dia   = round(mb_fechou_mes / dias_uteis_dec, 2)
             membros_stats.append({

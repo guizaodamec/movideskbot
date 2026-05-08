@@ -128,6 +128,30 @@ def fetch_open_tickets_page(skip=0, top=50):
     return _get("tickets", params) or []
 
 
+def count_open_by_owner(max_tickets=5000):
+    """
+    Busca todos os tickets abertos ao vivo e retorna {owner_name_lower: count}.
+    Usa paginação — percorre até max_tickets resultados.
+    """
+    from collections import defaultdict
+    counts = defaultdict(int)
+    top  = 100
+    skip = 0
+    while skip < max_tickets:
+        page = fetch_open_tickets_page(skip=skip, top=top)
+        if not page:
+            break
+        for t in page:
+            owner = (t.get("owner") or {})
+            name  = (owner.get("businessName") or "").strip().lower()
+            if name:
+                counts[name] += 1
+        if len(page) < top:
+            break
+        skip += top
+    return dict(counts)
+
+
 def fetch_ticket_actions(ticket_id):
     """Busca as ações (conversa completa) de um chamado."""
     params = {
