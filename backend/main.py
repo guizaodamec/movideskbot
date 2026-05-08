@@ -2982,6 +2982,26 @@ def serve_react(path):
         return send_from_directory(_DIST, 'index.html')
     return _jsonify({'error': 'Frontend não encontrado. Execute npm run build primeiro.'}, 404)
 
+# ── Sync automático de tickets abertos ────────────────────────────────────────
+
+def _auto_sync_loop(interval_seconds=900):
+    """Roda sync_open_tickets em background a cada interval_seconds (padrão 15 min)."""
+    import time as _time
+    _time.sleep(30)  # aguarda o backend subir completamente antes do primeiro sync
+    while True:
+        try:
+            from utils.movidesk_sync import sync_open_tickets
+            novos = sync_open_tickets(max_tickets=2000)
+            logger.info("Auto-sync abertos: %d ticket(s) atualizados/novos", novos)
+        except Exception as exc:
+            logger.warning("Auto-sync abertos falhou: %s", exc)
+        _time.sleep(interval_seconds)
+
+
+_sync_thread = threading.Thread(target=_auto_sync_loop, daemon=True)
+_sync_thread.start()
+
+
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == '__main__':
