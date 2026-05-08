@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { Copy, Check } from 'lucide-react'
 import SqlBlock from './SqlBlock'
 
 function formatTime(ts) {
@@ -35,6 +37,14 @@ function parseContent(text) {
 export default function ChatMessage({ role, content, timestamp, onExecuteQuery }) {
   const isUser = role === 'user'
   const parts = isUser ? [{ type: 'text', content }] : parseContent(content)
+  const [copied, setCopied] = useState(false)
+
+  function handleCopy() {
+    navigator.clipboard.writeText(content).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    })
+  }
 
   return (
     <motion.div
@@ -75,10 +85,23 @@ export default function ChatMessage({ role, content, timestamp, onExecuteQuery }
           )
         )}
 
-        {/* Timestamp */}
-        <span className="text-[10px] text-text-muted px-1 select-none">
-          {formatTime(timestamp)}
-        </span>
+        {/* Timestamp + botão copiar */}
+        <div className="flex items-center gap-2 px-1">
+          <span className="text-[10px] text-text-muted select-none">
+            {formatTime(timestamp)}
+          </span>
+          {!isUser && (
+            <button
+              onClick={handleCopy}
+              title="Copiar resposta"
+              className="text-text-muted hover:text-text transition-colors select-none"
+            >
+              {copied
+                ? <Check size={12} className="text-green-400" />
+                : <Copy size={12} />}
+            </button>
+          )}
+        </div>
       </div>
     </motion.div>
   )
