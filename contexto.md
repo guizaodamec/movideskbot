@@ -594,9 +594,8 @@ Arquivo `erp_assistant/tv.html` servido pela rota `GET /tv` no Flask.
   - Nome do analista 32px, números Entr/Fech 46px, Saldo 46px (mesma escala), rank com `margin-right` para respirar
 - **Ritmo Diário:** barra de progresso horizontal por analista mostrando avanço em relação à meta diária
   - Meta diária = tickets entrados no mês / n_analistas / dias úteis decorridos
-  - Exibe `fechados_hoje / meta_dia` por analista; Diego exibe `0/0`
+  - Exibe `fechados_hoje / meta_dia` por analista
   - Barra fica inteiramente verde (`#00c853`) quando analista atinge ou supera a meta
-  - Analistas sem meta (`meta_dia = 0`, ex: Diego) têm barra sempre azul; não influenciam a escala do gráfico
   - `barMax` calculado apenas com analistas que têm `meta_dia > 0`
   - Sem tag de equipe abaixo do nome; sem coluna ritmo/dia
 - **Desempenho por Equipe:** grid 2×2
@@ -617,9 +616,9 @@ Arquivo `erp_assistant/tv.html` servido pela rota `GET /tv` no Flask.
 | Producao  | G3       | `#7F77DD` | Matheus, Boeira, Isaac, Raul, Ruam |
 | G1        | G1       | `#378ADD` | Alan, Marcello, Keven |
 | GW        | GW       | `#888780` | Nathan, Taynara |
-| Outro     | —        | `#378ADD` | Diego Teixeira (não influencia nenhuma meta) |
+| Outro     | —        | `#378ADD` | Diego Teixeira |
 
-Diego Teixeira aparece em todos os relatórios mas está em `excluir_metas` e `equipe: "Outro"` — não conta para `n_analistas` nem para o cálculo de metas.
+Diego Teixeira aparece em todos os relatórios mas está em `excluir_metas` e `equipe: "Outro"` — não conta para `n_analistas` nem para o cálculo de metas de equipe. Tem **meta fixa de 10.0/dia** configurada em `metas_fixas` no `gestao_config.json`.
 
 ### Lógica de dados
 
@@ -634,8 +633,16 @@ Diego Teixeira aparece em todos os relatórios mas está em `excluir_metas` e `e
 **`/api/painel/diario`** (Ritmo Diário)
 - **fechados_hoje** = tickets com `resolvedDate` hoje onde owner = analista (status 5 ou 6)
 - **meta_dia** = tickets entrados no mês / n_analistas (excluindo `excluir_metas`) / dias úteis decorridos
-- Analistas em `excluir_metas` (ex: Guilherme, Diego) recebem `meta_dia = 0`
+- Analistas em `excluir_metas` recebem `meta_dia = 0` por padrão, **a menos que** estejam em `metas_fixas` (ex: Diego → 10.0)
+- `metas_fixas` em `gestao_config.json` sobrepõe o cálculo automático por equipe para analistas específicos
 - Cache em memória TTL 2 min (`_diario_cache`)
+
+### Sync automático de tickets abertos
+Thread daemon iniciada junto com o backend (`_auto_sync_loop`):
+- Aguarda 30s após subir, depois roda `sync_open_tickets()` a cada **15 minutos**
+- Mantém o cache local (`movidesk_tickets.json`) alinhado com o Movidesk sem intervenção manual
+- Log no terminal: `Auto-sync abertos: X ticket(s) atualizados/novos`
+- Sync manual continua disponível para forçar atualização imediata
 
 ### Visual React (`Painel.jsx`)
 - Fundo escuro `#080c18`, overlay scanline sutil (`.painel-scanline`)
@@ -664,7 +671,7 @@ backend/main.py                    → _TV_KEY, _PAINEL_ANALISTAS, _painel_match
                                      _diario_cache / _diario_lock (Ritmo Diário)
 utils/movidesk_client.py           → fetch_resolved_page: filtra status 5 e 6
 utils/movidesk_sync.py             → _mem_cache / _mem_cache_mtime (cache em memória do JSON)
-utils/gestao_config.py             → excluir_metas: ["Guilherme Cordeiro", "Diego Teixeira"]
+utils/gestao_config.py             → excluir_metas, metas_fixas (meta fixa por analista), get_metas_fixas()
 frontend/src/pages/Painel.jsx      → página React completa + todos os sub-componentes
 frontend/src/App.jsx               → detecção ?tv=KEY, tvMode state, erp_tv_mode localStorage
 frontend/src/api/backend.js        → tvLogin(), painelSemanal(), painelResetCache()
@@ -830,3 +837,5 @@ Issues criadas em 24/04/2026 referentes à sessão de melhorias da FarmaBot:
 | 26 | Chamados "Fechado" (status 6) não contavam no Painel TV | `fetch_resolved_page` filtrava só `5 - Resolvido` → filtro expandido para `status eq '5 - Resolvido' or status eq '6 - Fechado'` |
 | 27 | Chat da IA lento (leitura de tickets.json a cada mensagem) | `load_cache()` em `movidesk_sync.py` lia arquivo do disco a cada chamada → cache em memória com invalidação por mtime |
 | 28 | Barra do Diego desproporcional no Ritmo Diário | Diego sem meta (`meta_dia = 0`) inflava `barMax` para todos → `barMax` calculado só com analistas com `meta_dia > 0` |
+| 29 | Fila de chamados desatualizada ao longo do dia | Sem sync automático, cache só atualizava com clique manual → thread daemon `_auto_sync_loop` roda `sync_open_tickets` a cada 15 min |
+| 30 | Diego sem meta no Ritmo Diário (exibia `0/0`) | Estava em `excluir_metas` sem override → campo `metas_fixas` em `gestao_config.json` + `get_metas_fixas()` aplicado no `painel_diario` |
