@@ -1536,6 +1536,45 @@ def gestao_abertos_hoje():
         return _jsonify({'error': str(e)}, 500)
 
 
+@app.route('/api/debug/ticket/<int:ticket_id>')
+def debug_ticket(ticket_id):
+    """Retorna campos brutos do ticket direto da API Movidesk — apenas para diagnóstico."""
+    sess, err = _require_auth(request)
+    if err: return err
+    if sess.get('role') not in ('lideres', 'administrador'):
+        return _jsonify({'error': 'Acesso negado'}, 403)
+    try:
+        from utils.movidesk_client import _get
+        result = _get("tickets", {
+            "$filter": f"id eq {ticket_id}",
+            "$select": "id,subject,status,serviceFirstLevel,serviceSecondLevel,tags",
+            "$expand": "actions",
+        })
+        if not result:
+            return _jsonify({'error': 'Ticket não encontrado'}, 404)
+        t = result[0]
+        actions = t.get("actions") or []
+        return _jsonify({
+            "id":               t.get("id"),
+            "subject":          t.get("subject"),
+            "status":           t.get("status"),
+            "serviceFirstLevel": t.get("serviceFirstLevel"),
+            "serviceSecondLevel":t.get("serviceSecondLevel"),
+            "tags":             t.get("tags"),
+            "total_actions":    len(actions),
+            "actions_sample":   [
+                {
+                    "createdDate": a.get("createdDate", "")[:10],
+                    "status":      a.get("status"),
+                    "description": (a.get("description") or "")[:300],
+                }
+                for a in actions[:10]
+            ],
+        })
+    except Exception as e:
+        return _jsonify({'error': str(e)}, 500)
+
+
 @app.route('/api/gestao/auditoria-contato')
 def gestao_auditoria_contato():
     sess, err = _require_auth(request)
@@ -1596,13 +1635,10 @@ def gestao_auditoria_contato():
             client = (((t.get("clients") or [{}])[0]).get("businessName") or "").strip()
             fechado_em = ((t.get("resolvedIn") or t.get("closedIn") or t.get("lastUpdate") or ""))[:10]
 
-            # Resolução legítima: analista usou a macro mas depois conseguiu contato
-            # e encerrou com "9 - Resolvido Ticket - sem artigo" → não é violação
-            service_text = " ".join([
-                (t.get("serviceFirstLevel") or "").lower(),
-                (t.get("serviceSecondLevel") or "").lower(),
-            ])
-            if "resolvido ticket - sem artigo" in service_text:
+            # Resolução legítima: quando o analista de fato falou com o cliente e resolveu,
+            # a action de resolução contém o template "Incidente/Dúvida Relatado:" preenchido.
+            # Se esse texto existir em qualquer action → não é violação.
+            if any("incidente/" in (a.get("description") or "").lower() for a in actions):
                 continue
 
             tipo  = None
