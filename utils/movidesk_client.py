@@ -169,3 +169,24 @@ def fetch_ticket_actions(ticket_id):
     if result:
         return result[0].get("actions", [])
     return []
+
+
+def fetch_encerrados_auditoria(skip=0, top=50, since_date=None, until_date=None):
+    """
+    Busca tickets RESOLVIDOS ou CANCELADOS no período com actions expandidas.
+    Usado pela auditoria de procedimento de contato.
+    """
+    filters = ["(status eq '5 - Resolvido' or status eq '6 - Cancelado')"]
+    if since_date:
+        filters.append(f"lastUpdate ge {_dt(since_date)}")
+    if until_date:
+        filters.append(f"lastUpdate lt {_dt(until_date, end=True)}")
+
+    params = {
+        "$top":    top,
+        "$skip":   skip,
+        "$select": "id,subject,status,createdDate,resolvedIn,closedIn,lastUpdate,serviceFirstLevel,serviceSecondLevel",
+        "$expand": "owner,clients,actions",
+        "$filter": " and ".join(filters),
+    }
+    return _get("tickets", params)

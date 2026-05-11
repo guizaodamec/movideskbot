@@ -10,6 +10,7 @@ import Login from './pages/Login'
 import Users from './pages/Users'
 import Gestao from './pages/Gestao'
 import AbertosHoje from './pages/AbertosHoje'
+import AuditoriaContato from './pages/AuditoriaContato'
 import Tarefas from './pages/Tarefas'
 import ProvedorNFSe from './pages/ProvedorNFSe'
 import Painel from './pages/Painel'
@@ -21,8 +22,8 @@ const ROLE_PAGES = {
   analista:      new Set(['chat', 'tarefas', 'gestao', 'provedor']),
   backservice:   new Set(['chat', 'abertos-hoje', 'tarefas', 'gestao', 'provedor']),
   fiscal:        new Set(['chat', 'abertos-hoje', 'tarefas', 'gestao', 'provedor']),
-  lideres:       new Set(['chat', 'gestao', 'abertos-hoje', 'tarefas', 'provedor', 'painel']),
-  administrador: new Set(['chat', 'profile', 'config', 'gestao', 'users', 'abertos-hoje', 'tarefas', 'provedor', 'painel']),
+  lideres:       new Set(['chat', 'gestao', 'abertos-hoje', 'tarefas', 'provedor', 'painel', 'auditoria']),
+  administrador: new Set(['chat', 'profile', 'config', 'gestao', 'users', 'abertos-hoje', 'tarefas', 'provedor', 'painel', 'auditoria']),
 }
 
 function MustChangePasswordModal({ username, onDone }) {
@@ -462,6 +463,13 @@ export default function App() {
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 transition={PAGE_TRANSITION}>
                 <ProvedorNFSe onSendToChat={handleSendToChat} />
+              </motion.div>
+            )}
+            {page === 'auditoria' && canAccess('auditoria') && (
+              <motion.div key="auditoria" className="absolute inset-0"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                transition={PAGE_TRANSITION}>
+                <AuditoriaContato />
               </motion.div>
             )}
             {page === 'painel' && canAccess('painel') && (

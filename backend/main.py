@@ -1536,6 +1536,117 @@ def gestao_abertos_hoje():
         return _jsonify({'error': str(e)}, 500)
 
 
+@app.route('/api/gestao/auditoria-contato')
+def gestao_auditoria_contato():
+    sess, err = _require_auth(request)
+    if err: return err
+    if sess.get('role') not in ('lideres', 'administrador'):
+        return _jsonify({'error': 'Acesso negado'}, 403)
+
+    date_from = request.args.get('date_from')
+    date_to   = request.args.get('date_to')
+    if not date_from or not date_to:
+        return _jsonify({'error': 'date_from e date_to são obrigatórios'}, 400)
+
+    try:
+        from utils.movidesk_client import fetch_encerrados_auditoria
+        from collections import defaultdict
+
+        MACRO_SUBSTR = "tentativas de contato via telefone"
+
+        tickets_raw = []
+        skip = 0
+        top  = 50
+        while True:
+            page = fetch_encerrados_auditoria(skip=skip, top=top,
+                                              since_date=date_from, until_date=date_to)
+            if not page:
+                break
+            tickets_raw.extend(page)
+            if len(page) < top:
+                break
+            skip += top
+
+        violations = []
+
+        for t in tickets_raw:
+            actions = t.get("actions") or []
+            status  = t.get("status", "")
+
+            # Encontra actions da macro (texto fixo ou status 9 - Cliente indisponivel)
+            macro_actions = [
+                a for a in actions
+                if MACRO_SUBSTR in (a.get("description") or "").lower()
+                or "9 - cliente indisponivel" in (a.get("description") or "").lower()
+                or "cliente indisponivel" in (a.get("status") or "").lower()
+            ]
+
+            if not macro_actions:
+                continue
+
+            # Datas distintas de tentativas (dias corridos, fim de semana conta)
+            datas = sorted({
+                (a.get("createdDate") or "")[:10]
+                for a in macro_actions
+                if (a.get("createdDate") or "")[:10]
+            })
+            tentativas = len(datas)
+
+            owner  = ((t.get("owner") or {}).get("businessName") or "Sem analista").strip()
+            client = (((t.get("clients") or [{}])[0]).get("businessName") or "").strip()
+            fechado_em = ((t.get("resolvedIn") or t.get("closedIn") or t.get("lastUpdate") or ""))[:10]
+
+            tipo  = None
+            label = None
+
+            if "5 - Resolvido" in status:
+                tipo  = "resolvido_indevido"
+                label = "Resolvido indevidamente (deveria ser cancelado)"
+            elif "Cancelado" in status and tentativas < 5:
+                tipo  = "cancelado_prematuro"
+                label = f"Cancelado com {tentativas} de 5 tentativas"
+
+            if tipo:
+                violations.append({
+                    "id":           t["id"],
+                    "subject":      t.get("subject", ""),
+                    "status":       status,
+                    "owner_name":   owner,
+                    "client_name":  client,
+                    "tentativas":   tentativas,
+                    "datas":        datas,
+                    "tipo":         tipo,
+                    "label":        label,
+                    "fechado_em":   fechado_em,
+                    "serviceFirst": t.get("serviceFirstLevel", ""),
+                    "serviceSecond":t.get("serviceSecondLevel", ""),
+                })
+
+        por_analista = defaultdict(list)
+        for v in violations:
+            por_analista[v["owner_name"]].append(v)
+
+        resultado = [
+            {
+                "analista": nome,
+                "total":    len(tks),
+                "resolvidos_indevidos":  sum(1 for t in tks if t["tipo"] == "resolvido_indevido"),
+                "cancelados_prematuros": sum(1 for t in tks if t["tipo"] == "cancelado_prematuro"),
+                "tickets": sorted(tks, key=lambda x: str(x["id"]), reverse=True),
+            }
+            for nome, tks in sorted(por_analista.items(), key=lambda x: len(x[1]), reverse=True)
+        ]
+
+        return _jsonify({
+            "resultado":       resultado,
+            "total_violacoes": len(violations),
+            "total_analisados":len(tickets_raw),
+            "periodo":         {"de": date_from, "ate": date_to},
+        })
+    except Exception as e:
+        return _jsonify({'error': str(e)}, 500)
+
+
 @app.route('/api/gestao/duplicados')
 def gestao_duplicados():
     try:

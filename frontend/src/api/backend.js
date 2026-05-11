@@ -208,6 +208,9 @@ const api = {
   gestaoAbertosHoje: () =>
     instance.get('/gestao/abertos-hoje'),
 
+  gestaoAuditoriaContato: (date_from, date_to) =>
+    instance.get('/gestao/auditoria-contato', { params: { date_from, date_to }, timeout: 120000 }),
+
   // TV auto-login
   tvLogin: (key) =>
     instance.get('/tv-login', { params: { key } }),
