@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="popup.css">
+  <title>FarmaFacil Assistente</title>
+</head>
+<body>
+  <div id="header">
+    <div class="logo">⚕</div>
+    <div>
+      <div class="title">FarmaFacil Assistente</div>
+      <div class="sub">Extensão Movidesk</div>
+    </div>
+  </div>
+
+  <!-- Estado: não autenticado -->
+  <div id="view-login">
+    <p class="hint">Faça login com suas credenciais do assistente.</p>
+    <label>Usuário</label>
+    <input id="inp-user" type="text" placeholder="seu usuário" autocomplete="username">
+    <label>Senha</label>
+    <input id="inp-pass" type="password" placeholder="••••••" autocomplete="current-password">
+    <div id="login-error" class="error" style="display:none"></div>
+    <button id="btn-login">Entrar</button>
+  </div>
+
+  <!-- Estado: autenticado -->
+  <div id="view-logged" style="display:none">
+    <div class="info-row">
+      <span class="info-label">Conectado como</span>
+      <span id="lbl-user" class="info-value"></span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Servidor</span>
+      <span class="info-value">192.168.0.118:5000</span>
+    </div>
+    <div class="divider"></div>
+    <p class="hint">
+      Abra qualquer chamado em <strong>prismafive.movidesk.com</strong> e clique no botão <strong>⚕</strong> à direita da tela.
+    </p>
+    <button id="btn-logout" class="secondary">Sair</button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -3143,6 +3143,207 @@ def painel_reset_cache():
     return _jsonify({"ok": True})
 
 
+# ── Contexto do Cliente (extensão Movidesk) ───────────────────────────────────
+
+_ctx_cache     = {}   # ticket_id -> {data, ts}
+_CTX_CACHE_TTL = 120  # 2 minutos
+
+
+def _fetch_ticket_by_id(ticket_id):
+    """Busca um chamado pelo ID na API do Movidesk."""
+    try:
+        from utils.movidesk_client import MOVIDESK_TOKEN
+        import requests as _req
+        r = _req.get(
+            "https://api.movidesk.com/public/v1/tickets",
+            params={
+                "token":    MOVIDESK_TOKEN,
+                "$filter":  f"id eq {ticket_id}",
+                "$select":  "id,subject,status,createdDate,lastUpdate,serviceFirstLevel,serviceSecondLevel,urgency",
+                "$expand":  "owner,clients",
+            },
+            timeout=15,
+        )
+        r.raise_for_status()
+        data = r.json()
+        return data[0] if data else None
+    except Exception:
+        return None
+
+
+def _avalon_versao_cliente(nome_cliente):
+    """Busca versão atual do cliente no Avalon por match de nome (somente leitura)."""
+    if not nome_cliente:
+        return None
+    try:
+        conn = _avalon_conn()
+        cur  = conn.cursor()
+        # Normaliza e busca por similaridade
+        nome_upper = nome_cliente.upper().strip()
+        cur.execute("""
+            SELECT
+                c.cd_cliente,
+                COALESCE(NULLIF(TRIM(c.nomecomercial_cliente),''), TRIM(c.razaosocial_cliente)) AS nome,
+                TRIM(c.cidade_cliente) AS cidade,
+                TRIM(c.estado_cliente) AS estado,
+                TRIM(va.versao_atualizada)  AS versao,
+                va.data_atualizacao         AS ultima_atualizacao
+            FROM cliente c
+            JOIN (
+                SELECT DISTINCT ON (id_cliente)
+                    id_cliente, versao_atualizada, data_atualizacao
+                FROM versao_atualizacao
+                ORDER BY id_cliente, data_atualizacao DESC NULLS LAST
+            ) va ON va.id_cliente = c.cd_cliente
+            WHERE c.inativo_cliente = false
+              AND (
+                    UPPER(TRIM(c.nomecomercial_cliente)) ILIKE %s
+                 OR UPPER(TRIM(c.razaosocial_cliente))   ILIKE %s
+              )
+            ORDER BY
+                CASE WHEN UPPER(TRIM(c.nomecomercial_cliente)) = %s THEN 0 ELSE 1 END
+            LIMIT 1
+        """, (f"%{nome_upper}%", f"%{nome_upper}%", nome_upper))
+        row = cur.fetchone()
+        cur.execute(
+            "SELECT TRIM(numero_versao) FROM versao WHERE fechado=true ORDER BY id DESC LIMIT 1"
+        )
+        versao_mais_recente = (cur.fetchone() or [None])[0]
+        conn.close()
+        if not row:
+            return {"encontrado": False, "versao_atual_sistema": versao_mais_recente}
+        cd, nome, cidade, estado, versao, dt = row
+
+        # Quantas versões atrás
+        cur2 = _avalon_conn().cursor()
+        cur2.execute(
+            "SELECT TRIM(numero_versao) FROM versao WHERE fechado=true ORDER BY id DESC"
+        )
+        todas = [r[0] for r in cur2.fetchall()]
+        cur2.connection.close()
+        idx_cliente = todas.index(versao) if versao in todas else -1
+        versoes_atrasado = idx_cliente  # 0 = atual, 1 = 1 atrás, etc.
+
+        return {
+            "encontrado":          True,
+            "cd_cliente":          cd,
+            "nome":                nome,
+            "cidade":              cidade,
+            "estado":              estado,
+            "versao":              versao or "",
+            "ultima_atualizacao":  str(dt) if dt else None,
+            "versao_atual_sistema": versao_mais_recente,
+            "versoes_atrasado":    versoes_atrasado,
+        }
+    except Exception as e:
+        return {"encontrado": False, "erro": str(e)}
+
+
+def _tickets_recentes_cliente(nome_cliente, limite=5):
+    """Retorna os últimos chamados do cliente a partir do cache local."""
+    if not nome_cliente:
+        return []
+    try:
+        from utils.movidesk_sync import load_cache
+        cache  = load_cache()
+        tickets = list(cache.get("tickets", {}).values())
+        nome_q  = nome_cliente.lower().strip()
+        matches = []
+        for t in tickets:
+            clients = t.get("clients") or []
+            client_name = ((clients[0].get("businessName") if clients else "") or "").lower()
+            if nome_q in client_name or client_name in nome_q or (len(nome_q) > 4 and nome_q[:10] in client_name):
+                matches.append(t)
+        matches.sort(key=lambda x: x.get("lastUpdate") or x.get("createdDate") or "", reverse=True)
+        result = []
+        for t in matches[:limite]:
+            result.append({
+                "id":       t.get("id"),
+                "assunto":  t.get("subject", ""),
+                "status":   t.get("status", ""),
+                "categoria": t.get("serviceFirstLevel", ""),
+                "data":     (t.get("lastUpdate") or t.get("createdDate") or "")[:10],
+                "analista": ((t.get("owner") or {}).get("businessName") or ""),
+            })
+        return result
+    except Exception:
+        return []
+
+
+@app.route('/api/cliente-contexto')
+def cliente_contexto():
+    sess, err = _require_auth(request)
+    if err:
+        return err
+
+    import time as _time
+    ticket_id = request.args.get('ticket_id', '').strip()
+    if not ticket_id:
+        return _jsonify({"error": "ticket_id obrigatório"}, 400)
+
+    # Cache por ticket_id
+    now = _time.time()
+    cached = _ctx_cache.get(ticket_id)
+    if cached and (now - cached["ts"]) < _CTX_CACHE_TTL:
+        return _jsonify(cached["data"])
+
+    try:
+        # 1. Busca o chamado no Movidesk
+        ticket = _fetch_ticket_by_id(int(ticket_id))
+        if not ticket:
+            return _jsonify({"error": "Chamado não encontrado"}, 404)
+
+        clients     = ticket.get("clients") or []
+        client_name = (clients[0].get("businessName") if clients else "") or ""
+        owner       = (ticket.get("owner") or {}).get("businessName") or ""
+
+        # 2. Versão no Avalon
+        versao_info = _avalon_versao_cliente(client_name)
+
+        # 3. Chamados recentes do cliente
+        chamados = _tickets_recentes_cliente(client_name)
+
+        # 4. Issues Jira abertas (do cache existente)
+        try:
+            issues_raw = _get_jira_issues_cached()
+            issues_abertas = [
+                {
+                    "key":         i.get("key", ""),
+                    "titulo":      i.get("titulo") or i.get("summary", ""),
+                    "status":      i.get("status", ""),
+                    "prioridade":  i.get("priority") or i.get("prioridade", ""),
+                    "tipo":        i.get("issuetype") or i.get("tipo", ""),
+                    "atualizado":  (i.get("updated") or i.get("atualizado") or "")[:10],
+                }
+                for i in (issues_raw or [])
+                if str(i.get("status", "")).lower() not in ("done", "concluído", "concluido", "fechado")
+                   and str(i.get("issuetype") or i.get("tipo", "")).lower() in ("bug", "impedimento", "bug report")
+            ][:10]
+        except Exception:
+            issues_abertas = []
+
+        result = {
+            "ticket": {
+                "id":       ticket.get("id"),
+                "assunto":  ticket.get("subject", ""),
+                "status":   ticket.get("status", ""),
+                "urgencia": ticket.get("urgency", ""),
+                "categoria": ticket.get("serviceFirstLevel", ""),
+                "analista": owner,
+                "cliente":  client_name,
+            },
+            "versao":          versao_info,
+            "chamados_recentes": chamados,
+            "bugs_jira":       issues_abertas,
+        }
+
+        _ctx_cache[ticket_id] = {"data": result, "ts": now}
+        return _jsonify(result)
+
+    except Exception as e:
+        return _jsonify({"error": str(e)}, 500)
+
+
 # ── Versões de Clientes (Avalon — somente leitura) ────────────────────────────
 
 _AVALON_HOST     = '192.168.0.81'

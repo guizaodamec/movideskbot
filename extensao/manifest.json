@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "FarmaFacil Assistente",
+  "version": "1.0",
+  "description": "Contexto do cliente diretamente no chamado Movidesk",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://prismafive.movidesk.com/*",
+    "http://192.168.0.118:5000/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://prismafive.movidesk.com/Ticket/Edit/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "FarmaFacil Assistente"
+  }
+}
