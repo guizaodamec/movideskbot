@@ -1635,10 +1635,17 @@ def gestao_auditoria_contato():
             client = (((t.get("clients") or [{}])[0]).get("businessName") or "").strip()
             fechado_em = ((t.get("resolvedIn") or t.get("closedIn") or t.get("lastUpdate") or ""))[:10]
 
-            # Resolução legítima: quando o analista de fato falou com o cliente e resolveu,
-            # a action de resolução contém o template "Incidente/Dúvida Relatado:" preenchido.
-            # Se esse texto existir em qualquer action → não é violação.
-            if any("incidente/" in (a.get("description") or "").lower() for a in actions):
+            # Exclusões legítimas — tickets que não devem entrar na auditoria:
+            # 1. Analista preencheu template "Incidente/Dúvida Relatado:" → resolveu de verdade
+            # 2. Action com "Verifiquei que este ticket apresenta a mesma situação" → duplicado/vinculado
+            _EXCLUIR_KW = [
+                "incidente/",
+                "verifiquei que este ticket apresenta a mesma situa",
+            ]
+            if any(
+                any(kw in (a.get("description") or "").lower() for kw in _EXCLUIR_KW)
+                for a in actions
+            ):
                 continue
 
             tipo  = None
