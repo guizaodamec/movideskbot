@@ -14,16 +14,17 @@ import AuditoriaContato from './pages/AuditoriaContato'
 import Tarefas from './pages/Tarefas'
 import ProvedorNFSe from './pages/ProvedorNFSe'
 import Painel from './pages/Painel'
+import VersaoClientes from './pages/VersaoClientes'
 import api from './api/backend'
 
 const PAGE_TRANSITION = { duration: 0.15 }
 
 const ROLE_PAGES = {
-  analista:      new Set(['chat', 'tarefas', 'gestao', 'provedor']),
-  backservice:   new Set(['chat', 'abertos-hoje', 'tarefas', 'gestao', 'provedor']),
-  fiscal:        new Set(['chat', 'abertos-hoje', 'tarefas', 'gestao', 'provedor']),
-  lideres:       new Set(['chat', 'gestao', 'abertos-hoje', 'tarefas', 'provedor', 'painel', 'auditoria']),
-  administrador: new Set(['chat', 'profile', 'config', 'gestao', 'users', 'abertos-hoje', 'tarefas', 'provedor', 'painel', 'auditoria']),
+  analista:      new Set(['chat', 'tarefas', 'gestao', 'provedor', 'versoes']),
+  backservice:   new Set(['chat', 'abertos-hoje', 'tarefas', 'gestao', 'provedor', 'versoes']),
+  fiscal:        new Set(['chat', 'abertos-hoje', 'tarefas', 'gestao', 'provedor', 'versoes']),
+  lideres:       new Set(['chat', 'gestao', 'abertos-hoje', 'tarefas', 'provedor', 'painel', 'auditoria', 'versoes']),
+  administrador: new Set(['chat', 'profile', 'config', 'gestao', 'users', 'abertos-hoje', 'tarefas', 'provedor', 'painel', 'auditoria', 'versoes']),
 }
 
 function MustChangePasswordModal({ username, onDone }) {
@@ -477,6 +478,13 @@ export default function App() {
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 transition={PAGE_TRANSITION}>
                 <Painel />
+              </motion.div>
+            )}
+            {page === 'versoes' && canAccess('versoes') && (
+              <motion.div key="versoes" className="absolute inset-0"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                transition={PAGE_TRANSITION}>
+                <VersaoClientes />
               </motion.div>
             )}
           </AnimatePresence>

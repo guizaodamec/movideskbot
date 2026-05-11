@@ -211,6 +211,13 @@ const api = {
   gestaoAuditoriaContato: (date_from, date_to) =>
     instance.get('/gestao/auditoria-contato', { params: { date_from, date_to }, timeout: 120000 }),
 
+  // Versões de Clientes — Avalon (somente leitura)
+  versoesClientes: () =>
+    instance.get('/versoes-clientes', { timeout: 20000 }),
+
+  versoesClientesAtualizar: () =>
+    instance.post('/versoes-clientes/atualizar'),
+
   // TV auto-login
   tvLogin: (key) =>
     instance.get('/tv-login', { params: { key } }),

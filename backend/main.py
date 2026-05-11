@@ -3143,6 +3143,129 @@ def painel_reset_cache():
     return _jsonify({"ok": True})
 
 
+# ── Versões de Clientes (Avalon — somente leitura) ────────────────────────────
+
+_AVALON_HOST     = '192.168.0.81'
+_AVALON_PORT     = 5432
+_AVALON_DB       = 'Avalon'
+_AVALON_USER     = 'sistema'
+_AVALON_PASSWORD = 'sistemafarmafacil123'
+
+_versoes_cache      = {"data": None, "ts": 0.0}
+_versoes_cache_lock = threading.Lock()
+_VERSOES_CACHE_TTL  = 300  # 5 minutos
+
+
+def _avalon_conn():
+    """Retorna conexão READ-ONLY ao banco Avalon. Nunca usar para escrita."""
+    import psycopg2
+    conn = psycopg2.connect(
+        host=_AVALON_HOST, port=_AVALON_PORT, dbname=_AVALON_DB,
+        user=_AVALON_USER, password=_AVALON_PASSWORD,
+        connect_timeout=8, sslmode='disable',
+        options="-c statement_timeout=15000 -c default_transaction_read_only=on",
+    )
+    conn.autocommit = True
+    return conn
+
+
+@app.route('/api/versoes-clientes')
+def versoes_clientes():
+    sess, err = _require_auth(request)
+    if err:
+        return err
+
+    import time as _time
+    now = _time.time()
+    with _versoes_cache_lock:
+        if _versoes_cache["data"] and (now - _versoes_cache["ts"]) < _VERSOES_CACHE_TTL:
+            return _jsonify(_versoes_cache["data"])
+
+    try:
+        import psycopg2
+        conn = _avalon_conn()
+        cur  = conn.cursor()
+
+        # Versão mais recente lançada
+        cur.execute(
+            "SELECT TRIM(numero_versao) FROM versao WHERE fechado = true ORDER BY id DESC LIMIT 1"
+        )
+        row = cur.fetchone()
+        versao_atual = row[0] if row else ''
+
+        # Clientes ativos com a versão mais recente de cada um via versao_atualizacao
+        cur.execute("""
+            SELECT
+                c.cd_cliente,
+                COALESCE(NULLIF(TRIM(c.nomecomercial_cliente), ''), TRIM(c.razaosocial_cliente)) AS nome,
+                COALESCE(NULLIF(TRIM(c.cidade_cliente), ''), '') AS cidade,
+                COALESCE(NULLIF(TRIM(c.estado_cliente), ''), '') AS estado,
+                TRIM(va.versao_atualizada)                         AS versao,
+                va.data_atualizacao                                AS ultima_atualizacao
+            FROM cliente c
+            JOIN (
+                SELECT DISTINCT ON (id_cliente)
+                    id_cliente, versao_atualizada, data_atualizacao
+                FROM versao_atualizacao
+                ORDER BY id_cliente, data_atualizacao DESC NULLS LAST
+            ) va ON va.id_cliente = c.cd_cliente
+            WHERE c.inativo_cliente = false
+            ORDER BY TRIM(va.versao_atualizada) DESC, TRIM(c.nomecomercial_cliente)
+        """)
+        rows = cur.fetchall()
+
+        clientes = []
+        dist = {}
+        for cd, nome, cidade, estado, versao, dt in rows:
+            if not nome:
+                continue
+            clientes.append({
+                "id":                 cd,
+                "nome":               nome,
+                "cidade":             cidade,
+                "estado":             estado,
+                "versao":             versao or '',
+                "ultima_atualizacao": str(dt) if dt else None,
+            })
+            dist[versao or ''] = dist.get(versao or '', 0) + 1
+
+        # Lista de versões ordenada (mais recente primeiro)
+        versoes_ord = sorted(dist.keys(), reverse=True)
+        distribuicao = [{"versao": v, "total": dist[v]} for v in versoes_ord]
+
+        na_versao_atual = dist.get(versao_atual, 0)
+
+        result = {
+            "versao_atual":    versao_atual,
+            "total_clientes":  len(clientes),
+            "na_versao_atual": na_versao_atual,
+            "clientes":        clientes,
+            "distribuicao":    distribuicao,
+            "updated_at":      datetime.datetime.now().strftime("%H:%M"),
+        }
+
+        conn.close()
+
+        with _versoes_cache_lock:
+            _versoes_cache["data"] = result
+            _versoes_cache["ts"]   = now
+
+        return _jsonify(result)
+
+    except Exception as e:
+        return _jsonify({"error": str(e)}, 500)
+
+
+@app.route('/api/versoes-clientes/atualizar', methods=['POST'])
+def versoes_clientes_atualizar():
+    sess, err = _require_auth(request)
+    if err:
+        return err
+    with _versoes_cache_lock:
+        _versoes_cache["ts"] = 0.0
+    return _jsonify({"ok": True})
+
+
 # ── Painel TV standalone ──────────────────────────────────────────────────────
 
 @app.route('/tv')

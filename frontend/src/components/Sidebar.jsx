@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { MessageSquare, User, Settings, ChevronLeft, ChevronRight, Users, LogOut, BarChart2, Inbox, KanbanSquare, ShieldAlert, Trophy, ClipboardCheck } from 'lucide-react'
+import { MessageSquare, User, Settings, ChevronLeft, ChevronRight, Users, LogOut, BarChart2, Inbox, KanbanSquare, ShieldAlert, Trophy, ClipboardCheck, PackageCheck } from 'lucide-react'
 import ConnectionBadge from './ConnectionBadge'
 
 const ALL_NAV = [
@@ -8,6 +8,7 @@ const ALL_NAV = [
   { key: 'abertos-hoje',  label: 'Abertos Hoje',      icon: Inbox          },
   { key: 'tarefas',       label: 'Tarefas',           icon: KanbanSquare   },
   { key: 'provedor',      label: 'Provedores NFS-e',  icon: ShieldAlert    },
+  { key: 'versoes',       label: 'Versões Clientes',  icon: PackageCheck   },
   { key: 'gestao',        label: 'Gestão',            icon: BarChart2      },
   { key: 'auditoria',     label: 'Auditoria',         icon: ClipboardCheck },
   { key: 'painel',        label: 'Painel TV',         icon: Trophy         },
@@ -17,11 +18,11 @@ const ALL_NAV = [
 ]
 
 const ROLE_PAGES = {
-  analista:      new Set(['chat', 'tarefas', 'gestao', 'provedor']),
-  backservice:   new Set(['chat', 'abertos-hoje', 'tarefas', 'gestao', 'provedor']),
-  fiscal:        new Set(['chat', 'abertos-hoje', 'tarefas', 'gestao', 'provedor']),
-  lideres:       new Set(['chat', 'gestao', 'abertos-hoje', 'tarefas', 'provedor', 'painel', 'auditoria']),
-  administrador: new Set(['chat', 'profile', 'config', 'gestao', 'users', 'abertos-hoje', 'tarefas', 'provedor', 'painel', 'auditoria']),
+  analista:      new Set(['chat', 'tarefas', 'gestao', 'provedor', 'versoes']),
+  backservice:   new Set(['chat', 'abertos-hoje', 'tarefas', 'gestao', 'provedor', 'versoes']),
+  fiscal:        new Set(['chat', 'abertos-hoje', 'tarefas', 'gestao', 'provedor', 'versoes']),
+  lideres:       new Set(['chat', 'gestao', 'abertos-hoje', 'tarefas', 'provedor', 'painel', 'auditoria', 'versoes']),
+  administrador: new Set(['chat', 'profile', 'config', 'gestao', 'users', 'abertos-hoje', 'tarefas', 'provedor', 'painel', 'auditoria', 'versoes']),
 }
 
 const ROLE_LABELS = {

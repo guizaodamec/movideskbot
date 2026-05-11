@@ -815,6 +815,26 @@ O script faz `git add -A`, exibe o status, pede uma mensagem de commit (ou gera 
 
 ---
 
+## Banco Avalon — ReleaseManager (Versões de Clientes)
+
+**REGRA ABSOLUTA: NUNCA inserir, atualizar ou excluir dados no banco Avalon. Apenas leitura (SELECT).**
+
+O banco `Avalon` (host: 192.168.0.81:5432) é o banco de **produção** do sistema ReleaseManager da Prismafive. Qualquer operação de escrita pode corromper o histórico de releases e afetar todos os clientes. Toda integração com este banco deve usar exclusivamente queries `SELECT`.
+
+**Conexão:**
+- Host: `192.168.0.81`, porta `5432`
+- Banco de produção: `Avalon`
+- Banco de homologação: `AvalonHomologacao`
+- Usuário PostgreSQL: `avalon`
+- Credenciais armazenadas em `connection.json` (nunca no código)
+
+**Uso no sistema:**
+- Módulo **Versões de Clientes** — exibe em qual versão do FarmaFácil cada cliente está
+- Toda query deve ser `SELECT` puro (sem `INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`, `DROP`)
+- Endpoints: somente `GET` — nunca `POST`/`PUT`/`DELETE` que modifiquem dados
+
+---
+
 ## Jira — Rastreamento de Issues
 
 **REGRA ABSOLUTA: NUNCA criar, editar ou excluir issues no Jira. Apenas leitura (GET).**
