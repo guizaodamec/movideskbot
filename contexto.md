@@ -681,7 +681,7 @@ Monitora analistas que não seguem o procedimento correto ao tentar contato com 
 - **Resolvido indevidamente** — ticket com macro aplicada foi fechado como `5 - Resolvido` em vez de cancelado
 - **Cancelado prematuro** — ticket foi cancelado com menos de 5 dias distintos de tentativas
 
-**Exclusão legítima:** se `serviceFirstLevel` ou `serviceSecondLevel` contém `"resolvido ticket - sem artigo"`, o ticket é ignorado mesmo que tenha ações da macro. Significa que o analista usou a macro mas depois conseguiu contato e resolveu corretamente.
+**Exclusão legítima:** se qualquer `action.description` contém `"incidente/"` (parte do template padrão `"Incidente/Dúvida Relatado:"`), o ticket é ignorado. Esse template é preenchido pelo analista quando resolve de verdade — indica que houve contato real com o cliente. Tickets sem esse template na resolução são candidatos a violação.
 
 **Detecção:** busca nas `actions` de cada ticket o texto `"tentativas de contato via telefone"` (substring fixa da macro) ou referência ao status `"9 - cliente indisponivel"`. Conta as datas distintas das actions da macro.
 
@@ -908,4 +908,5 @@ Issues criadas em 24/04/2026 referentes à sessão de melhorias da FarmaBot:
 | 31 | Fila do Diego no Gestão incluía tickets de outros clientes | Diego atende só Fórmula Animal mas fila contava todos os tickets dele → grupo `FormulaAnimal` com `client_filters: "formula animal"` filtra métricas por `client_name` |
 | 32 | Métricas do grupo FormulaAnimal zeradas no Gestão → Metas | Diego estava em `excluir_metas` → `membros_metas` ficava vazio, todas as métricas eram 0 → removido de `excluir_metas`; equipe alterada para `"FormulaAnimal"` no `_PAINEL_ANALISTAS` |
 | 33 | Painel Analista removido | Substituído pela página Abertos Hoje — mostra chamados do dia com filtro por grupo (Fiscal/Produção/G1/GW) |
-| 34 | Auditoria flagrava resoluções legítimas | Analista usava macro mas depois conseguia contato e resolvia com "9 - Resolvido Ticket - sem artigo" → adicionada exclusão por `serviceFirstLevel/serviceSecondLevel` antes de checar violações |
+| 34 | Auditoria flagrava resoluções legítimas (1ª tentativa) | Tentativa de exclusão via `serviceFirstLevel/serviceSecondLevel` com texto "resolvido ticket - sem artigo" — não funcionou pois o campo não continha esse valor no ticket real |
+| 35 | Auditoria flagrava resoluções legítimas (fix real) | Exclusão correta: verifica se qualquer `action.description` contém `"incidente/"` (template "Incidente/Dúvida Relatado:" preenchido pelo analista ao resolver de verdade) → ignora o ticket |
