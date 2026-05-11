@@ -2637,20 +2637,21 @@ def _fetch_acbr_ini():
     req = _ur.Request(_ACBR_INI_URL, headers={'User-Agent': 'FarmaFacil-Assistente/1.0'})
     with _ur.urlopen(req, timeout=30) as resp:
         raw = resp.read().decode('utf-8', errors='ignore')
-    municipios = {}  # nome_norm → {nome, uf, provedor}
+    _FIELDS = ('nome', 'uf', 'provedor', 'prorecepcionar', 'prolinkurl')
+    municipios = {}  # nome_norm → {nome, uf, provedor, prorecepcionar, prolinkurl}
     current = {}
     for line in raw.splitlines():
         line = line.strip()
         if line.startswith('[') and line.endswith(']'):
             if current.get('provedor') and current.get('nome'):
                 key = _norm_mun(current['nome'])
-                municipios.setdefault(key, current)  # primeiro encontrado ganha
+                municipios.setdefault(key, current)
             current = {}
-        elif '=' in line:
+        elif '=' in line and not line.startswith(';'):
             k, _, v = line.partition('=')
             k = k.strip().lower()
             v = v.strip()
-            if k in ('nome', 'uf', 'provedor'):
+            if k in _FIELDS:
                 current[k] = v
     if current.get('provedor') and current.get('nome'):
         key = _norm_mun(current['nome'])
@@ -3239,18 +3240,23 @@ def _avalon_versao_cliente(nome_cliente):
         return {"encontrado": False, "erro": str(e)}
 
 
+_STATUS_FECHADO = {'5 - resolvido', '6 - fechado', '6 - cancelado'}
+
 def _tickets_recentes_cliente(nome_cliente, limite=5):
-    """Retorna os últimos chamados do cliente a partir do cache local."""
+    """Retorna os últimos chamados ABERTOS do cliente a partir do cache local."""
     if not nome_cliente:
         return []
     try:
         from utils.movidesk_sync import load_cache
-        cache  = load_cache()
+        cache   = load_cache()
         tickets = list(cache.get("tickets", {}).values())
         nome_q  = nome_cliente.lower().strip()
         matches = []
         for t in tickets:
-            clients = t.get("clients") or []
+            status = (t.get("status") or "").lower()
+            if status in _STATUS_FECHADO:
+                continue
+            clients     = t.get("clients") or []
             client_name = ((clients[0].get("businessName") if clients else "") or "").lower()
             if nome_q in client_name or client_name in nome_q or (len(nome_q) > 4 and nome_q[:10] in client_name):
                 matches.append(t)
@@ -3300,41 +3306,41 @@ def cliente_contexto():
         # 2. Versão no Avalon
         versao_info = _avalon_versao_cliente(client_name)
 
-        # 3. Chamados recentes do cliente
+        # 3. Chamados abertos do cliente
         chamados = _tickets_recentes_cliente(client_name)
 
-        # 4. Issues Jira abertas (do cache existente)
-        try:
-            issues_raw = _get_jira_issues_cached()
-            issues_abertas = [
-                {
-                    "key":         i.get("key", ""),
-                    "titulo":      i.get("titulo") or i.get("summary", ""),
-                    "status":      i.get("status", ""),
-                    "prioridade":  i.get("priority") or i.get("prioridade", ""),
-                    "tipo":        i.get("issuetype") or i.get("tipo", ""),
-                    "atualizado":  (i.get("updated") or i.get("atualizado") or "")[:10],
-                }
-                for i in (issues_raw or [])
-                if str(i.get("status", "")).lower() not in ("done", "concluído", "concluido", "fechado")
-                   and str(i.get("issuetype") or i.get("tipo", "")).lower() in ("bug", "impedimento", "bug report")
-            ][:10]
-        except Exception:
-            issues_abertas = []
+        # 4. Provedor NFS-e do município do cliente
+        nfse_info = None
+        cidade = (versao_info or {}).get("cidade", "") or ""
+        if cidade:
+            try:
+                ini = _get_acbr_ini_cached()
+                entrada = ini.get(_norm_mun(cidade))
+                if entrada:
+                    nfse_info = {
+                        "provedor":        entrada.get("provedor", ""),
+                        "municipio":       entrada.get("nome", cidade),
+                        "uf":              entrada.get("uf", ""),
+                        "url_producao":    entrada.get("prorecepcionar", ""),
+                        "url_link":        entrada.get("prolinkurl", ""),
+                        "github_url":      "https://github.com/ProjetoACBr/ACBr/blob/master/Fontes/ACBrDFe/ACBrNFSeX/ACBrNFSeXServicos.ini",
+                    }
+            except Exception:
+                pass
 
         result = {
             "ticket": {
-                "id":       ticket.get("id"),
-                "assunto":  ticket.get("subject", ""),
-                "status":   ticket.get("status", ""),
-                "urgencia": ticket.get("urgency", ""),
+                "id":        ticket.get("id"),
+                "assunto":   ticket.get("subject", ""),
+                "status":    ticket.get("status", ""),
+                "urgencia":  ticket.get("urgency", ""),
                 "categoria": ticket.get("serviceFirstLevel", ""),
-                "analista": owner,
-                "cliente":  client_name,
+                "analista":  owner,
+                "cliente":   client_name,
             },
-            "versao":          versao_info,
-            "chamados_recentes": chamados,
-            "bugs_jira":       issues_abertas,
+            "versao":            versao_info,
+            "chamados_abertos":  chamados,
+            "nfse":              nfse_info,
         }
 
         _ctx_cache[ticket_id] = {"data": result, "ts": now}
