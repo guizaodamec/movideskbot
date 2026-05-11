@@ -681,7 +681,11 @@ Monitora analistas que não seguem o procedimento correto ao tentar contato com 
 - **Resolvido indevidamente** — ticket com macro aplicada foi fechado como `5 - Resolvido` em vez de cancelado
 - **Cancelado prematuro** — ticket foi cancelado com menos de 5 dias distintos de tentativas
 
-**Exclusão legítima:** se qualquer `action.description` contém `"incidente/"` (parte do template padrão `"Incidente/Dúvida Relatado:"`), o ticket é ignorado. Esse template é preenchido pelo analista quando resolve de verdade — indica que houve contato real com o cliente. Tickets sem esse template na resolução são candidatos a violação.
+**Exclusões legítimas** — tickets ignorados mesmo com ações da macro (lista `_EXCLUIR_KW` em `gestao_auditoria_contato`):
+1. `"incidente/"` → template `"Incidente/Dúvida Relatado:"` preenchido = analista resolveu de verdade com contato real
+2. `"verifiquei que este ticket apresenta a mesma situa"` → ticket duplicado/vinculado a outro
+
+Para adicionar novos critérios de exclusão, basta inserir a substring na lista `_EXCLUIR_KW` no endpoint.
 
 **Detecção:** busca nas `actions` de cada ticket o texto `"tentativas de contato via telefone"` (substring fixa da macro) ou referência ao status `"9 - cliente indisponivel"`. Conta as datas distintas das actions da macro.
 
@@ -910,3 +914,4 @@ Issues criadas em 24/04/2026 referentes à sessão de melhorias da FarmaBot:
 | 33 | Painel Analista removido | Substituído pela página Abertos Hoje — mostra chamados do dia com filtro por grupo (Fiscal/Produção/G1/GW) |
 | 34 | Auditoria flagrava resoluções legítimas (1ª tentativa) | Tentativa de exclusão via `serviceFirstLevel/serviceSecondLevel` com texto "resolvido ticket - sem artigo" — não funcionou pois o campo não continha esse valor no ticket real |
 | 35 | Auditoria flagrava resoluções legítimas (fix real) | Exclusão correta: verifica se qualquer `action.description` contém `"incidente/"` (template "Incidente/Dúvida Relatado:" preenchido pelo analista ao resolver de verdade) → ignora o ticket |
+| 36 | Auditoria incluía tickets duplicados/vinculados | Actions com "Verifiquei que este ticket apresenta a mesma situação relatada" indicam duplicado → adicionado à lista `_EXCLUIR_KW` |
