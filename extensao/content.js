@@ -101,24 +101,21 @@ function renderData(body, data, ticketId) {
 
     <!-- NFS-e -->
     <div class="ff-section">
-      <div class="ff-section-title">NFS-e — Provedor do Município</div>
+      <div class="ff-section-title" style="display:flex;justify-content:space-between;align-items:center">
+        <span>NFS-e — Provedor do Município</span>
+        ${nf ? `<a class="ff-link" href="${GITHUB_INI}" target="_blank" style="font-size:10px">ACBr ↗</a>` : ''}
+      </div>
       ${nf ? `
-        <div class="ff-row">
-          <span class="ff-label">Município</span>
-          <span class="ff-value">${nf.municipio}${nf.uf ? ' · ' + nf.uf : ''}</span>
-        </div>
-        <div class="ff-row">
-          <span class="ff-label">Provedor</span>
-          <span class="ff-value" style="color:#a78bfa;font-weight:600">${nf.provedor}</span>
-        </div>
-        ${nf.url_producao ? `
-        <div style="margin-top:4px">
-          <div class="ff-label" style="margin-bottom:3px">URL Produção</div>
-          <div style="font-size:10px;color:#6e7681;word-break:break-all;line-height:1.4">${nf.url_producao}</div>
-        </div>` : ''}
-        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
-          ${nf.url_producao ? `<a class="ff-link" href="${nf.url_producao}" target="_blank">Abrir WebService ↗</a>` : ''}
-          <a class="ff-link" href="${GITHUB_INI}" target="_blank">Ver no ACBr ↗</a>
+        <div class="ff-ini-block">
+          <div class="ff-ini-section">[${nf.secao_id}]</div>
+          ${(nf.campos_raw || []).map(([k, v]) => {
+            const isUrl = v.startsWith('http')
+            return `<div class="ff-ini-line">
+              <span class="ff-ini-key">${k}=</span>${isUrl
+                ? `<a class="ff-ini-url" href="${v}" target="_blank">${v}</a>`
+                : `<span class="ff-ini-val">${v}</span>`}
+            </div>`
+          }).join('')}
         </div>
       ` : v.cidade ? `
         <div style="color:#6e7681;font-size:11px">

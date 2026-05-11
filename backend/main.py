@@ -2633,29 +2633,40 @@ def _norm_mun(nome):
 
 
 def _fetch_acbr_ini():
-    """Baixa e parseia o INI do ACBr. Chave: nome_normalizado (sem UF, para máximo match)."""
+    """Baixa e parseia o INI do ACBr. Chave: nome_normalizado."""
     req = _ur.Request(_ACBR_INI_URL, headers={'User-Agent': 'FarmaFacil-Assistente/1.0'})
     with _ur.urlopen(req, timeout=30) as resp:
         raw = resp.read().decode('utf-8', errors='ignore')
-    _FIELDS = ('nome', 'uf', 'provedor', 'prorecepcionar', 'prolinkurl')
-    municipios = {}  # nome_norm → {nome, uf, provedor, prorecepcionar, prolinkurl}
-    current = {}
+    municipios = {}
+    current_id  = None
+    current     = {}   # chave lowercase → valor
+    current_raw = []   # [(Key_original, valor)] — para exibição fiel ao INI
+    def _commit():
+        if current.get('provedor') and current.get('nome'):
+            key = _norm_mun(current['nome'])
+            municipios.setdefault(key, {
+                'secao_id':   current_id,
+                'nome':       current.get('nome', ''),
+                'uf':         current.get('uf', ''),
+                'provedor':   current.get('provedor', ''),
+                'prorecepcionar': current.get('prorecepcionar', ''),
+                'prolinkurl':     current.get('prolinkurl', ''),
+                'campos_raw': list(current_raw),   # todos os campos em ordem
+            })
     for line in raw.splitlines():
         line = line.strip()
         if line.startswith('[') and line.endswith(']'):
-            if current.get('provedor') and current.get('nome'):
-                key = _norm_mun(current['nome'])
-                municipios.setdefault(key, current)
-            current = {}
+            _commit()
+            current_id  = line[1:-1]
+            current     = {}
+            current_raw = []
         elif '=' in line and not line.startswith(';'):
             k, _, v = line.partition('=')
-            k = k.strip().lower()
-            v = v.strip()
-            if k in _FIELDS:
-                current[k] = v
-    if current.get('provedor') and current.get('nome'):
-        key = _norm_mun(current['nome'])
-        municipios.setdefault(key, current)
+            k_orig = k.strip()
+            v      = v.strip()
+            current[k_orig.lower()] = v
+            current_raw.append((k_orig, v))
+    _commit()
     return municipios
 
 
@@ -3242,8 +3253,8 @@ def _avalon_versao_cliente(nome_cliente):
 
 _STATUS_FECHADO = {'5 - resolvido', '6 - fechado', '6 - cancelado'}
 
-def _tickets_recentes_cliente(nome_cliente, limite=5):
-    """Retorna os últimos chamados ABERTOS do cliente a partir do cache local."""
+def _tickets_recentes_cliente(nome_cliente, categoria=None, limite=5):
+    """Retorna os últimos chamados ABERTOS do cliente, filtrando pela categoria do chamado atual."""
     if not nome_cliente:
         return []
     try:
@@ -3251,27 +3262,31 @@ def _tickets_recentes_cliente(nome_cliente, limite=5):
         cache   = load_cache()
         tickets = list(cache.get("tickets", {}).values())
         nome_q  = nome_cliente.lower().strip()
+        cat_q   = (categoria or "").lower().strip()
         matches = []
         for t in tickets:
-            status = (t.get("status") or "").lower()
-            if status in _STATUS_FECHADO:
+            if (t.get("status") or "").lower() in _STATUS_FECHADO:
                 continue
+            if cat_q:
+                t_cat = (t.get("serviceFirstLevel") or "").lower().strip()
+                if t_cat != cat_q:
+                    continue
             clients     = t.get("clients") or []
             client_name = ((clients[0].get("businessName") if clients else "") or "").lower()
             if nome_q in client_name or client_name in nome_q or (len(nome_q) > 4 and nome_q[:10] in client_name):
                 matches.append(t)
         matches.sort(key=lambda x: x.get("lastUpdate") or x.get("createdDate") or "", reverse=True)
-        result = []
-        for t in matches[:limite]:
-            result.append({
+        return [
+            {
                 "id":       t.get("id"),
                 "assunto":  t.get("subject", ""),
                 "status":   t.get("status", ""),
                 "categoria": t.get("serviceFirstLevel", ""),
                 "data":     (t.get("lastUpdate") or t.get("createdDate") or "")[:10],
                 "analista": ((t.get("owner") or {}).get("businessName") or ""),
-            })
-        return result
+            }
+            for t in matches[:limite]
+        ]
     except Exception:
         return []
 
@@ -3306,24 +3321,25 @@ def cliente_contexto():
         # 2. Versão no Avalon
         versao_info = _avalon_versao_cliente(client_name)
 
-        # 3. Chamados abertos do cliente
-        chamados = _tickets_recentes_cliente(client_name)
+        # 3. Chamados abertos do cliente (mesma categoria do chamado atual)
+        categoria_ticket = ticket.get("serviceFirstLevel", "")
+        chamados = _tickets_recentes_cliente(client_name, categoria=categoria_ticket)
 
         # 4. Provedor NFS-e do município do cliente
         nfse_info = None
         cidade = (versao_info or {}).get("cidade", "") or ""
         if cidade:
             try:
-                ini = _get_acbr_ini_cached()
+                ini    = _get_acbr_ini_cached()
                 entrada = ini.get(_norm_mun(cidade))
                 if entrada:
                     nfse_info = {
-                        "provedor":        entrada.get("provedor", ""),
-                        "municipio":       entrada.get("nome", cidade),
-                        "uf":              entrada.get("uf", ""),
-                        "url_producao":    entrada.get("prorecepcionar", ""),
-                        "url_link":        entrada.get("prolinkurl", ""),
-                        "github_url":      "https://github.com/ProjetoACBr/ACBr/blob/master/Fontes/ACBrDFe/ACBrNFSeX/ACBrNFSeXServicos.ini",
+                        "secao_id":    entrada.get("secao_id", ""),
+                        "provedor":    entrada.get("provedor", ""),
+                        "municipio":   entrada.get("nome", cidade),
+                        "uf":          entrada.get("uf", ""),
+                        "campos_raw":  entrada.get("campos_raw", []),
+                        "github_url":  "https://github.com/ProjetoACBr/ACBr/blob/master/Fontes/ACBrDFe/ACBrNFSeX/ACBrNFSeXServicos.ini",
                     }
             except Exception:
                 pass
