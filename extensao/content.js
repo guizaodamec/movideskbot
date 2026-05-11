@@ -79,7 +79,19 @@ function renderData(body, data, ticketId) {
       </div>
       ${v.encontrado ? `
         <div class="ff-row">
-          <span class="ff-label">Versão atual</span>
+          <span class="ff-label">Cliente</span>
+          <span class="ff-value" style="font-size:11px">${v.nome || '—'}</span>
+        </div>
+        <div class="ff-row">
+          <span class="ff-label">Localização</span>
+          <span class="ff-value" style="font-size:11px">${v.cidade && v.estado ? v.cidade+' · '+v.estado : v.cidade || v.estado || '—'}</span>
+        </div>
+        ${v.sem_historico ? `
+        <div style="margin-top:6px;padding:6px 8px;background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:6px;font-size:11px;color:#fbbf24">
+          Cliente encontrado no Avalon, mas sem histórico de atualização via ReleaseManager.
+        </div>` : `
+        <div class="ff-row" style="margin-top:6px">
+          <span class="ff-label">Versão</span>
           <span class="ff-badge ${bClass}">${v.versao || '?'}</span>
         </div>
         <div class="ff-row">
@@ -93,7 +105,7 @@ function renderData(body, data, ticketId) {
         <div class="ff-row" style="margin-top:6px">
           <span class="ff-label">Última atualização</span>
           <span class="ff-value">${v.ultima_atualizacao ? v.ultima_atualizacao.slice(0,10) : '—'}</span>
-        </div>
+        </div>`}
       ` : `<div style="color:#6e7681;font-size:11px;margin-top:4px">
         ${v.erro ? 'Erro ao consultar o banco.' : 'Cliente não encontrado no Avalon.'}
       </div>`}

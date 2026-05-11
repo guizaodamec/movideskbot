@@ -3188,64 +3188,75 @@ def _avalon_versao_cliente(nome_cliente):
     if not nome_cliente:
         return None
     try:
-        conn = _avalon_conn()
-        cur  = conn.cursor()
-        # Normaliza e busca por similaridade
+        conn       = _avalon_conn()
+        cur        = conn.cursor()
         nome_upper = nome_cliente.upper().strip()
+
+        # Passo 1 — acha o cliente (independente de ter versão)
         cur.execute("""
             SELECT
-                c.cd_cliente,
-                COALESCE(NULLIF(TRIM(c.nomecomercial_cliente),''), TRIM(c.razaosocial_cliente)) AS nome,
-                TRIM(c.cidade_cliente) AS cidade,
-                TRIM(c.estado_cliente) AS estado,
-                TRIM(va.versao_atualizada)  AS versao,
-                va.data_atualizacao         AS ultima_atualizacao
-            FROM cliente c
-            JOIN (
-                SELECT DISTINCT ON (id_cliente)
-                    id_cliente, versao_atualizada, data_atualizacao
-                FROM versao_atualizacao
-                ORDER BY id_cliente, data_atualizacao DESC NULLS LAST
-            ) va ON va.id_cliente = c.cd_cliente
-            WHERE c.inativo_cliente = false
+                cd_cliente,
+                COALESCE(NULLIF(TRIM(nomecomercial_cliente),''), TRIM(razaosocial_cliente)),
+                TRIM(cidade_cliente),
+                TRIM(estado_cliente)
+            FROM cliente
+            WHERE inativo_cliente = false
               AND (
-                    UPPER(TRIM(c.nomecomercial_cliente)) ILIKE %s
-                 OR UPPER(TRIM(c.razaosocial_cliente))   ILIKE %s
+                    UPPER(TRIM(nomecomercial_cliente)) ILIKE %s
+                 OR UPPER(TRIM(razaosocial_cliente))   ILIKE %s
               )
             ORDER BY
-                CASE WHEN UPPER(TRIM(c.nomecomercial_cliente)) = %s THEN 0 ELSE 1 END
+                CASE WHEN UPPER(TRIM(nomecomercial_cliente)) = %s THEN 0 ELSE 1 END
             LIMIT 1
         """, (f"%{nome_upper}%", f"%{nome_upper}%", nome_upper))
-        row = cur.fetchone()
-        cur.execute(
-            "SELECT TRIM(numero_versao) FROM versao WHERE fechado=true ORDER BY id DESC LIMIT 1"
-        )
+        cliente_row = cur.fetchone()
+
+        # Versão mais recente do sistema
+        cur.execute("SELECT TRIM(numero_versao) FROM versao WHERE fechado=true ORDER BY id DESC LIMIT 1")
         versao_mais_recente = (cur.fetchone() or [None])[0]
+
+        if not cliente_row:
+            conn.close()
+            return {"encontrado": False}
+
+        cd, nome, cidade, estado = cliente_row
+
+        # Passo 2 — tenta buscar a versão mais recente desse cliente
+        cur.execute("""
+            SELECT TRIM(versao_atualizada), data_atualizacao
+            FROM versao_atualizacao
+            WHERE id_cliente = %s
+            ORDER BY data_atualizacao DESC NULLS LAST
+            LIMIT 1
+        """, (cd,))
+        versao_row = cur.fetchone()
         conn.close()
-        if not row:
-            return {"encontrado": False, "versao_atual_sistema": versao_mais_recente}
-        cd, nome, cidade, estado, versao, dt = row
+
+        versao = None
+        dt     = None
+        if versao_row:
+            versao, dt = versao_row
 
         # Quantas versões atrás
-        cur2 = _avalon_conn().cursor()
-        cur2.execute(
-            "SELECT TRIM(numero_versao) FROM versao WHERE fechado=true ORDER BY id DESC"
-        )
-        todas = [r[0] for r in cur2.fetchall()]
-        cur2.connection.close()
-        idx_cliente = todas.index(versao) if versao in todas else -1
-        versoes_atrasado = idx_cliente  # 0 = atual, 1 = 1 atrás, etc.
+        versoes_atrasado = None
+        if versao and versao_mais_recente:
+            conn2 = _avalon_conn()
+            cur2  = conn2.cursor()
+            cur2.execute("SELECT TRIM(numero_versao) FROM versao WHERE fechado=true ORDER BY id DESC")
+            todas = [r[0] for r in cur2.fetchall()]
+            conn2.close()
+            versoes_atrasado = todas.index(versao) if versao in todas else None
 
         return {
-            "encontrado":          True,
-            "cd_cliente":          cd,
-            "nome":                nome,
-            "cidade":              cidade,
-            "estado":              estado,
-            "versao":              versao or "",
-            "ultima_atualizacao":  str(dt) if dt else None,
-            "versao_atual_sistema": versao_mais_recente,
-            "versoes_atrasado":    versoes_atrasado,
+            "encontrado":         True,
+            "cd_cliente":         cd,
+            "nome":               nome,
+            "cidade":             cidade or "",
+            "estado":             estado or "",
+            "versao":             versao or "",
+            "ultima_atualizacao": str(dt) if dt else None,
+            "versoes_atrasado":   versoes_atrasado,
+            "sem_historico":      versao is None,
         }
     except Exception as e:
         return {"encontrado": False, "erro": str(e)}
