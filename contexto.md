@@ -976,7 +976,8 @@ Flask  GET /api/cliente-contexto?ticket_id={id}
   ```json
   {
     "ticket":   { id, assunto, status, urgencia, categoria, analista, cliente },
-    "versao":   { encontrado, versao, versoes_atrasado, ultima_atualizacao, cidade, estado },
+    "versao":   { encontrado, nome, cidade, estado, versao, versoes_atrasado,
+                  ultima_atualizacao, sem_historico },
     "chamados_abertos": [ { id, assunto, status, categoria, data, analista } ],
     "nfse":     { secao_id, provedor, municipio, uf, campos_raw, github_url }
   }
@@ -987,30 +988,35 @@ Flask  GET /api/cliente-contexto?ticket_id={id}
 | Seção | Conteúdo |
 |---|---|
 | Chamado | Status, analista, categoria do chamado atual |
-| Versão do Cliente | Versão no Avalon, quantas versões atrás, data da última atualização, barra visual |
+| Versão do Cliente | Nome e cidade do cliente; versão, quantas versões atrás e data (se houver histórico); banner amarelo se `sem_historico=true` |
 | NFS-e | Bloco INI fiel ao ACBr (`[ID]`, `Nome=`, `Provedor=`, `ProRecepcionar=` etc.) com URLs clicáveis |
 | Chamados em aberto | Últimos 5 chamados abertos do mesmo cliente **na mesma categoria** do chamado atual |
 
 ### Regras de negócio
 
-- Chamados filtrados: `status` não em `{5 - Resolvido, 6 - Fechado, 6 - Cancelado}` **e** `serviceFirstLevel == categoria do ticket atual`
-- NFS-e: lookup por `_norm_mun(cidade)` no cache do ACBr INI (24h) — exibe todos os campos com case original
-- Versão: `default_transaction_read_only=on` no Avalon — nunca escreve
+- **Busca de cliente no Avalon — dois passos:**
+  1. Busca o cliente na tabela `cliente` por `ILIKE` no nome (independente de ter versão)
+  2. Busca a versão mais recente em `versao_atualizacao` separadamente
+  - Se o cliente existe mas não tem registro em `versao_atualizacao` → `sem_historico: true` (exibe nome/cidade mas sem versão)
+  - Clientes sem nenhuma entrada no Avalon → `encontrado: false`
+- **Chamados filtrados:** `status` não em `{5 - Resolvido, 6 - Fechado, 6 - Cancelado}` **e** `serviceFirstLevel == categoria do ticket atual`
+- **NFS-e:** lookup por `_norm_mun(cidade)` no cache do ACBr INI (24h) — exibe todos os campos com case original e `secao_id` (ex: `[1505304]`)
+- **Avalon:** `default_transaction_read_only=on` — nunca escreve
 
 ### Arquivos relevantes
 
 ```
 extensao/
-├── manifest.json    → MV3, host_permissions: movidesk.com + 192.168.0.118:5000
-├── background.js    → fetch autenticado ao Flask, chrome.storage.local para token
-├── content.js       → injeção do painel, renderização, detecção SPA
-├── content.css      → dark theme, ff-ini-block (fonte mono), badges de versão
+├── manifest.json     → MV3, host_permissions: movidesk.com + 192.168.0.118:5000
+├── background.js     → fetch autenticado ao Flask, chrome.storage.local para token
+├── content.js        → injeção do painel, renderização, detecção SPA
+├── content.css       → dark theme, ff-ini-block (fonte mono), badges de versão
 ├── popup.html/js/css → login/logout
-└── INSTALAR.md      → guia de instalação
+└── INSTALAR.md       → guia de instalação
 
-backend/main.py      → _fetch_ticket_by_id(), _avalon_versao_cliente(),
-                       _tickets_recentes_cliente(nome, categoria, limite),
-                       _STATUS_FECHADO, /api/cliente-contexto
+backend/main.py       → _fetch_ticket_by_id(), _avalon_versao_cliente(),
+                        _tickets_recentes_cliente(nome, categoria, limite),
+                        _STATUS_FECHADO, /api/cliente-contexto
 ```
 
 ### Notas técnicas
@@ -1020,6 +1026,7 @@ backend/main.py      → _fetch_ticket_by_id(), _avalon_versao_cliente(),
 - O token fica em `chrome.storage.local` — expira ao reiniciar o backend Flask
 - Se o IP do servidor mudar: editar `background.js` linha 1 (`const SERVER = ...`)
 - `_fetch_acbr_ini()` captura `campos_raw` (lista ordenada de tuplas `[key_original, valor]`) e `secao_id` para exibição fiel ao arquivo
+- Instalação em outras máquinas da rede: apontar o Chrome/Edge para `\\192.168.0.118\Users\guilherme.cordeiro\Desktop\CLAUDE\erp_assistant\extensao` — atualizações futuras são aplicadas automaticamente
 
 ---
 
