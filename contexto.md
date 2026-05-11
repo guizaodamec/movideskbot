@@ -236,12 +236,12 @@ processar_odt.py    → Lê Resumo.odt, divide em blocos, processa via IA
 | Role | Páginas |
 |---|---|
 | `analista` | Chat, Tarefas, Gestão (tabs limitados), Provedores NFS-e |
-| `backservice` | Chat, Painel Analista, Tarefas, Gestão, Provedores NFS-e |
-| `fiscal` | Chat, Painel Analista, Tarefas, Gestão, Provedores NFS-e |
-| `lideres` | Chat, Painel Analista, Tarefas, Gestão, Provedores NFS-e |
-| `administrador` | Chat, Perfil, Configuração, Gestão, Usuários, Painel Analista, Tarefas, Provedores NFS-e |
+| `backservice` | Chat, Abertos Hoje, Tarefas, Gestão, Provedores NFS-e |
+| `fiscal` | Chat, Abertos Hoje, Tarefas, Gestão, Provedores NFS-e |
+| `lideres` | Chat, Abertos Hoje, Tarefas, Gestão, Provedores NFS-e, Painel TV, Auditoria |
+| `administrador` | Chat, Perfil, Configuração, Gestão, Usuários, Abertos Hoje, Tarefas, Provedores NFS-e, Painel TV, Auditoria |
 
-**Páginas removidas do menu:** Analisar Print, Analisar Log, Analisar XML (removidas de todos os roles)
+**Páginas removidas do menu:** Analisar Print, Analisar Log, Analisar XML, Painel Analista (removidas)
 
 **Gestão — tabs visíveis por role:**
 - `analista`: Dashboard, Analistas, Farmácias, Metas + botão Sincronizar
@@ -296,12 +296,13 @@ erp_assistant/
 │   │   ├── api/backend.js     ← URL da API (usa window.location.hostname)
 │   │   └── pages/
 │   │       ├── Login.jsx
-│   │       ├── Chat.jsx           ← Seletor de modelo (CC / Kiro / GPT-4o)
+│   │       ├── Chat.jsx             ← Seletor de modelo (CC / Kiro / GPT-4o)
 │   │       ├── Setup.jsx
 │   │       ├── Users.jsx
-│   │       ├── ProvedorNFSe.jsx   ← Monitoramento de provedores NFS-e
+│   │       ├── ProvedorNFSe.jsx     ← Monitoramento de provedores NFS-e
 │   │       ├── Gestao.jsx
-│   │       └── Suporte.jsx
+│   │       ├── AbertosHoje.jsx      ← Chamados abertos no dia com filtro por grupo
+│   │       └── AuditoriaContato.jsx ← Auditoria de procedimento cliente indisponível (lideres+)
 │   └── dist/                  ← Build gerado pelo vite (servido pelo Flask)
 │
 ├── ai/
@@ -412,6 +413,8 @@ Acessível por todos os roles com permissão (ver tabela RBAC).
 - `GET /api/gestao/aderencia?date_from=&date_to=` — aderência ao perfil por analista
 - `GET /api/gestao/nova-versao` — issues do sprint ativo do Jira (somente leitura, cache 30 min)
 - `POST /api/gestao/sync-abertos` — sync de todos os tickets em aberto (sem filtro de data)
+- `GET /api/gestao/abertos-hoje` — tickets criados hoje do cache local com classificação de grupo
+- `GET /api/gestao/auditoria-contato?date_from=&date_to=` — auditoria de procedimento cliente indisponível (lideres+ only)
 
 **Aderência ao perfil (`/api/gestao/aderencia`):**
 - Para cada analista em grupo conhecido (exceto `excluir_metas`), computa:
@@ -642,6 +645,62 @@ Diego Teixeira pertence ao grupo FormulaAnimal. Sua meta diária é calculada di
 - `metas_fixas` em `gestao_config.json` pode sobrepor o cálculo automático para analistas específicos (atualmente vazio)
 - Cache em memória TTL 2 min (`_diario_cache`)
 
+### Módulo Abertos Hoje (`AbertosHoje.jsx`)
+
+Acessível por: **backservice, fiscal, lideres, administrador** (analista não vê).
+
+Mostra todos os chamados cuja `createdDate == hoje` com filtro por grupo.
+
+**Filtros:** Todos | Fiscal | Produção | G1 | GW (com contador em cada botão, na cor do grupo)
+
+- Lista compacta com borda colorida esquerda por grupo
+- Colunas: #ID (link Movidesk), Assunto/Farmácia, Analista, Categoria, Status
+- Tickets classificados via `get_grupo_for_ticket()` do `gestao_config.py`
+- Grupos Ouvidoria e FormulaAnimal aparecem em "Todos" mas não têm botão de filtro
+
+**Endpoint:** `GET /api/gestao/abertos-hoje`
+- Lê do cache local (`movidesk_tickets.json`)
+- Filtra `createdDate == date.today()`
+- Retorna `{tickets, total, contagem: {Fiscal, Producao, G1, GW, outros}, data}`
+
+---
+
+### Módulo Auditoria de Contato (`AuditoriaContato.jsx`)
+
+Acessível somente por **lideres** e **administrador**. Backend verifica role — retorna 403 para os demais.
+
+Monitora analistas que não seguem o procedimento correto ao tentar contato com clientes.
+
+**Procedimento correto:**
+1. Ligar para o cliente → não conseguiu → aplicar macro "3 - Cliente indisponível para resolução"
+2. Quando a macro é aplicada: ticket muda para status `"Em pausa"` / `"9 - Cliente indisponivel"` e uma mensagem é inserida na conversa com o texto fixo `"tentativas de contato via telefone"`
+3. Repetir em **5 dias diferentes** (dias corridos — fim de semana conta)
+4. Após 5 tentativas: **CANCELAR** o ticket (nunca resolver)
+
+**Tipos de violação detectados:**
+- **Resolvido indevidamente** — ticket com macro aplicada foi fechado como `5 - Resolvido` em vez de cancelado
+- **Cancelado prematuro** — ticket foi cancelado com menos de 5 dias distintos de tentativas
+
+**Detecção:** busca nas `actions` de cada ticket o texto `"tentativas de contato via telefone"` (substring fixa da macro) ou referência ao status `"9 - cliente indisponivel"`. Conta as datas distintas das actions da macro.
+
+**Período:** date picker De/Até escolhido pelo líder. Padrão: últimos 30 dias.
+
+**Resultado:** agrupado por analista, ordenado por mais violações. Cada card é expansível e mostra os tickets com tipo de violação, datas das tentativas e link para o Movidesk.
+
+**Endpoints:**
+- `GET /api/gestao/auditoria-contato?date_from=&date_to=` — busca na API Movidesk (não cache local) tickets resolvidos + cancelados no período com `$expand=actions`, aplica detecção e retorna `{resultado, total_violacoes, total_analisados, periodo}`
+- `fetch_encerrados_auditoria()` em `movidesk_client.py` — faz o fetch paginado com `$expand=owner,clients,actions`
+
+**Arquivos relevantes:**
+```
+backend/main.py                          → gestao_auditoria_contato(), proteção de role
+utils/movidesk_client.py                 → fetch_encerrados_auditoria()
+frontend/src/pages/AuditoriaContato.jsx  → página completa
+frontend/src/api/backend.js              → gestaoAuditoriaContato()
+```
+
+---
+
 ### Sync automático de tickets abertos
 Thread daemon iniciada junto com o backend (`_auto_sync_loop`):
 - Aguarda 30s após subir, depois roda `sync_open_tickets()` a cada **15 minutos**
@@ -846,3 +905,4 @@ Issues criadas em 24/04/2026 referentes à sessão de melhorias da FarmaBot:
 | 30 | Diego sem meta no Ritmo Diário (exibia `0/0`) | Estava em `excluir_metas` sem override → campo `metas_fixas` em `gestao_config.json` + `get_metas_fixas()` aplicado no `painel_diario` |
 | 31 | Fila do Diego no Gestão incluía tickets de outros clientes | Diego atende só Fórmula Animal mas fila contava todos os tickets dele → grupo `FormulaAnimal` com `client_filters: "formula animal"` filtra métricas por `client_name` |
 | 32 | Métricas do grupo FormulaAnimal zeradas no Gestão → Metas | Diego estava em `excluir_metas` → `membros_metas` ficava vazio, todas as métricas eram 0 → removido de `excluir_metas`; equipe alterada para `"FormulaAnimal"` no `_PAINEL_ANALISTAS` |
+| 33 | Painel Analista removido | Substituído pela página Abertos Hoje — mostra chamados do dia com filtro por grupo (Fiscal/Produção/G1/GW) |
