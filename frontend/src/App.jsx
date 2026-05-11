@@ -9,7 +9,7 @@ import Profile from './pages/Profile'
 import Login from './pages/Login'
 import Users from './pages/Users'
 import Gestao from './pages/Gestao'
-import Suporte from './pages/Suporte'
+import AbertosHoje from './pages/AbertosHoje'
 import Tarefas from './pages/Tarefas'
 import ProvedorNFSe from './pages/ProvedorNFSe'
 import Painel from './pages/Painel'
@@ -19,10 +19,10 @@ const PAGE_TRANSITION = { duration: 0.15 }
 
 const ROLE_PAGES = {
   analista:      new Set(['chat', 'tarefas', 'gestao', 'provedor']),
-  backservice:   new Set(['chat', 'suporte', 'tarefas', 'gestao', 'provedor']),
-  fiscal:        new Set(['chat', 'suporte', 'tarefas', 'gestao', 'provedor']),
-  lideres:       new Set(['chat', 'gestao', 'suporte', 'tarefas', 'provedor', 'painel']),
-  administrador: new Set(['chat', 'profile', 'config', 'gestao', 'users', 'suporte', 'tarefas', 'provedor', 'painel']),
+  backservice:   new Set(['chat', 'abertos-hoje', 'tarefas', 'gestao', 'provedor']),
+  fiscal:        new Set(['chat', 'abertos-hoje', 'tarefas', 'gestao', 'provedor']),
+  lideres:       new Set(['chat', 'gestao', 'abertos-hoje', 'tarefas', 'provedor', 'painel']),
+  administrador: new Set(['chat', 'profile', 'config', 'gestao', 'users', 'abertos-hoje', 'tarefas', 'provedor', 'painel']),
 }
 
 function MustChangePasswordModal({ username, onDone }) {
@@ -443,11 +443,11 @@ export default function App() {
                 <Gestao role={session?.role || 'analista'} />
               </motion.div>
             )}
-            {page === 'suporte' && canAccess('suporte') && (
-              <motion.div key="suporte" className="absolute inset-0"
+            {page === 'abertos-hoje' && canAccess('abertos-hoje') && (
+              <motion.div key="abertos-hoje" className="absolute inset-0"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 transition={PAGE_TRANSITION}>
-                <Suporte session={session} />
+                <AbertosHoje />
               </motion.div>
             )}
             {page === 'tarefas' && canAccess('tarefas') && (

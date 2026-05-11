@@ -205,6 +205,9 @@ const api = {
   provedorAtualizarJira: () =>
     instance.post('/provedor/atualizar-jira', {}, { timeout: 60000 }),
 
+  gestaoAbertosHoje: () =>
+    instance.get('/gestao/abertos-hoje'),
+
   // TV auto-login
   tvLogin: (key) =>
     instance.get('/tv-login', { params: { key } }),

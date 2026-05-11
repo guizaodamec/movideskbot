@@ -1,26 +1,26 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { MessageSquare, User, Settings, ChevronLeft, ChevronRight, Users, LogOut, BarChart2, Headphones, KanbanSquare, ShieldAlert, Trophy } from 'lucide-react'
+import { MessageSquare, User, Settings, ChevronLeft, ChevronRight, Users, LogOut, BarChart2, Inbox, KanbanSquare, ShieldAlert, Trophy } from 'lucide-react'
 import ConnectionBadge from './ConnectionBadge'
 
 const ALL_NAV = [
-  { key: 'chat',     label: 'Chat',              icon: MessageSquare },
-  { key: 'suporte',  label: 'Painel Analista',   icon: Headphones    },
-  { key: 'tarefas',  label: 'Tarefas',           icon: KanbanSquare  },
-  { key: 'provedor', label: 'Provedores NFS-e',  icon: ShieldAlert   },
-  { key: 'gestao',   label: 'Gestão',            icon: BarChart2     },
-  { key: 'painel',   label: 'Painel TV',         icon: Trophy        },
-  { key: 'profile',  label: 'Perfil',            icon: User          },
-  { key: 'config',   label: 'Configuração',      icon: Settings      },
-  { key: 'users',    label: 'Usuários',          icon: Users         },
+  { key: 'chat',          label: 'Chat',              icon: MessageSquare },
+  { key: 'abertos-hoje',  label: 'Abertos Hoje',      icon: Inbox         },
+  { key: 'tarefas',       label: 'Tarefas',           icon: KanbanSquare  },
+  { key: 'provedor',      label: 'Provedores NFS-e',  icon: ShieldAlert   },
+  { key: 'gestao',        label: 'Gestão',            icon: BarChart2     },
+  { key: 'painel',        label: 'Painel TV',         icon: Trophy        },
+  { key: 'profile',       label: 'Perfil',            icon: User          },
+  { key: 'config',        label: 'Configuração',      icon: Settings      },
+  { key: 'users',         label: 'Usuários',          icon: Users         },
 ]
 
 const ROLE_PAGES = {
   analista:      new Set(['chat', 'tarefas', 'gestao', 'provedor']),
-  backservice:   new Set(['chat', 'suporte', 'tarefas', 'gestao', 'provedor']),
-  fiscal:        new Set(['chat', 'suporte', 'tarefas', 'gestao', 'provedor']),
-  lideres:       new Set(['chat', 'gestao', 'suporte', 'tarefas', 'provedor', 'painel']),
-  administrador: new Set(['chat', 'profile', 'config', 'gestao', 'users', 'suporte', 'tarefas', 'provedor', 'painel']),
+  backservice:   new Set(['chat', 'abertos-hoje', 'tarefas', 'gestao', 'provedor']),
+  fiscal:        new Set(['chat', 'abertos-hoje', 'tarefas', 'gestao', 'provedor']),
+  lideres:       new Set(['chat', 'gestao', 'abertos-hoje', 'tarefas', 'provedor', 'painel']),
+  administrador: new Set(['chat', 'profile', 'config', 'gestao', 'users', 'abertos-hoje', 'tarefas', 'provedor', 'painel']),
 }
 
 const ROLE_LABELS = {

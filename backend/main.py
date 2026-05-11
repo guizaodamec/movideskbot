@@ -1496,6 +1496,46 @@ def gestao_sync_abertos():
         return _jsonify({'error': str(e)}, 500)
 
 
+@app.route('/api/gestao/abertos-hoje')
+def gestao_abertos_hoje():
+    try:
+        from utils.movidesk_sync import load_cache
+        from utils.gestao_config import get_grupo_for_ticket
+        from datetime import date
+
+        hoje = date.today().isoformat()
+        cache = load_cache()
+        tickets_hoje = [
+            t for t in cache["tickets"].values()
+            if (t.get("createdDate") or "")[:10] == hoje
+        ]
+
+        result = []
+        for t in tickets_hoje:
+            grupo = get_grupo_for_ticket(t)
+            result.append({
+                "id":            t["id"],
+                "subject":       t.get("subject", ""),
+                "status":        t.get("status", ""),
+                "createdDate":   t.get("createdDate", ""),
+                "serviceFirst":  t.get("serviceFirst", ""),
+                "serviceSecond": t.get("serviceSecond", ""),
+                "client_name":   t.get("client_name", ""),
+                "owner_name":    t.get("owner_name", ""),
+                "grupo":         grupo,
+            })
+
+        result.sort(key=lambda x: int(x["id"]) if str(x["id"]).isdigit() else 0, reverse=True)
+
+        grupos = ["Fiscal", "Producao", "G1", "GW"]
+        contagem = {g: sum(1 for t in result if t["grupo"] == g) for g in grupos}
+        contagem["outros"] = sum(1 for t in result if t["grupo"] not in grupos)
+
+        return _jsonify({"tickets": result, "total": len(result), "contagem": contagem, "data": hoje})
+    except Exception as e:
+        return _jsonify({'error': str(e)}, 500)
+
+
 @app.route('/api/gestao/duplicados')
 def gestao_duplicados():
     try:
