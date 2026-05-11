@@ -895,6 +895,134 @@ Issues criadas em 24/04/2026 referentes à sessão de melhorias da FarmaBot:
 
 ---
 
+## Módulo Versões de Clientes
+
+Acessível por **todos os roles**. Ícone: `PackageCheck` no menu lateral (key `versoes`).
+
+**Objetivo:** Visualizar em qual versão do FarmaFácil cada cliente está, comparando com a versão mais recente lançada.
+
+### Fonte de dados
+
+- Banco **Avalon** (192.168.0.81:5432) — **somente leitura** (`default_transaction_read_only=on`)
+- Tabela `versao_atualizacao`: versão mais recente de cada cliente (`DISTINCT ON id_cliente ORDER BY data_atualizacao DESC`)
+- Tabela `versao`: versão mais recente lançada (`fechado = true ORDER BY id DESC LIMIT 1`)
+- Tabela `cliente`: nome, cidade, estado, `inativo_cliente`
+- Credenciais: `sistema` / `sistemafarmafacil123` (mesmas do FarmaFácil)
+
+### Endpoints
+
+| Rota | Método | Descrição |
+|---|---|---|
+| `GET /api/versoes-clientes` | GET | Lista clientes + versão atual + distribuição por versão. Cache 5 min |
+| `POST /api/versoes-clientes/atualizar` | POST | Invalida cache (não modifica banco) |
+
+### Frontend (`frontend/src/pages/VersaoClientes.jsx`)
+
+- 3 stat cards: Total monitorado / Na versão atual / Desatualizados
+- Busca por nome, cidade ou estado
+- Dropdown de filtro por versão (com contagem)
+- Tabela com colorização:
+  - Verde — versão atual
+  - Amarelo — 1–2 versões atrás
+  - Laranja — 3–5 versões atrás
+  - Vermelho — muito defasado
+
+### Arquivos relevantes
+
+```
+backend/main.py              → _avalon_conn(), rotas /api/versoes-clientes*
+frontend/src/pages/VersaoClientes.jsx
+frontend/src/api/backend.js  → versoesClientes(), versoesClientesAtualizar()
+```
+
+---
+
+## Extensão Chrome/Edge — Contexto no Movidesk
+
+Extensão que injeta um painel lateral em qualquer chamado aberto no Movidesk, mostrando contexto completo do cliente sem sair da página.
+
+**Instalação (por máquina, uma vez):**
+1. Abrir `chrome://extensions` ou `edge://extensions`
+2. Ativar **Modo do desenvolvedor**
+3. **Carregar sem compactação** → selecionar `erp_assistant/extensao/`
+4. Clicar no ícone ⚕ → fazer login com usuário/senha do assistente
+
+### Arquitetura
+
+```
+prismafive.movidesk.com/Ticket/Edit/{id}
+        |
+        | chrome.runtime.sendMessage
+        v
+background.js (service worker)
+        |
+        | fetch com Bearer token
+        v
+Flask  GET /api/cliente-contexto?ticket_id={id}
+        |
+        |-- Movidesk API  → client_name, status, analista, categoria
+        |-- Avalon DB     → versão atual do cliente (somente leitura)
+        |-- movidesk_tickets.json → chamados abertos da mesma categoria
+        |-- ACBr INI cache → provedor NFS-e do município
+```
+
+### Endpoint backend
+
+`GET /api/cliente-contexto?ticket_id=N`
+
+- **Auth:** Bearer token (igual ao frontend React)
+- **Cache:** 2 minutos por ticket_id
+- **Retorna:**
+  ```json
+  {
+    "ticket":   { id, assunto, status, urgencia, categoria, analista, cliente },
+    "versao":   { encontrado, versao, versoes_atrasado, ultima_atualizacao, cidade, estado },
+    "chamados_abertos": [ { id, assunto, status, categoria, data, analista } ],
+    "nfse":     { secao_id, provedor, municipio, uf, campos_raw, github_url }
+  }
+  ```
+
+### Painel lateral — seções
+
+| Seção | Conteúdo |
+|---|---|
+| Chamado | Status, analista, categoria do chamado atual |
+| Versão do Cliente | Versão no Avalon, quantas versões atrás, data da última atualização, barra visual |
+| NFS-e | Bloco INI fiel ao ACBr (`[ID]`, `Nome=`, `Provedor=`, `ProRecepcionar=` etc.) com URLs clicáveis |
+| Chamados em aberto | Últimos 5 chamados abertos do mesmo cliente **na mesma categoria** do chamado atual |
+
+### Regras de negócio
+
+- Chamados filtrados: `status` não em `{5 - Resolvido, 6 - Fechado, 6 - Cancelado}` **e** `serviceFirstLevel == categoria do ticket atual`
+- NFS-e: lookup por `_norm_mun(cidade)` no cache do ACBr INI (24h) — exibe todos os campos com case original
+- Versão: `default_transaction_read_only=on` no Avalon — nunca escreve
+
+### Arquivos relevantes
+
+```
+extensao/
+├── manifest.json    → MV3, host_permissions: movidesk.com + 192.168.0.118:5000
+├── background.js    → fetch autenticado ao Flask, chrome.storage.local para token
+├── content.js       → injeção do painel, renderização, detecção SPA
+├── content.css      → dark theme, ff-ini-block (fonte mono), badges de versão
+├── popup.html/js/css → login/logout
+└── INSTALAR.md      → guia de instalação
+
+backend/main.py      → _fetch_ticket_by_id(), _avalon_versao_cliente(),
+                       _tickets_recentes_cliente(nome, categoria, limite),
+                       _STATUS_FECHADO, /api/cliente-contexto
+```
+
+### Notas técnicas
+
+- O content script só roda em `https://prismafive.movidesk.com/Ticket/Edit/*`
+- Detecta navegação SPA via `MutationObserver` (Movidesk é SPA)
+- O token fica em `chrome.storage.local` — expira ao reiniciar o backend Flask
+- Se o IP do servidor mudar: editar `background.js` linha 1 (`const SERVER = ...`)
+- `_fetch_acbr_ini()` captura `campos_raw` (lista ordenada de tuplas `[key_original, valor]`) e `secao_id` para exibição fiel ao arquivo
+
+---
+
 ## Bugs Corrigidos (histórico)
 
 | # | Problema | Fix |
