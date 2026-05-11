@@ -1596,6 +1596,15 @@ def gestao_auditoria_contato():
             client = (((t.get("clients") or [{}])[0]).get("businessName") or "").strip()
             fechado_em = ((t.get("resolvedIn") or t.get("closedIn") or t.get("lastUpdate") or ""))[:10]
 
+            # Resolução legítima: analista usou a macro mas depois conseguiu contato
+            # e encerrou com "9 - Resolvido Ticket - sem artigo" → não é violação
+            service_text = " ".join([
+                (t.get("serviceFirstLevel") or "").lower(),
+                (t.get("serviceSecondLevel") or "").lower(),
+            ])
+            if "resolvido ticket - sem artigo" in service_text:
+                continue
+
             tipo  = None
             label = None
 
